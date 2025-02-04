@@ -12,5 +12,10 @@ Hi, ito steps for github
     <----pagkatapos pindutin mo source control sa tabi (or ctrl+shift+g)
 
     diyan pwede ka na mag commit(need ng message bago commit) at mag push and pull
+    -> pindutin mo muna 'stage changes' tapos tsaka ka maglagay commit message tas commit
+
+    --IMPORTANT--
     PUSH - kapag iuupdate mo yung nasa github
     PULL - kapag kukunin mo yung nasa github
+
+    baka mag push ka ng di naupdate na code!!
