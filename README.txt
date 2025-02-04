@@ -13,6 +13,7 @@ Hi, ito steps for github
 
     diyan pwede ka na mag commit(need ng message bago commit) at mag push and pull
     -> pindutin mo muna 'stage changes' tapos tsaka ka maglagay commit message tas commit
+    tapos push and sync
 
     --IMPORTANT--
     PUSH - kapag iuupdate mo yung nasa github
