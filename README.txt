@@ -1,7 +1,8 @@
-Hi, ito steps for github
-1. sign in ka muna sa github of course, both sa website at sa device mong gamit
-    of course kailangan nakainstall git sa computer mo. Kapag naka install type mo
-    ito sa console kapag wala ka pa.
+Hi, ito steps for setting up github, very important na sundan step by step:
+
+--INITIALIZING--
+1.  Gawa ka github account kapag wala ka pa
+   V-- after that, type mo to sa terminal ng visual studio --V
 
     git config --global user.email "you@example.com"
     git config --global user.name "Your UserName"
@@ -12,8 +13,9 @@ Hi, ito steps for github
     <----pagkatapos pindutin mo source control sa tabi (or ctrl+shift+g)
 
     diyan pwede ka na mag commit(need ng message bago commit) at mag push and pull
-    -> pindutin mo muna 'stage changes' tapos tsaka ka maglagay commit message tas commit
-    tapos push and sync
+    -> pindutin mo muna 'stage changes' 
+    -> tapos tsaka ka maglagay commit message tas pindutin mo commit
+    -> tapos push and sync
 
     --IMPORTANT--
     PUSH - kapag iuupdate mo yung nasa github
