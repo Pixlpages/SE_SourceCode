@@ -21,4 +21,4 @@ Hi, ito steps for setting up github, very important na sundan step by step:
     PUSH - kapag iuupdate mo yung nasa github
     PULL - kapag kukunin mo yung nasa github
 
-    baka mag push ka ng di naupdate na code!!
+    baka mag push ka ng di naupdate na code!!ff
