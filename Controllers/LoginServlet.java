@@ -1,4 +1,5 @@
 package Controllers;
+
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,7 +16,6 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         
-
         // Hardcoded credentials (Replace with database check in production)
         if ("admin".equals(username) && "adminpass".equals(password)) {
             response.sendRedirect("Admin.html");  // Redirect Admin
