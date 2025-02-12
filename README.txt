@@ -14,7 +14,7 @@ Hi, ito steps for setting up github, very important na sundan step by step:
 
     diyan pwede ka na mag commit(need ng message bago commit) at mag push and pull
     -> pindutin mo muna 'stage changes' 
-    -> tapos tsaka ka maglagay commit message tas pindutin mo commit
+    -> tapos tsaka ka maglagay commit message(required) tas pindutin mo commit
     -> tapos push and sync
 
     --IMPORTANT--
