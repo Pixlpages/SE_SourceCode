@@ -7,7 +7,7 @@ Hi, ito steps for github
     git config --global user.name "Your UserName"
 
 2. Next kapag wala pa ikaw kahit ano type mo sa taas
-    >git: Clone https://github.com/Pixlpages/SE_SourceCode.git
+    > git: Clone https://github.com/Pixlpages/SE_SourceCode.git
 
     <----pagkatapos pindutin mo source control sa tabi (or ctrl+shift+g)
 
