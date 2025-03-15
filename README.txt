@@ -1,5 +1,12 @@
 Hi, ito steps for setting up github, very important na sundan step by step:
 
+--Download Git--
+1. -> Kapag wala kapang git na naka lagay sa pc mo; https://git-scm.com/downloads
+2. -> kapag na install mo na yung .exe, punta ka 'System Properties' sa pc mo then 'Edit System Variables', pwede mo diretso search yan sa pc mo
+3. -> Sa Environment Variables window, dun sa System variables, hanapin mo 'Path' then edit.
+4. -> pindutin mo 'New' tapos lagay mo yung file path ng git na ininstall mo from the .exe; ganto itsura(C:\Program Files\Git\cmd)
+5. -> to check, type mo sa cmd, 'git version'
+
 --INITIALIZING--
 1. -> Gawa ka github account kapag wala ka pa
 2. -> after that, type mo to sa terminal ng visual studio
@@ -11,7 +18,7 @@ Hi, ito steps for setting up github, very important na sundan step by step:
 
 3. -> Next type mo to sa search sa taas ng visual studio
 
-    >Git: Clone 
+    '>Git: Clone' 
 
    -> tapos type mo ito sa "Provide repository URL"
 
