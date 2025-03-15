@@ -18,7 +18,7 @@ Hi, ito steps for setting up github, very important na sundan step by step:
 
 3. -> Next type mo to sa search sa taas ng visual studio
 
-    >Git: Clone 
+    '>Git: Clone' 
 
    -> tapos type mo ito sa "Provide repository URL"
 
