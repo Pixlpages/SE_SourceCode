@@ -2,13 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "msedge", // Specifies Microsoft Edge as the browser
-            "request": "launch", // Launches a new browser instance
-            "name": "Open Ahome.html", // Name of the configuration
-            "file": "${workspaceFolder}/Ahome.html", // Path to your HTML file
-            "runtimeExecutable": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", // Path to Edge executable
-            "runtimeArgs": ["--remote-debugging-port=9222"], // Enables remote debugging
-            "webRoot": "${workspaceFolder}" // Sets the root folder for debugging
+            "type": "msedge",
+            "request": "launch",
+            "name": "Open LandingPage.html",
+            "file": "${workspaceFolder}/Web/LandingPage.html",
+            "runtimeExecutable": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+            "runtimeArgs": ["--remote-debugging-port=9222"],
+            "webRoot": "${workspaceFolder}"
         }
     ]
 }

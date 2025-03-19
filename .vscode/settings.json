@@ -15,5 +15,21 @@
             "connectionTimeout": 30,
             "askForPassword": true
         }
-    ]
+    ],
+    "local-tomcat.tomcatInstances": [
+        {
+            "name": "tomcat-9",
+            "catalinaHome": "C:\\apache-tomcat-9.0.102",
+            "deploymentPort": 8080,
+            "javaHome": "C:\\Program Files\\Java\\jdk1.8.0_202",
+            "logs": [
+                {
+                    "name": "catalina",
+                    "path": "C:\\apache-tomcat-9.0.102\\logs\\catalina.out"
+                }
+            ]
+        }
+    ],
+    "local-tomcat.warDir": "C:\\Users\\Lenovo\\Documents\\Software Eng\\SE_SourceCode",
+    "local-tomcat.terminalMode": true
 }
