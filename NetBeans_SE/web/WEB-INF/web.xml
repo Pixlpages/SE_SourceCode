@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee           http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
-    <!-- Login Servlet Mapping -->
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>Controllers.LoginServlet</servlet-class>
     </servlet>
-    <!-- Logout Servlet Mapping -->
     <servlet>
         <servlet-name>LogoutServlet</servlet-name>
         <servlet-class>Controllers.LogoutServlet</servlet-class>
     </servlet>
-    <!-- Default Welcome Page -->
     <welcome-file-list>
         <welcome-file>LandingPage.jsp</welcome-file>
     </welcome-file-list>
-    <!-- Session Configuration -->
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/LoginServlet</url-pattern>
@@ -25,6 +21,13 @@
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
-        <!-- Session expires after 30 minutes of inactivity -->
     </session-config>
+    <error-page>
+        <exception-type>CredentialsError</exception-type>
+        <location>/error_credentials.jsp</location>
+    </error-page>
+    <error-page>
+        <exception-type>SessionError</exception-type>
+        <location>/error_session.jsp</location>
+    </error-page>
 </web-app>

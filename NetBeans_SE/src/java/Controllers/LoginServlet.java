@@ -25,13 +25,13 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("role", "admin");  // Store role in session
             session.setAttribute("LoggedIn", true);
             response.sendRedirect("Ahome.jsp");  // Redirect Admin
-        } else if ("staff".equals(username) && "staffpass".equals(password)) {
+        } else if ("staff".equals(username) && "123".equals(password)) {
             session.setAttribute("username", username);
             session.setAttribute("role", "staff");
             session.setAttribute("LoggedIn", true);
             response.sendRedirect("Bhome.jsp");  // Redirect Staff
         } else {
-            response.sendRedirect("login.html?error=1");  // Redirect back with error
+            response.sendRedirect("error_credentials.jsp");  // Redirect back with error
         }
     }
 }

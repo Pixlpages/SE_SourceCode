@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<%@ page session="true" %>
+<%
+    // Prevent browser caching
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setHeader("Expires", "0");
+
+    // If the user comes back using the Back button, set LoggedIn to false
+    session.setAttribute("LoggedIn", false);
+%>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
