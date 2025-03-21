@@ -3,19 +3,34 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
          http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" 
          version="3.1">
-         
+    
+    <!-- Login Servlet Mapping -->
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>Controllers.LoginServlet</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
-        <url-pattern>/login</url-pattern>
+        <url-pattern>/Login</url-pattern>
     </servlet-mapping>
 
+    <!-- Logout Servlet Mapping -->
+    <servlet>
+        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-class>Controllers.LogoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LogoutServlet</servlet-name>
+        <url-pattern>/Logout</url-pattern>
+    </servlet-mapping>
+
+    <!-- Default Welcome Page -->
     <welcome-file-list>
         <welcome-file>LandingPage.html</welcome-file>
     </welcome-file-list>
 
+    <!-- Session Configuration -->
+    <session-config>
+        <session-timeout>30</session-timeout>  <!-- Session expires after 30 minutes of inactivity -->
+    </session-config>
 </web-app>
