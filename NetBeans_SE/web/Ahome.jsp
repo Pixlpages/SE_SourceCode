@@ -256,21 +256,17 @@
             <section class="card" aria-labelledby="add-items-title">
                 <h3 id="add-items-title">Add Items</h3>
                 <ul>
-                    <li><a href="#" onclick="// Backend: Add item quantity">Add Items Quantity</a></li>
-                    <!-- Backend: Implement add item quantity functionality here -->
-                    <li><a href="#" onclick="// Backend: Include to inventory">Include to Inventory</a></li>
-                    <!-- Backend: Implement include to inventory functionality here -->
+                    <li><a href="AdminActionsServlet?action=increasequantity">Add Items Quantity</a></li>
+                    <li><a href="AdminActionsServlet?action=newproduct">Include to Inventory</a></li>
                     <li><a href="#" onclick="// Backend: Edit item info">Edit Item Information</a></li>
-                    <!-- Backend: Implement edit item information functionality here -->
                 </ul>
             </section>
 
-            <!-- Deliver Items Card -->
+            <!-- Distribute Items Card -->
             <section class="card" aria-labelledby="deliver-items-title">
-                <h3 id="deliver-items-title">Deliver Items</h3>
+                <h3 id="deliver-items-title">Distribute Items</h3>
                 <ul>
-                    <li><a href="#" onclick="// Backend: Search item name/code">Search Item Name/Code</a></li>
-                    <!-- Backend: Implement search item functionality here -->
+                    <li><a href="AdminActionsServlet?action=distribute">Search Item Name/Code</a></li>
                 </ul>
             </section>
 
@@ -280,8 +276,7 @@
                 <ul>
                     <li><a href="#" onclick="// Backend: View items report">View Items</a></li>
                     <!-- Backend: Implement view items report functionality here -->
-                    <li><a href="#" onclick="// Backend: Manage defective items">Manage Defective Items</a></li>
-                    <!-- Backend: Implement manage defective items functionality here -->
+                    <li><a href="AdminActionsServlet?action=managedefective">Manage Defective Items</a></li>
                 </ul>
             </section>
         </div>
