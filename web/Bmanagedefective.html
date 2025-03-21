@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Defective Items</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .header {
+            background-color: #3399aa;
+            color: white;
+            padding: 15px;
+            font-size: 20px;
+        }
+        .back {
+            padding: 10px;
+            color: black;
+            cursor: pointer;
+            display: block;
+        }
+        .container {
+            padding: 20px;
+            background: white;
+            display: flex;
+            gap: 20px;
+            justify-content: space-around;
+        }
+        .box {
+            background: #e8e3f1;
+            padding: 15px;
+            border-radius: 10px;
+            width: 40%;
+        }
+        .input-field, select, button {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+        }
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .items-list {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">MV88 Ventures Inventory System</div>
+    <div class="back">&larr; back</div>
+    <div class="container">
+        <div class="box">
+            <h3>Search Item Name/Code</h3>
+            <input type="text" id="search" class="input-field" placeholder="Search..." onkeyup="searchItems()">
+            <div id="searchResults" class="items-list"></div>
+            <label>Amount of Defective Items</label>
+            <input type="number" class="input-field" min="0" max="99999">
+            <label>Reason</label>
+            <select class="input-field">
+                <option>Reason 1</option>
+                <option>Reason 2</option>
+            </select>
+            <button onclick="addToList()">Add to List</button>
+        </div>
+        <div class="box">
+            <h3>List of Items to Mark as Defective</h3>
+            <div id="defectiveList" class="items-list"></div>
+            <div class="checkbox">
+                <input type="checkbox" id="confirm">
+                <label for="confirm">Confirm Items</label>
+            </div>
+            <button>Mark As Defective</button>
+        </div>
+    </div>
+
+    <script>
+        function searchItems() {
+            let searchQuery = document.getElementById('search').value;
+            fetch('/api/get-items?q=' + searchQuery)
+                .then(response => response.json())
+                .then(data => {
+                    let resultsDiv = document.getElementById('searchResults');
+                    resultsDiv.innerHTML = '';
+                    data.forEach(item => {
+                        let div = document.createElement('div');
+                        div.innerText = item.name;
+                        div.onclick = () => selectItem(item);
+                        resultsDiv.appendChild(div);
+                    });
+                });
+        }
+
+        function selectItem(item) {
+            document.getElementById('search').value = item.name;
+        }
+
+        function addToList() {
+            let itemName = document.getElementById()
+        }
