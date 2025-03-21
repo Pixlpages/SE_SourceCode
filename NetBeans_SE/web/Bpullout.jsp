@@ -89,7 +89,7 @@
     <div class="container">
         <div class="content-wrapper">
             <div class="welcome">
-                Welcome <span style="color: gray;">●</span> Tagaytay Staff
+                Welcome <span style="color: gray;">?</span> Tagaytay Staff
             </div>
             <div class="question">
                 What would you like to access?

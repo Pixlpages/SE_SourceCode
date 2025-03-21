@@ -12,7 +12,7 @@
     </servlet>
     <!-- Default Welcome Page -->
     <welcome-file-list>
-        <welcome-file>LandingPage.html</welcome-file>
+        <welcome-file>LandingPage.jsp</welcome-file>
     </welcome-file-list>
     <!-- Session Configuration -->
     <servlet-mapping>
