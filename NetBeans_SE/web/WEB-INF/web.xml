@@ -11,6 +11,10 @@
     <welcome-file-list>
         <welcome-file>LandingPage.jsp</welcome-file>
     </welcome-file-list>
+    <servlet>
+        <servlet-name>AdminActionsServlet</servlet-name>
+        <servlet-class>Controllers.AdminActionsServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/LoginServlet</url-pattern>
@@ -18,6 +22,10 @@
     <servlet-mapping>
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/LogoutServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminActionsServlet</servlet-name>
+        <url-pattern>/AdminActionsServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
