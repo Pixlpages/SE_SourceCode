@@ -11,12 +11,21 @@
             margin: 0;
             padding: 0;
         }
-        header {
-            background-color: #4a90e2;
+        .header {
+            background-color: #5cb5c9;
             color: white;
-            padding: 10px;
+            padding: 20px;
             text-align: center;
-            font-size: 24px;
+        }
+        .sub-header {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .sub-header a {
+            text-decoration: none;
+            color: black;
+            margin-right: 10px;
         }
         .container {
             display: flex;
@@ -45,8 +54,8 @@
             padding: 5px;
             font-size: 16px;
         }
-        .search-bar button {
-            background-color: #4a90e2;
+        .da_button {
+            background-color: #5cb5c9;
             color: white;
             border: none;
             padding: 10px;
@@ -89,25 +98,20 @@
         .confirm-add input {
             margin-right: 10px;
         }
-        .add-button {
-            background-color: #4a90e2;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
-    <header>
-        MV88 Ventures Inventory System
-    </header>
+    <div class="header">
+        <h1>MV88 Ventures Inventory System</h1>
+    </div>
+    <div class="sub-header">
+        <a href="Ahome.jsp">&#8592; back</a>
+    </div>
     <div class="container">
         <div class="left-side">
             <div class="search-bar">
                 <input type="text" placeholder="Search Item Name/Code">
-                <button>Search</button>
+                <button class="da_button">Search</button>
             </div>
             <div class="items-list">
                 <h3>Items Code</h3>
@@ -124,7 +128,7 @@
             <div class="amount-location">
                 <h5>Amount to Add</h5>
                 <input type="number" placeholder="0-99999">
-                <button>Add to List</button>
+                <button class="da_button">Add to List</button>
             </div>
         </div>
         <div class="right-side">
@@ -147,7 +151,7 @@
                 <input type="checkbox" id="confirm-items">
                 <label for="confirm-items">Confirm Items</label>
             </div>
-            <button class="add-button">Add Items</button>
+            <button class="da_button">Add Items</button>
         </div>
     </div>
 </body>

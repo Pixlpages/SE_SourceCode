@@ -9,13 +9,23 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: #f5f5f5;
         }
         .header {
-            background-color: #3399aa;
+            background-color: #5cb5c9;
             color: white;
-            padding: 15px;
-            font-size: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+        .sub-header {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .sub-header a {
+            text-decoration: none;
+            color: black;
+            margin-right: 10px;
         }
         .back {
             padding: 10px;
@@ -25,7 +35,7 @@
         }
         .container {
             padding: 20px;
-            background: white;
+            background: #f5f5f5;
             display: flex;
             gap: 30px;
             justify-content: space-around;
@@ -44,15 +54,13 @@
             border-radius: 8px;
             border: 1px solid #ccc;
         }
-        button {
-            background-color: #6200ea;
+        .da_button {
+            background-color: #5cb5c9;
             color: white;
             border: none;
+            padding: 10px;
+            border-radius: 5px;
             cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #3700b3;
         }
         .checkbox {
             display: flex;
@@ -83,8 +91,12 @@
     </style>
 </head>
 <body>
-    <div class="header">MV88 Ventures Inventory System</div>
-    <div class="back">&larr; back</div>
+    <div class="header">
+        <h1>MV88 Ventures Inventory System</h1>
+    </div>
+    <div class="sub-header">
+        <a href="Bhome.jsp">&#8592; back</a>
+    </div>
     <div class="container">
         <div class="box">
             <h3>Search Item Name/Code</h3>
@@ -97,7 +109,7 @@
                 <option>Reason 1</option>
                 <option>Reason 2</option>
             </select>
-            <button onclick="addToList()">Add to List</button>
+            <button class="da_button" onclick="addToList()">Add to List</button>
         </div>
         <div class="box">
             <h3>List of Items to Mark as Defective</h3>
@@ -106,7 +118,7 @@
                 <input type="checkbox" id="confirm">
                 <label for="confirm">Confirm Items</label>
             </div>
-            <button>Mark As Defective</button>
+            <button class="da_button">Mark As Defective</button>
         </div>
     </div>
 

@@ -15,6 +15,10 @@
         <servlet-name>AdminActionsServlet</servlet-name>
         <servlet-class>Controllers.AdminActionsServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>StaffActionsServlet</servlet-name>
+        <servlet-class>Controllers.StaffActionsServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/LoginServlet</url-pattern>
@@ -26,6 +30,10 @@
     <servlet-mapping>
         <servlet-name>AdminActionsServlet</servlet-name>
         <url-pattern>/AdminActionsServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StaffActionsServlet</servlet-name>
+        <url-pattern>/StaffActionsServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

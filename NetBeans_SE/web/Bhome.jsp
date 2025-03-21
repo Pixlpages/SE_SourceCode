@@ -145,7 +145,7 @@
 
         .card ul li a {
             text-decoration: none;
-            color: #007bff;
+            color: #5cb5c9;
             transition: color 0.3s ease;
         }
 
@@ -155,7 +155,7 @@
 
         .card ul li::before {
             content: "\25BA \0020"; /* Triangle bullet */
-            color: #007bff;
+            color: #5cb5c9;
         }
 
         .header-right-container {
@@ -203,23 +203,13 @@
     <script>
         // Real-time date and time script
         function updateDateTime() {
-            const dateElement = document.getElementById("current-date");
-            const timeElement = document.getElementById("current-time");
             const now = new Date();
-
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, "0");
-            const day = String(now.getDate()).padStart(2, "0");
-            dateElement.textContent = `${year}-${month}-${day}`;
-
-            const hours = String(now.getHours()).padStart(2, "0");
-            const minutes = String(now.getMinutes()).padStart(2, "0");
-            const seconds = String(now.getSeconds()).padStart(2, "0");
-            timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+            document.getElementById("current-date").textContent = now.toISOString().split("T")[0];
+            document.getElementById("current-time").textContent = now.toLocaleTimeString();
         }
 
         setInterval(updateDateTime, 1000);
-        window.onload = updateDateTime;
+        updateDateTime();
     </script>
 </head>
 <body>
@@ -255,8 +245,7 @@
             <section class="card" aria-labelledby="receive-items-title">
                 <h3 id="receive-items-title">Receive Items</h3>
                 <ul>
-                    <li><a href="#" onclick="// Backend: Recent shipments">Recent Shipments</a></li>
-                    <!-- Backend: Implement recent shipments functionality here -->
+                    <li><a href="StaffActionsServlet?action=receive">Recent Shipments</a></li>
                 </ul>
             </section>
 
@@ -264,8 +253,7 @@
             <section class="card" aria-labelledby="pullout-items-title">
                 <h3 id="pullout-items-title">Pullout Items</h3>
                 <ul>
-                    <li><a href="#" onclick="// Backend: Search item name/code">Search Item Name/Code</a></li>
-                    <!-- Backend: Implement search item functionality here -->
+                    <li><a href="StaffActionsServlet?action=pull">Search Item Name/Code</a></li>
                 </ul>
             </section>
 
@@ -273,10 +261,8 @@
             <section class="card" aria-labelledby="reports-title">
                 <h3 id="reports-title">Reports</h3>
                 <ul>
-                    <li><a href="#" onclick="// Backend: View items report">View Items</a></li>
-                    <!-- Backend: Implement view items report functionality here -->
-                    <li><a href="#" onclick="// Backend: Manage defective items">Manage Defective Items</a></li>
-                    <!-- Backend: Implement manage defective items functionality here -->
+                    <li><a href="StaffActionsServlet?action=view">View Items</a></li>
+                    <li><a href="StaffActionsServlet?action=manage">Manage Defective Items</a></li>
                 </ul>
             </section>
         </div>

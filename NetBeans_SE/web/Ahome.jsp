@@ -146,7 +146,7 @@
 
         .card ul li a {
             text-decoration: none;
-            color: #007bff;
+            color: #5cb5c9;
             transition: color 0.3s ease;
         }
 
@@ -156,7 +156,7 @@
 
         .card ul li::before {
             content: "\25BA \0020"; /* Triangle bullet */
-            color: #007bff;
+            color: #5cb5c9;
         }
 
         .header-right-container {
@@ -164,7 +164,7 @@
             flex-direction: column;
             align-items: flex-end;
         }
-
+        
         .content-right {
             align-self: flex-end;
             text-align: right;
@@ -204,23 +204,13 @@
     <script>
         // Real-time date and time script
         function updateDateTime() {
-            const dateElement = document.getElementById("current-date");
-            const timeElement = document.getElementById("current-time");
             const now = new Date();
-
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, "0");
-            const day = String(now.getDate()).padStart(2, "0");
-            dateElement.textContent = `${year}-${month}-${day}`;
-
-            const hours = String(now.getHours()).padStart(2, "0");
-            const minutes = String(now.getMinutes()).padStart(2, "0");
-            const seconds = String(now.getSeconds()).padStart(2, "0");
-            timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+            document.getElementById("current-date").textContent = now.toISOString().split("T")[0];
+            document.getElementById("current-time").textContent = now.toLocaleTimeString();
         }
 
         setInterval(updateDateTime, 1000);
-        window.onload = updateDateTime;
+        updateDateTime();
     </script>
 </head>
 <body>
@@ -258,7 +248,7 @@
                 <ul>
                     <li><a href="AdminActionsServlet?action=increasequantity">Add Items Quantity</a></li>
                     <li><a href="AdminActionsServlet?action=newproduct">Include to Inventory</a></li>
-                    <li><a href="#" onclick="// Backend: Edit item info">Edit Item Information</a></li>
+                    <li><a href="" onclick="// Backend: Edit item info">Edit Item Information</a></li>
                 </ul>
             </section>
 
@@ -274,7 +264,7 @@
             <section class="card" aria-labelledby="reports-title">
                 <h3 id="reports-title">Reports</h3>
                 <ul>
-                    <li><a href="#" onclick="// Backend: View items report">View Items</a></li>
+                    <li><a href="" onclick="// Backend: View items report">View Items</a></li>
                     <!-- Backend: Implement view items report functionality here -->
                     <li><a href="AdminActionsServlet?action=managedefective">Manage Defective Items</a></li>
                 </ul>

@@ -1,4 +1,20 @@
 <!DOCTYPE html>
+<%@ page session="true" %>
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setHeader("Expires", "0"); // Proxies
+
+    // Session validation
+    String username = (String) session.getAttribute("username");
+    String role = (String) session.getAttribute("role");
+    Boolean loggedIn = (Boolean) session.getAttribute("LoggedIn");
+
+    if (loggedIn == null || !loggedIn || !"admin".equals(role)) {
+        response.sendRedirect("error_session.jsp"); // Redirect unauthorized users
+    }
+%>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,13 +28,12 @@
             background-color: #f5f5f5;
         }
         .header {
-            background-color: #4db6ac;
+            background-color: #5cb5c9;
             color: white;
             padding: 20px;
             text-align: center;
         }
         .sub-header {
-            background-color: #f8bbd0;
             padding: 10px;
             display: flex;
             align-items: center;
@@ -56,11 +71,11 @@
         .left-side label {
             margin-right: 20px;
         }
-        .left-side button {
-            background-color: #4db6ac;
+        .da_button {
+            background-color: #5cb5c9;
             color: white;
-            padding: 10px 20px;
             border: none;
+            padding: 10px;
             border-radius: 5px;
             cursor: pointer;
         }
@@ -84,14 +99,6 @@
         .right-side input[type="checkbox"] {
             margin-right: 10px;
         }
-        .right-side button {
-            background-color: #4db6ac;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -99,7 +106,7 @@
         <h1>MV88 Ventures Inventory System</h1>
     </div>
     <div class="sub-header">
-        <a href="#">&#8592; back</a>
+        <a href="Ahome.jsp">&#8592; back</a>
     </div>
     <div class="container">
         <div class="left-side">
@@ -119,7 +126,7 @@
                 <!-- Add more categories as needed -->
             </select>
             <input type="text" placeholder="0-99999">
-            <button>Add to List</button>
+            <button class="da_button">Add to List</button>
         </div>
         <div class="right-side">
             <h3>Items to Include</h3>

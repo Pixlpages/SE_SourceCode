@@ -11,12 +11,21 @@
             margin: 0;
             padding: 0;
         }
-        header {
-            background-color: #4a90e2;
+        .header {
+            background-color: #5cb5c9;
             color: white;
-            padding: 10px;
+            padding: 20px;
             text-align: center;
-            font-size: 24px;
+        }
+        .sub-header {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .sub-header a {
+            text-decoration: none;
+            color: black;
+            margin-right: 10px;
         }
         .container {
             display: flex;
@@ -45,8 +54,8 @@
             padding: 5px;
             font-size: 16px;
         }
-        .search-bar button {
-            background-color: #4a90e2;
+        .da_button {
+            background-color: #5cb5c9;
             color: white;
             border: none;
             padding: 10px;
@@ -89,25 +98,20 @@
         .confirm-distribute input {
             margin-right: 10px;
         }
-        .distribute-button {
-            background-color: #4a90e2;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
-    <header>
-        MV88 Ventures Inventory System
-    </header>
+    <div class="header">
+        <h1>MV88 Ventures Inventory System</h1>
+    </div>
+    <div class="sub-header">
+        <a href="Ahome.jsp">&#8592; back</a>
+    </div>
     <div class="container">
         <div class="left-side">
             <div class="search-bar">
                 <input type="text" placeholder="Search Item Name/Code">
-                <button>Search</button>
+                <button class="da_button">Search</button>
             </div>
             <div class="items-list">
                 <h3>Items Code</h3>
@@ -127,7 +131,7 @@
                     <option>Location 1</option>
                     <!-- Add more locations as needed -->
                 </select>
-                <button>Add to List</button>
+                <button class="da_button">Add to List</button>
             </div>
         </div>
         <div class="right-side">
@@ -150,7 +154,7 @@
                 <input type="checkbox" id="confirm-items-out">
                 <label for="confirm-items-out">Confirm Items Out</label>
             </div>
-            <button class="distribute-button">Distribute</button>
+            <button class="da_button">Distribute</button>
         </div>
     </div>
 </body>

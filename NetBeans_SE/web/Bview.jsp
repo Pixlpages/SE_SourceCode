@@ -9,23 +9,27 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: #f5f5f5;
         }
         .header {
-            background-color: #3399aa;
+            background-color: #5cb5c9;
             color: white;
-            padding: 15px;
-            font-size: 20px;
+            padding: 20px;
+            text-align: center;
         }
-        .back {
+        .sub-header {
             padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .sub-header a {
+            text-decoration: none;
             color: black;
-            cursor: pointer;
-            display: block;
+            margin-right: 10px;
         }
         .container {
             padding: 15px;
-            background: white;
+            background: #f5f5f5;
         }
         .reports {
             display: flex;
@@ -66,8 +70,12 @@
     </style>
 </head>
 <body>
-    <div class="header">MV88 Ventures Inventory System</div>
-    <div class="back">&larr; back</div>
+    <div class="header">
+        <h1>MV88 Ventures Inventory System</h1>
+    </div>
+    <div class="sub-header">
+        <a href="Bhome.jsp">&#8592; back</a>
+    </div>
     <div class="container">
         <h2>View Reports</h2>
         <div class="reports">
