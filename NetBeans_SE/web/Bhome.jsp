@@ -24,6 +24,7 @@
     <style>
         /* General Styles */
         body {
+            font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
@@ -33,20 +34,25 @@
 
         /* Header Styles */
         .header {
-            background-color: #5cb5c9;
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            box-sizing: border-box;
-        }
+    background-color: #5cb5c9;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: center; /* Centers everything in the header */
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
 
         .header-left {
-            display: flex;
-            align-items: center;
-        }
+    display: flex;
+    align-items: center;
+    flex: 1; /* Allows it to take up available space */
+    justify-content: center; /* Centers content horizontally */
+    text-align: center;
+}
+
 
         .header-right {
             display: flex;

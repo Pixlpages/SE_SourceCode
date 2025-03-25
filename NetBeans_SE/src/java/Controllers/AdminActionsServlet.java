@@ -24,7 +24,7 @@ public class AdminActionsServlet extends HttpServlet {
             response.sendRedirect("Adistribute.jsp");
         } else if ("view".equals(action)) {
             // Handle editing item information logic
-            response.sendRedirect(""); // WALA RIN VIEW JSP
+            response.sendRedirect("Aview.jsp"); // WALA RIN VIEW JSP
         } else if ("managedefective".equals(action)) {
             // Handle editing item information logic
             response.sendRedirect("Amanagedefective.jsp");

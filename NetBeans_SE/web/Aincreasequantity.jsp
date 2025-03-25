@@ -5,13 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MV88 Ventures Inventory System</title>
     <style>
-        
-        @media screen and (max-width: 600px) {
-            .container {
-                width: 100%;
-            }
-        }
-        html, body {
+        body {
             font-family: Arial, sans-serif;
             height: 100%;
             background-color: #f5f5f5;
@@ -25,13 +19,21 @@
             flex: 1; /* Ensures this takes up all remaining space */
         }
         
-        header {
-            background-color: #4a90e2;
+        .header {
+            background-color: #5cb5c9;
             color: white;
             padding: 20px;
-            padding-right: 50px;
-            text-align: left;
-            font-size: 24px;
+            text-align: center;
+        }
+        .sub-header {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .sub-header a {
+            text-decoration: none;
+            color: black;
+            margin-right: 10px;
         }
         
         footer {
@@ -298,13 +300,11 @@
     </style>
 </head>
 <body>
-    <header>
-        MV88 Ventures Inventory System
-    </header>
-    <div class="secondary-header">
-        <a href="javascript:history.back()" class="back-button">
-            ? Back
-        </a>
+    <div class="header">
+        <h1>MV88 Ventures Inventory System</h1>
+    </div>
+    <div class="sub-header">
+        <a href="Ahome.jsp">&#8592; back</a>
     </div>
     <div class="container">
         <br>

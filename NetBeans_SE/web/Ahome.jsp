@@ -25,6 +25,7 @@
     <style>
         /* General Styles */
         body {
+            font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
@@ -34,20 +35,25 @@
 
         /* Header Styles */
         .header {
-            background-color: #5cb5c9;
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            box-sizing: border-box;
-        }
+    background-color: #5cb5c9;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: center; /* Centers everything in the header */
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
 
         .header-left {
-            display: flex;
-            align-items: center;
-        }
+    display: flex;
+    align-items: center;
+    flex: 1; /* Allows it to take up available space */
+    justify-content: center; /* Centers content horizontally */
+    text-align: center;
+}
+
 
         .header-right {
             display: flex;
@@ -264,7 +270,7 @@
             <section class="card" aria-labelledby="reports-title">
                 <h3 id="reports-title">Reports</h3>
                 <ul>
-                    <li><a href="" onclick="// Backend: View items report">View Items</a></li>
+                    <li><a href="AdminActionsServlet?action=view">View Items</a></li>
                     <!-- Backend: Implement view items report functionality here -->
                     <li><a href="AdminActionsServlet?action=managedefective">Manage Defective Items</a></li>
                 </ul>
