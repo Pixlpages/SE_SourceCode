@@ -1,4 +1,19 @@
 <!DOCTYPE html>
+<%@ page session="true" %>
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setHeader("Expires", "0"); // Proxies
+
+    // Session validation
+    String username = (String) session.getAttribute("username");
+    String role = (String) session.getAttribute("role");
+    Boolean loggedIn = (Boolean) session.getAttribute("LoggedIn");
+
+    if (loggedIn == null || !loggedIn || !"admin".equals(role)) {
+        response.sendRedirect("error_session.jsp"); // Redirect unauthorized users
+    }
+%>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
