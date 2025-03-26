@@ -16,9 +16,9 @@ public class AdminActionsServlet extends HttpServlet {
         } else if ("newproduct".equals(action)) {
             // Handle including in inventory logic
             response.sendRedirect("Anewproduct.jsp");
-        } else if ("editItem".equals(action)) {
+        } else if ("edit".equals(action)) {
             // Handle editing item information logic
-            response.sendRedirect(""); //WALA PA EDIT JSP
+            response.sendRedirect("Aeditproduct.jsp"); //WALA PA EDIT JSP
         } else if ("distribute".equals(action)) {
             // Handle editing item information logic
             response.sendRedirect("Adistribute.jsp");

@@ -254,7 +254,7 @@
                 <ul>
                     <li><a href="AdminActionsServlet?action=increasequantity">Add Items Quantity</a></li>
                     <li><a href="AdminActionsServlet?action=newproduct">Include to Inventory</a></li>
-                    <li><a href="" onclick="// Backend: Edit item info">Edit Item Information</a></li>
+                    <li><a href="AdminActionsServlet?action=edit">Edit Item Information</a></li>
                 </ul>
             </section>
 
