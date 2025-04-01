@@ -21,7 +21,7 @@
     </servlet>
     <servlet>
         <servlet-name>UserServlet</servlet-name>
-        <servlet-class>Controllers.User</servlet-class>
+        <servlet-class>Controllers.DBManager</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>UserServlet</servlet-name>

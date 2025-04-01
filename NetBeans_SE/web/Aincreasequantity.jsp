@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@ page session="true" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
     response.setHeader("Pragma", "no-cache"); // HTTP 1.0
@@ -14,17 +15,19 @@
         response.sendRedirect("error_session.jsp"); // Redirect unauthorized users
     }
 %>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MV88 Ventures Inventory System</title>
     <style>
+        /* Add your CSS styles here */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
             margin: 0;
             padding: 0;
+            background-color: #f5f5f5;
         }
         .header {
             background-color: #5cb5c9;
@@ -77,13 +80,13 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .items-list, .add-list {
+        .items-list {
             background-color: #f0f0f0;
             padding: 10px;
             border-radius: 5px;
             margin-bottom: 20px;
         }
-        .items-list h3, .add-list h3 {
+        .items-list h3 {
             margin-top: 0;
         }
         .item {
@@ -95,25 +98,117 @@
         .item:last-child {
             border-bottom: none;
         }
-        .amount-location {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .amount-location input, .amount-location select {
-            margin-right: 10px;
-            padding: 5px;
-            font-size: 16px;
-        }
-        .confirm-add {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .confirm-add input {
-            margin-right: 10px;
+        .selected-item {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e0f7fa;
+            border-radius: 5px;
         }
     </style>
+    <script>
+        let selectedItemId = null; 
+        let selectedItemName = ""; 
+        let selectedItemQuantity = 0; 
+        let itemsToUpdate = []; 
+
+        function searchItems() {
+            const query = document.getElementById("searchInput").value;
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", "Aincreasequantity?query=" + encodeURIComponent(query), true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    console.log("Response from server:", response);
+                    const items = response.items; 
+                    const itemsList = document.getElementById("itemsList");
+                    itemsList.innerHTML = ""; 
+
+                    items.forEach(item => {
+                        const li = document.createElement("li");
+                        li.className = "item"; 
+
+                        li.innerHTML = `
+                            <strong>Item Code:</strong> ${item.itemCode}, 
+                            <strong>Item Name:</strong> ${item.itemName}, 
+                            <strong>Current Quantity:</strong> ${item.totalQuantity} 
+                            <button onclick="selectItem('${item.itemCode}', '${item.itemName}', ${item.totalQuantity})">Select</button>`;
+
+                        itemsList.appendChild(li);
+                    });
+                }
+            };
+            xhr.send();
+        }
+
+        function selectItem(itemCode, itemName, totalQuantity) {
+            console.log("Selected Item Code:", itemCode);
+            console.log("Selected Item Name:", itemName);
+            console.log("Selected Item Quantity:", totalQuantity);
+            selectedItemId = itemCode; 
+            selectedItemName = itemName; 
+            selectedItemQuantity = totalQuantity; 
+
+            document.getElementById("selectedItemDetails").innerHTML = `
+                <strong>Selected Item:</strong> ${selectedItemName} (Code: ${selectedItemId})<br>
+                <strong>Current Quantity:</strong> ${selectedItemQuantity}<br>
+                <input type="number" id="quantityInput" placeholder="Enter quantity to add" min="1" max="99999">
+                <button class="da_button" onclick="addToUpdateList()">Add to List</button>`;
+        }
+        function addToUpdateList() {
+            const quantity = document.getElementById("quantityInput").value;
+            if (quantity > 0) {
+                const itemToUpdate = {
+                    itemCode: selectedItemId,
+                    itemName: selectedItemName,
+                    quantity: parseInt(quantity) // Ensure this is a valid number
+                };
+                itemsToUpdate.push(itemToUpdate);
+                updateItemsList();
+            } else {
+                alert("Please enter a valid quantity.");
+            }
+        }
+
+        function updateItemsList() {
+            const itemsList = document.getElementById("itemsToUpdate");
+            itemsList.innerHTML = ""; 
+            itemsToUpdate.forEach(item => {
+                const li = document.createElement("li");
+                li.className = "item";
+                li.innerHTML = `
+                    <strong>Item Code:</strong> ${item.itemCode}, 
+                    <strong>Item Name:</strong> ${item.itemName}, 
+                    <strong>Quantity to Add:</strong> ${item.quantity}`;
+                itemsList.appendChild(li);
+            });
+        }
+
+        function updateQuantity() {
+            if (itemsToUpdate.length === 0) {
+                alert("No items to update.");
+                return;
+            }
+            console.log("Items to Update:", itemsToUpdate);
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "Aincreasequantity", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        alert("Quantity updated successfully!");
+                        searchItems(); 
+                        itemsToUpdate = []; 
+                        updateItemsList(); 
+                    } else {
+                        alert("Failed to update quantity.");
+                    }
+                }
+            };
+            const itemsToUpdateString = JSON.stringify(itemsToUpdate);
+            xhr.send("action=updateQuantity&itemsToUpdate=" + encodeURIComponent(itemsToUpdateString));
+        }
+    </script>
 </head>
 <body>
     <div class="header">
@@ -125,47 +220,31 @@
     <div class="container">
         <div class="left-side">
             <div class="search-bar">
-                <input type="text" placeholder="Search Item Name/Code">
-                <button class="da_button">Search</button>
+                <input type="text" id="searchInput" placeholder="Search Item Name/Code" onkeyup="searchItems()">
+                <button class="da_button" onclick="searchItems()">Search</button>
             </div>
             <div class="items-list">
                 <h3>Items Code</h3>
-                <div class="item">
-                    <span>Supporting line text lorem ipsum dolor sit</span>
-                </div>
-                <div class="item">
-                    <span>Supporting line text lorem ipsum dolor sit</span>
-                </div>
-                <div class="item">
-                    <span>Supporting line text lorem ipsum dolor sit</span>
-                </div>
+                <ul id="itemsList">
+                    <!-- Dynamic item list will be populated here -->
+                </ul>
             </div>
-            <div class="amount-location">
-                <input type="number" placeholder="0-99999">
-                <button class="da_button">Add to List</button>
+            <div class="selected-item" id="selectedItemDetails">
+                <!-- Selected item details will be displayed here -->
             </div>
         </div>
         <div class="right-side">
             <div class="add-list">
-                <h3>List of Items to Add</h3>
-                <div class="item">
-                    <span>List item</span>
-                    <span>100+</span>
-                </div>
-                <div class="item">
-                    <span>List item</span>
-                    <span>100+</span>
-                </div>
-                <div class="item">
-                    <span>List item</span>
-                    <span>100+</span>
-                </div>
+                <h3>List of Items to Update</h3>
+                <ul id="itemsToUpdate">
+                    <!-- Dynamic list of items to update will be populated here -->
+                </ul>
             </div>
             <div class="confirm-add">
                 <input type="checkbox" id="confirm-items">
                 <label for="confirm-items">Confirm Items</label>
             </div>
-            <button class="da_button">Add Items</button>
+            <button class="da_button" onclick="updateQuantity()">Update Item Quantity</button>
         </div>
     </div>
 </body>

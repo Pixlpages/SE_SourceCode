@@ -22,7 +22,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
     HttpSession session = request.getSession();  // Create session
     
     UserDao userDAO = new UserDao();
-    User user = userDAO.getUser (username, password); // Fetch user from DB
+    DBManager user = userDAO.getUser (username, password); // Fetch user from DB
     
     if (user != null) {
         session.setAttribute("username", user.getUsername());
