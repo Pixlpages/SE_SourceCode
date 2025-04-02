@@ -104,6 +104,10 @@
             background-color: #e0f7fa;
             border-radius: 5px;
         }
+        #quantityInput {
+            width: 100px;
+            margin-right: 10px;
+        }
     </style>
     <script>
         let selectedItemId = null; 
@@ -111,34 +115,74 @@
         let selectedItemQuantity = 0; 
         let itemsToUpdate = []; 
 
-        function searchItems() {
-            const query = document.getElementById("searchInput").value;
-            const xhr = new XMLHttpRequest();
-            xhr.open("GET", "Aincreasequantity?query=" + encodeURIComponent(query), true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-                    console.log("Response from server:", response);
-                    const items = response.items; 
-                    const itemsList = document.getElementById("itemsList");
-                    itemsList.innerHTML = ""; 
+function searchItems() {
+    const query = document.getElementById("searchInput").value;
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "Aincreasequantity?query=" + encodeURIComponent(query), true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            try {
+                const response = JSON.parse(xhr.responseText);
+                console.log("Full response from server:", response);
 
-                    items.forEach(item => {
-                        const li = document.createElement("li");
-                        li.className = "item"; 
-
-                        li.innerHTML = `
-                            <strong>Item Code:</strong> ${item.itemCode}, 
-                            <strong>Item Name:</strong> ${item.itemName}, 
-                            <strong>Current Quantity:</strong> ${item.totalQuantity} 
-                            <button onclick="selectItem('${item.itemCode}', '${item.itemName}', ${item.totalQuantity})">Select</button>`;
-
-                        itemsList.appendChild(li);
-                    });
+                if (!response.items || response.items.length === 0) {
+                    console.warn("No items found.");
+                    return;
                 }
-            };
-            xhr.send();
+
+                const items = response.items;
+                const itemsList = document.getElementById("itemsList");
+                itemsList.innerHTML = ""; // Clear previous results
+
+                items.forEach(item => {
+                    const itemCode = item.itemCode || "N/A";
+                    const itemName = item.itemName || "N/A";
+                    const totalQuantity = item.totalQuantity || item.total_quantity || 0;
+
+                    console.log("Processed Item:", { itemCode, itemName, totalQuantity });
+
+                    // Create list item
+                    const li = document.createElement("li");
+                    li.className = "item";
+
+                    // Create spans for item details
+                    const itemCodeSpan = document.createElement("span");
+                    itemCodeSpan.innerHTML = `<strong>Item Code:</strong> ${itemCode}`;
+
+                    const itemNameSpan = document.createElement("span");
+                    itemNameSpan.innerHTML = `<strong>Item Name:</strong> ${itemName}`;
+
+                    const quantitySpan = document.createElement("span");
+                    quantitySpan.innerHTML = `<strong>Current Quantity:</strong> ${totalQuantity}`;
+
+                    // Create button
+                    const button = document.createElement("button");
+                    button.textContent = "Select";
+                    button.onclick = function () {
+                        selectItem(String(itemCode), String(itemName), totalQuantity);
+                    };
+
+                    // Append elements
+                    li.appendChild(itemCodeSpan);
+                    li.appendChild(document.createTextNode(", ")); // Add separator
+                    li.appendChild(itemNameSpan);
+                    li.appendChild(document.createTextNode(", "));
+                    li.appendChild(quantitySpan);
+                    li.appendChild(document.createTextNode(" "));
+                    li.appendChild(button);
+
+                    itemsList.appendChild(li);
+                });
+
+            } catch (error) {
+                console.error("Error parsing JSON response:", error);
+            }
         }
+    };
+    xhr.send();
+}
+
+
 
         function selectItem(itemCode, itemName, totalQuantity) {
             console.log("Selected Item Code:", itemCode);
@@ -150,7 +194,7 @@
 
             document.getElementById("selectedItemDetails").innerHTML = `
                 <strong>Selected Item:</strong> ${selectedItemName} (Code: ${selectedItemId})<br>
-                <strong>Current Quantity:</strong> ${selectedItemQuantity}<br>
+                <strong>Current Quantity:</strong> ${selectedItemQuantity}<br><br>
                 <input type="number" id="quantityInput" placeholder="Enter quantity to add" min="1" max="99999">
                 <button class="da_button" onclick="addToUpdateList()">Add to List</button>`;
         }
@@ -183,31 +227,43 @@
             });
         }
 
-        function updateQuantity() {
-            if (itemsToUpdate.length === 0) {
-                alert("No items to update.");
-                return;
+function updateQuantity() {
+    const confirmCheckbox = document.getElementById("confirm-items");
+
+    // Check if the checkbox is checked
+    if (!confirmCheckbox.checked) {
+        alert("Please confirm the items before updating.");
+        return;
+    }
+
+    if (itemsToUpdate.length === 0) {
+        alert("No items to update.");
+        return;
+    }
+
+    console.log("Items to Update:", itemsToUpdate);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "Aincreasequantity", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            if (response.success) {
+                alert("Quantity updated successfully!");
+                searchItems(); // Refresh the list after update
+                itemsToUpdate = []; // Clear the itemsToUpdate array
+                updateItemsList(); // Update the list display
+            } else {
+                alert("Failed to update quantity.");
             }
-            console.log("Items to Update:", itemsToUpdate);
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", "Aincreasequantity", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-                    if (response.success) {
-                        alert("Quantity updated successfully!");
-                        searchItems(); 
-                        itemsToUpdate = []; 
-                        updateItemsList(); 
-                    } else {
-                        alert("Failed to update quantity.");
-                    }
-                }
-            };
-            const itemsToUpdateString = JSON.stringify(itemsToUpdate);
-            xhr.send("action=updateQuantity&itemsToUpdate=" + encodeURIComponent(itemsToUpdateString));
         }
+    };
+
+    const itemsToUpdateString = JSON.stringify(itemsToUpdate);
+    xhr.send("action=updateQuantity&itemsToUpdate=" + encodeURIComponent(itemsToUpdateString));
+}
+
     </script>
 </head>
 <body>
