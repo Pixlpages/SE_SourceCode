@@ -87,14 +87,24 @@ public class Aincreasequantity extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        // Create a response object
-        ItemResponse itemResponse = new ItemResponse();
-        itemResponse.setItems(matchingItems);
+        // Create a response object for DataTables
+        JsonObject jsonResponse = new JsonObject();
+        jsonResponse.addProperty("sEcho", request.getParameter("sEcho"));
+        jsonResponse.addProperty("iTotalRecords", matchingItems.size());
+        jsonResponse.addProperty("iTotalDisplayRecords", matchingItems.size());
 
-        // Convert the response object to JSON using GSON
-        String jsonResponse = new Gson().toJson(itemResponse);
-        
-        out.print(jsonResponse); // Return the JSON response
+        JsonArray dataArray = new JsonArray();
+        for (DBManager.Item item : matchingItems) {
+            JsonArray row = new JsonArray();
+            row.add(item.getItemCode());
+            row.add(item.getItemName());
+            row.add(item.getTotalQuantity());
+            dataArray.add(row);
+        }
+        jsonResponse.add("aaData", dataArray);
+
+        // Send JSON response
+        out.print(jsonResponse.toString());
         out.flush();
     }
 

@@ -21,8 +21,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MV88 Ventures Inventory System</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
     <style>
-        /* Add your CSS styles here */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -80,190 +82,84 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .items-list {
-            background-color: #f0f0f0;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .items-list h3 {
-            margin-top: 0;
-        }
-        .item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-        }
-        .item:last-child {
-            border-bottom: none;
-        }
         .selected-item {
             margin-top: 20px;
             padding: 10px;
             background-color: #e0f7fa;
             border-radius: 5px;
         }
-        #quantityInput {
-            width: 100px;
-            margin-right: 10px;
-        }
     </style>
     <script>
-        let selectedItemId = null; 
-        let selectedItemName = ""; 
-        let selectedItemQuantity = 0; 
-        let itemsToUpdate = []; 
+        let itemsToUpdate = []; // Array to hold items to update
 
-function searchItems() {
-    const query = document.getElementById("searchInput").value;
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "Aincreasequantity?query=" + encodeURIComponent(query), true);
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            try {
-                const response = JSON.parse(xhr.responseText);
-                console.log("Full response from server:", response);
+        $(document).ready(function() {
+            var table = $('#itemsTable').DataTable({
+                "ajax": {
+                    "url": "Aincreasequantity",
+                    "data": function (d) {
+                        d.query = $('#searchInput').val(); // Pass the search input value
+                        d.sEcho = Math.random(); // Random value for sEcho
+                    }
+                },
+                "columns": [
+                    { "data": 0 }, // itemCode
+                    { "data": 1 }, // itemName
+                    { "data": 2 }  // totalQuantity
+                ]
+            });
 
-                if (!response.items || response.items.length === 0) {
-                    console.warn("No items found.");
+            // Handle row click event for item selection
+            $('#itemsTable tbody').on('click', 'tr', function() {
+                var data = table.row(this).data();
+                if (data) {
+                    // Display selected item details
+                    $('#selectedItemCode').text(data[0]);
+                    $('#selectedItemName').text(data[1]);
+                    $('#selectedItemQuantity').text(data[2]);
+                    $('#selectedItem').show();
+                }
+            });
+
+            // Update database functionality
+            $('#updateDatabaseButton').on('click', function() {
+                var quantityToAdd = $('#quantityInput').val();
+                var selectedItemCode = $('#selectedItemCode').text();
+                var selectedItemName = $('#selectedItemName').text();
+
+                if (selectedItemCode && quantityToAdd) {
+                    // Add item to the batch list
+                    itemsToUpdate.push({
+                        itemCode: selectedItemCode,
+                        itemName: selectedItemName,
+                        quantity: quantityToAdd
+                    });
+                }
+
+                if (itemsToUpdate.length === 0) {
+                    alert("No items to update.");
                     return;
                 }
 
-                const items = response.items;
-                const itemsList = document.getElementById("itemsList");
-                itemsList.innerHTML = ""; // Clear previous results
-
-                items.forEach(item => {
-                    const itemCode = item.itemCode || "N/A";
-                    const itemName = item.itemName || "N/A";
-                    const totalQuantity = item.totalQuantity || item.total_quantity || 0;
-
-                    console.log("Processed Item:", { itemCode, itemName, totalQuantity });
-
-                    // Create list item
-                    const li = document.createElement("li");
-                    li.className = "item";
-
-                    // Create spans for item details
-                    const itemCodeSpan = document.createElement("span");
-                    itemCodeSpan.innerHTML = `<strong>Item Code:</strong> ${itemCode}`;
-
-                    const itemNameSpan = document.createElement("span");
-                    itemNameSpan.innerHTML = `<strong>Item Name:</strong> ${itemName}`;
-
-                    const quantitySpan = document.createElement("span");
-                    quantitySpan.innerHTML = `<strong>Current Quantity:</strong> ${totalQuantity}`;
-
-                    // Create button
-                    const button = document.createElement("button");
-                    button.textContent = "Select";
-                    button.onclick = function () {
-                        selectItem(String(itemCode), String(itemName), totalQuantity);
-                    };
-
-                    // Append elements
-                    li.appendChild(itemCodeSpan);
-                    li.appendChild(document.createTextNode(", ")); // Add separator
-                    li.appendChild(itemNameSpan);
-                    li.appendChild(document.createTextNode(", "));
-                    li.appendChild(quantitySpan);
-                    li.appendChild(document.createTextNode(" "));
-                    li.appendChild(button);
-
-                    itemsList.appendChild(li);
+                $.ajax({
+                    url: 'Aincreasequantity', // Your servlet to handle quantity update
+                    type: 'POST',
+                    data: {
+                        action: 'updateQuantity',
+                        itemsToUpdate: JSON.stringify(itemsToUpdate)
+                    },
+                    success: function(response) {
+                        alert("Quantity updated successfully!");
+                        $('#itemsTable').DataTable().ajax.reload(); // Reload the table data
+                        itemsToUpdate = []; // Clear the batch list
+                        $('#selectedItem').hide(); // Hide the selected item details
+                        $('#quantityInput').val(''); // Clear the input field
+                    },
+                    error: function() {
+                        alert("Error updating quantity. Please try again.");
+                    }
                 });
-
-            } catch (error) {
-                console.error("Error parsing JSON response:", error);
-            }
-        }
-    };
-    xhr.send();
-}
-
-
-
-        function selectItem(itemCode, itemName, totalQuantity) {
-            console.log("Selected Item Code:", itemCode);
-            console.log("Selected Item Name:", itemName);
-            console.log("Selected Item Quantity:", totalQuantity);
-            selectedItemId = itemCode; 
-            selectedItemName = itemName; 
-            selectedItemQuantity = totalQuantity; 
-
-            document.getElementById("selectedItemDetails").innerHTML = `
-                <strong>Selected Item:</strong> ${selectedItemName} (Code: ${selectedItemId})<br>
-                <strong>Current Quantity:</strong> ${selectedItemQuantity}<br><br>
-                <input type="number" id="quantityInput" placeholder="Enter quantity to add" min="1" max="99999">
-                <button class="da_button" onclick="addToUpdateList()">Add to List</button>`;
-        }
-        function addToUpdateList() {
-            const quantity = document.getElementById("quantityInput").value;
-            if (quantity > 0) {
-                const itemToUpdate = {
-                    itemCode: selectedItemId,
-                    itemName: selectedItemName,
-                    quantity: parseInt(quantity) // Ensure this is a valid number
-                };
-                itemsToUpdate.push(itemToUpdate);
-                updateItemsList();
-            } else {
-                alert("Please enter a valid quantity.");
-            }
-        }
-
-        function updateItemsList() {
-            const itemsList = document.getElementById("itemsToUpdate");
-            itemsList.innerHTML = ""; 
-            itemsToUpdate.forEach(item => {
-                const li = document.createElement("li");
-                li.className = "item";
-                li.innerHTML = `
-                    <strong>Item Code:</strong> ${item.itemCode}, 
-                    <strong>Item Name:</strong> ${item.itemName}, 
-                    <strong>Quantity to Add:</strong> ${item.quantity}`;
-                itemsList.appendChild(li);
             });
-        }
-
-function updateQuantity() {
-    const confirmCheckbox = document.getElementById("confirm-items");
-
-    // Check if the checkbox is checked
-    if (!confirmCheckbox.checked) {
-        alert("Please confirm the items before updating.");
-        return;
-    }
-
-    if (itemsToUpdate.length === 0) {
-        alert("No items to update.");
-        return;
-    }
-
-    console.log("Items to Update:", itemsToUpdate);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "Aincreasequantity", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            const response = JSON.parse(xhr.responseText);
-            if (response.success) {
-                alert("Quantity updated successfully!");
-                searchItems(); // Refresh the list after update
-                itemsToUpdate = []; // Clear the itemsToUpdate array
-                updateItemsList(); // Update the list display
-            } else {
-                alert("Failed to update quantity.");
-            }
-        }
-    };
-
-    const itemsToUpdateString = JSON.stringify(itemsToUpdate);
-    xhr.send("action=updateQuantity&itemsToUpdate=" + encodeURIComponent(itemsToUpdateString));
-}
-
+        });
     </script>
 </head>
 <body>
@@ -272,35 +168,32 @@ function updateQuantity() {
     </div>
     <div class="sub-header">
         <a href="Ahome.jsp">&#8592; back</a>
+        <input type="text" id="searchInput" placeholder="Search items..." />
     </div>
     <div class="container">
         <div class="left-side">
-            <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="Search Item Name/Code" onkeyup="searchItems()">
-                <button class="da_button" onclick="searchItems()">Search</button>
-            </div>
-            <div class="items-list">
-                <h3>Items Code</h3>
-                <ul id="itemsList">
-                    <!-- Dynamic item list will be populated here -->
-                </ul>
-            </div>
-            <div class="selected-item" id="selectedItemDetails">
-                <!-- Selected item details will be displayed here -->
-            </div>
+            <table id="itemsTable" class="display">
+                <thead>
+                    <tr>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Total Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </div>
         <div class="right-side">
-            <div class="add-list">
-                <h3>List of Items to Update</h3>
-                <ul id="itemsToUpdate">
-                    <!-- Dynamic list of items to update will be populated here -->
-                </ul>
-            </div>
-            <div class="confirm-add">
-                <input type="checkbox" id="confirm-items">
-                <label for="confirm-items">Confirm Items</label>
-            </div>
-            <button class="da_button" onclick="updateQuantity()">Update Item Quantity</button>
+            <h3>Item Details</h3>
+            <div id="selectedItem" class="selected-item" style="display:none;">
+                <h3>Selected Item</h3>
+                <p><strong>Item Code:</strong> <span id="selectedItemCode"></span></p>
+                <p><strong>Item Name:</strong> <span id="selectedItemName"></span></p>
+                <p><strong>Total Quantity:</strong> <span id="selectedItemQuantity"></span></p>
+                <input type="number" id="quantityInput" placeholder="Enter quantity to add" />
+                <button id="updateDatabaseButton" class="da_button">Update Database</button>
+            </div> 
         </div>
     </div>
 </body>
