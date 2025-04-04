@@ -59,21 +59,6 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 45%;
         }
-        .search-bar {
-            display: flex;
-            align-items: center;
-            background-color: #e0e0e0;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .search-bar input {
-            border: none;
-            background: none;
-            flex-grow: 1;
-            padding: 5px;
-            font-size: 16px;
-        }
         .da_button {
             background-color: #5cb5c9;
             color: white;
@@ -95,11 +80,8 @@
         $(document).ready(function() {
             var table = $('#itemsTable').DataTable({
                 "ajax": {
-                    "url": "Aincreasequantity",
-                    "data": function (d) {
-                        d.query = $('#searchInput').val(); // Pass the search input value
-                        d.sEcho = Math.random(); // Random value for sEcho
-                    }
+                    "url": "Aincreasequantity", // Ensure this URL is correct
+                    "dataSrc": "aaData" // Use the correct data source
                 },
                 "columns": [
                     { "data": 0 }, // itemCode
@@ -168,7 +150,6 @@
     </div>
     <div class="sub-header">
         <a href="Ahome.jsp">&#8592; back</a>
-        <input type="text" id="searchInput" placeholder="Search items..." />
     </div>
     <div class="container">
         <div class="left-side">

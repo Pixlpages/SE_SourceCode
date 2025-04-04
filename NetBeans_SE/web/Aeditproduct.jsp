@@ -19,6 +19,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Product</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -43,99 +46,147 @@
             margin-right: 10px;
         }
 
-.container {
-    display: flex;
-    gap: 20px;
-    padding: 20px;
-}
+    .container {
+        display: flex;
+        gap: 20px;
+        padding: 20px;
+    }
 
-.search-section {
-    background-color: #ECE3F0;
-    border-radius: 10px;
-    padding: 10px;
-    width: 50%;
-}
+    .search-section {
+        background-color: #ECE3F0;
+        border-radius: 10px;
+        padding: 10px;
+        width: 50%;
+    }
 
-.search-box {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 5px;
-    border-bottom: 1px solid #ccc;
-}
+    .search-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 5px;
+        border-bottom: 1px solid #ccc;
+    }
 
-.search-box input {
-    flex: 1;
-    border: none;
-    background: none;
-    outline: none;
-}
+    .search-box input {
+        flex: 1;
+        border: none;
+        background: none;
+        outline: none;
+    }
 
-.search-results {
-    max-height: 300px;
-    overflow-y: auto;
-}
+    .search-results {
+        max-height: 300px;
+        overflow-y: auto;
+    }
 
-.search-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    background-color: white;
-    border-radius: 5px;
-    margin-top: 5px;
-}
+    .search-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background-color: white;
+        border-radius: 5px;
+        margin-top: 5px;
+    }
 
-.search-item img {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background-color: purple;
-}
+    .search-item img {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: purple;
+    }
 
-.edit-section {
-    flex-grow: 1;
-    width: 50%;
-}
+    .edit-section {
+        flex-grow: 1;
+        width: 50%;
+    }
 
-.radio-group {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
+    .radio-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
 
-input, select {
-    display: block;
-    margin-top: 10px;
-    padding: 5px;
-    width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
+    input, select {
+        display: block;
+        margin-top: 10px;
+        padding: 5px;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
 
-.confirm-btn {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: lightgray;
-    border: none;
-    cursor: pointer;
-}
+    .confirm-btn {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: lightgray;
+        border: none;
+        cursor: pointer;
+    }
 
-h2 {
-    display: block;
-    font-size: 1.5em;
-    margin-block-start: 0.83em;
-    margin-block-end: 0.83em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-    font-weight: bold;
-    unicode-bidi: isolate;
-}
+    h2 {
+        display: block;
+        font-size: 1.5em;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+        margin-inline-start: 0px;
+        margin-inline-end: 0px;
+        font-weight: bold;
+        unicode-bidi: isolate;
+    }
 
-.page-title {
-    margin: 20px;
-}
     </style>
+    <script>
+        $(document).ready(function() {
+            var table = $('#itemsTable').DataTable({
+                "ajax": {
+                    "url": "Agetproducts", // Servlet to fetch products
+                    "dataSrc": ""
+                },
+                "columns": [
+                    { "data": "itemCode" },
+                    { "data": "itemName" },
+                    { "data": "itemCategory" },
+                    { "data": "totalQuantity" }
+                ]
+            });
+
+            // Handle row click event for item selection
+            $('#itemsTable tbody').on('click', 'tr', function() {
+                var data = table.row(this).data();
+                if (data) {
+                    // Populate the edit form with selected item data
+                    $('#itemCodeInput').val(data.itemCode);
+                    $('#itemNameInput').val(data.itemName);
+                    $('#itemCategorySelect').val(data.itemCategory);
+                }
+            });
+
+            // Handle confirm edit button click
+            $('.confirm-btn').on('click', function() {
+                var itemCode = $('#itemCodeInput').val();
+                var itemName = $('#itemNameInput').val();
+                var itemCategory = $('#itemCategorySelect').val();
+
+                $.ajax({
+                    url: 'Aeditproduct', // Your servlet to handle the edit
+                    type: 'POST',
+                    data: {
+                        itemCode: itemCode,
+                        itemName: itemName,
+                        itemCategory: itemCategory
+                    },
+                    success: function(response) {
+                        alert("Item updated successfully!");
+                        table.ajax.reload(); // Reload the table data
+                    },
+                    error: function() {
+                        alert("Error updating item. Please try again.");
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 
 <body>
@@ -145,58 +196,33 @@ h2 {
     <div class="sub-header">
         <a href="Ahome.jsp">&#8592; back</a>
     </div>
-    <div class="page-title">
-        <h2>Search Item to Edit</h2>
-    </div>
-
-
     <div class="container">
         <div class="search-section">
-            <div class="search-box">
-                <button class="back-search">&#8592;</button>
-                <input type="text" placeholder="Search Item Name/Code">
-                <button class="clear-search">&#10006;</button>
-            </div>
-            <div class="search-results">
-                <div class="search-item">
-                    <img src="Placeholder.png" alt="icon">
-                    <div>
-                        <strong>Item Code</strong>
-                        <p>Supporting line text lorem ipsum dolor si...</p>
-                    </div>
-                </div>
-                <div class="search-item">
-                    <img src="Placeholder.png" alt="icon">
-                    <div>
-                        <strong>Item Code</strong>
-                        <p>Supporting line text lorem ipsum dolor si...</p>
-                    </div>
-                </div>
-                <div class="search-item">
-                    <img src="Placeholder.png" alt="icon">
-                    <div>
-                        <strong>Item Code</strong>
-                        <p>Supporting line text lorem ipsum dolor si...</p>
-                    </div>
-                </div>
-            </div>
+            <table id="itemsTable" class="display">
+                <thead>
+                    <tr>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Category</th>
+                        <th>Total Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </div>
 
         <div class="edit-section">
-            <p>Selected Item Code: <strong>*item code*</strong></p>
-            <input type="text" placeholder="Item Name">
-            <div class="radio-group">
-                <label><input type="radio" name="category"> Dog</label>
-                <label><input type="radio" name="category"> Dog & Cat</label>
-                <label><input type="radio" name="category"> Cat</label>
-            </div>
-            <select>
-                <option>Category 1</option>
+            <h3>Edit Selected Item</h3>
+            <input type="text" id="itemCodeInput" placeholder="Item Code" required>
+            <input type="text" id="itemNameInput" placeholder="Item Name" required>
+            <select id="itemCategorySelect" required>
+                <option value="category1">Category 1</option>
+                <option value="category2">Category 2</option>
+                <!-- Add more categories as needed -->
             </select>
-            <input type="text" placeholder="Insert URL">
-            <button class="confirm-btn">Confirm Edit</button>
+            <button type="button" class="confirm-btn">Confirm Edit</button>
         </div>
     </div>
 </body>
-
 </html>

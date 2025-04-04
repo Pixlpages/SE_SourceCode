@@ -81,8 +81,7 @@ public class Aincreasequantity extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String query = request.getParameter("query");
-        List<DBManager.Item> matchingItems = searchItems(query); // Search for items based on the query
+        List<DBManager.Item> items = fetchItems(); // Fetch all items from the database
 
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -90,11 +89,11 @@ public class Aincreasequantity extends HttpServlet {
         // Create a response object for DataTables
         JsonObject jsonResponse = new JsonObject();
         jsonResponse.addProperty("sEcho", request.getParameter("sEcho"));
-        jsonResponse.addProperty("iTotalRecords", matchingItems.size());
-        jsonResponse.addProperty("iTotalDisplayRecords", matchingItems.size());
+        jsonResponse.addProperty("iTotalRecords", items.size());
+        jsonResponse.addProperty("iTotalDisplayRecords", items.size());
 
         JsonArray dataArray = new JsonArray();
-        for (DBManager.Item item : matchingItems) {
+        for (DBManager.Item item : items) {
             JsonArray row = new JsonArray();
             row.add(item.getItemCode());
             row.add(item.getItemName());
@@ -108,22 +107,18 @@ public class Aincreasequantity extends HttpServlet {
         out.flush();
     }
 
-    private List<DBManager.Item> searchItems(String query) {
+    private List<DBManager.Item> fetchItems() {
         List<DBManager.Item> items = new ArrayList<>();
-        String sql = "SELECT item_code, item_name, item_category, pet_category, total_quantity FROM products_test WHERE item_code LIKE ? OR item_name LIKE ?";
+        String sql = "SELECT item_code, item_name, total_quantity FROM products_test"; // Adjust the query as needed
 
         try (Connection connection = DatabaseUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, "%" + query + "%");
-            preparedStatement.setString(2, "%" + query + "%");
-            ResultSet resultSet = preparedStatement.executeQuery();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
                 DBManager.Item item = new DBManager.Item();
                 item.setItemCode(resultSet.getString("item_code"));
                 item.setItemName(resultSet.getString("item_name"));
-                item.setItemCategory(resultSet.getString("item_category"));
-                item.setPetCategory(resultSet.getString("pet_category"));
                 item.setTotalQuantity(resultSet.getInt("total_quantity"));
                 items.add(item);
             }
@@ -131,17 +126,5 @@ public class Aincreasequantity extends HttpServlet {
             e.printStackTrace(); // Log the exception for debugging
         }
         return items;
-    }
-
-    private static class ItemResponse {
-        private List<DBManager.Item> items;
-
-        public List<DBManager.Item> getItems() {
-            return items;
-        }
-
-        public void setItems(List<DBManager.Item> items) {
-            this.items = items;
-        }
     }
 }
