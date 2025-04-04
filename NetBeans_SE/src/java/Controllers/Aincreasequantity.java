@@ -68,7 +68,7 @@ public class Aincreasequantity extends HttpServlet {
     }
 
     private boolean increaseItemQuantity(String itemCode, int quantity) throws SQLException {
-        String sql = "UPDATE products_test SET total_quantity = total_quantity + ? WHERE item_code = ?";
+        String sql = "UPDATE items SET total_quantity = total_quantity + ? WHERE item_code = ?";
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -109,7 +109,7 @@ public class Aincreasequantity extends HttpServlet {
 
     private List<DBManager.Item> fetchItems() {
         List<DBManager.Item> items = new ArrayList<>();
-        String sql = "SELECT item_code, item_name, total_quantity FROM products_test"; // Adjust the query as needed
+        String sql = "SELECT item_code, item_name, total_quantity FROM items"; // Adjust the query as needed
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql);

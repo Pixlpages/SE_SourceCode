@@ -10,18 +10,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/Aeditproduct")
-public class Aeditproduct extends HttpServlet {
+@WebServlet("/Aeditproduct_delete")
+public class Aeditproduct_delete extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String itemCode = request.getParameter("itemCode");
-        String itemName = request.getParameter("itemName");
-        String itemCategory = request.getParameter("itemCategory");
 
         try {
-            updateItemInDatabase(itemCode, itemName, itemCategory);
+            deleteItemFromDatabase(itemCode);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -29,14 +27,12 @@ public class Aeditproduct extends HttpServlet {
         }
     }
 
-    private void updateItemInDatabase(String itemCode, String itemName, String itemCategory) throws SQLException {
-        String sql = "UPDATE items SET item_name = ?, item_category = ? WHERE item_code = ?";
+    private void deleteItemFromDatabase(String itemCode) throws SQLException {
+        String sql = "DELETE FROM products_test WHERE item_code = ?";
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, itemName);
-            preparedStatement.setString(2, itemCategory);
-            preparedStatement.setString(3, itemCode);
+            preparedStatement.setString(1, itemCode);
             preparedStatement.executeUpdate();
         }
     }

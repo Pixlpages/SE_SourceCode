@@ -134,7 +134,6 @@
         font-weight: bold;
         unicode-bidi: isolate;
     }
-
     </style>
     <script>
         $(document).ready(function() {
@@ -185,6 +184,33 @@
                     }
                 });
             });
+
+            // Handle delete button click
+            $('#deleteButton').on('click', function() {
+                var itemCode = $('#itemCodeInput').val();
+
+                if (itemCode) {
+                    $.ajax({
+                        url: 'Aeditproduct_delete', // Your servlet to handle the delete
+                        type: 'POST',
+                        data: {
+                            itemCode: itemCode
+                        },
+                        success: function(response) {
+                            alert("Item deleted successfully!");
+                            table.ajax.reload(); // Reload the table data
+                            $('#itemCodeInput').val(''); // Clear the input field
+                            $('#itemNameInput').val('');
+                            $('#itemCategorySelect').val('');
+                        },
+                        error: function() {
+                            alert("Error deleting item. Please try again.");
+                        }
+                    });
+                } else {
+                    alert("No item selected for deletion.");
+                }
+            });
         });
     </script>
 </head>
@@ -202,7 +228,7 @@
                 <thead>
                     <tr>
                         <th>Item Code</th>
-                        <th>Item Name</th>
+ <th>Item Name</th>
                         <th>Category</th>
                         <th>Total Quantity</th>
                     </tr>
@@ -217,11 +243,17 @@
             <input type="text" id="itemCodeInput" placeholder="Item Code" required>
             <input type="text" id="itemNameInput" placeholder="Item Name" required>
             <select id="itemCategorySelect" required>
-                <option value="category1">Category 1</option>
-                <option value="category2">Category 2</option>
+                <option value="category1">CODE 1</option>
+                <option value="category2">CODE 2</option>
+                <option value="category3">CODE 3</option>
+                <option value="category4">CODE 4</option>
+                <option value="category5">CODE 5</option>
+                <option value="category6">CODE 6</option>
+                <option value="category7">CODE 7</option>
                 <!-- Add more categories as needed -->
             </select>
             <button type="button" class="confirm-btn">Confirm Edit</button>
+            <button type="button" id="deleteButton" class="confirm-btn">Delete Item</button>
         </div>
     </div>
 </body>

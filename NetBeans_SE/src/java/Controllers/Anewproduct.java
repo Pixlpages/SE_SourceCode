@@ -71,7 +71,7 @@ public class Anewproduct extends HttpServlet {
     }
 
     private void addAllItemsToDatabase(List<DBManager.Item> itemList) throws SQLException {
-        String sql = "INSERT INTO products_test (item_code, item_name, item_category, pet_category, total_quantity) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO items (item_code, item_name, item_category, pet_category, total_quantity) VALUES (?, ?, ?, ?, ?)";
         
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {

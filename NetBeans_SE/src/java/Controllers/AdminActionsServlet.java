@@ -18,13 +18,13 @@ public class AdminActionsServlet extends HttpServlet {
             response.sendRedirect("Anewproduct.jsp");
         } else if ("edit".equals(action)) {
             // Handle editing item information logic
-            response.sendRedirect("Aeditproduct.jsp"); //WALA PA EDIT JSP
+            response.sendRedirect("Aeditproduct.jsp"); 
         } else if ("distribute".equals(action)) {
             // Handle editing item information logic
             response.sendRedirect("Adistribute.jsp");
         } else if ("view".equals(action)) {
             // Handle editing item information logic
-            response.sendRedirect("Aview.jsp"); // WALA RIN VIEW JSP
+            response.sendRedirect("Aview.jsp"); 
         } else if ("managedefective".equals(action)) {
             // Handle editing item information logic
             response.sendRedirect("Amanagedefective.jsp");

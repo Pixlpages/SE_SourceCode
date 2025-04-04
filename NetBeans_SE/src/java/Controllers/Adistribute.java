@@ -17,7 +17,7 @@ public class Adistribute extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
         String action = request.getParameter("action");
         if ("distributeItems".equals(action)) {
             String itemsData = request.getParameter("itemsToDistribute");
@@ -31,31 +31,71 @@ public class Adistribute extends HttpServlet {
     }
 
     private void distributeItems(Item[] items) {
-        String sql = "UPDATE products_test SET total_quantity = total_quantity - ? WHERE item_code = ? AND branch = ?";
+        String updateSql = "UPDATE items SET total_quantity = total_quantity - ? WHERE item_code = ?";
+        String insertSql = "INSERT INTO %s (item_code, item_name, item_category, total_quantity) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE total_quantity = total_quantity + ?";
+
         try (Connection connection = DatabaseUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+             PreparedStatement updateStatement = connection.prepareStatement(updateSql)) {
+
             for (Item item : items) {
-                preparedStatement.setInt(1, Integer.parseInt(item.getQuantity()));
-                preparedStatement.setString(2, item.getItemCode());
-                preparedStatement.setString(3, item.getBranch()); // Include the branch in the update
-                preparedStatement.executeUpdate();
+                // Update the quantity in products_test
+                updateStatement.setInt(1, Integer.parseInt(item.getQuantity()));
+                updateStatement.setString(2, item.getItemCode());
+                int rowsUpdated = updateStatement.executeUpdate();
+
+                if (rowsUpdated > 0) {
+                    // Only insert into the branch table if the update was successful
+                    String branchTable = getBranchTable(item.getBranch());
+                    String formattedInsertSql = String.format(insertSql, branchTable);
+                    try (PreparedStatement insertStatement = connection.prepareStatement(formattedInsertSql)) {
+                        insertStatement.setString(1, item.getItemCode());
+                        insertStatement.setString(2, item.getItemName());
+                        insertStatement.setString(3, item.getItemCategory());
+                        insertStatement.setInt(4, Integer.parseInt(item.getQuantity()));
+                        insertStatement.setInt(5, Integer.parseInt(item.getQuantity())); // For ON DUPLICATE KEY UPDATE
+                        insertStatement.executeUpdate();
+                    }
+                } else {
+                    System.out.println("No rows updated for item code: " + item.getItemCode());
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    private String getBranchTable(String branch) {
+        // Map branch names to table names
+        switch (branch) {
+            case "Branch1":
+                return "items"; // Ensure this matches your actual branch table name
+            case "Branch2":
+                return "branch2";
+            case "Branch3":
+                return "branch3";
+            // Add more branches as needed
+            default:
+                throw new IllegalArgumentException("Invalid branch: " + branch);
+        }
+    }
+
     private static class Item {
         private String itemCode;
+        private String itemName;
         private String quantity;
+        private String itemCategory;
         private String branch; // Add branch property
 
         // Getters and Setters
         public String getItemCode() { return itemCode; }
         public void setItemCode(String itemCode) { this.itemCode = itemCode; }
+        public String getItemName() { return itemName; }
+        public void setItemName(String itemName) { this.itemName = itemName; }
         public String getQuantity() { return quantity; }
         public void setQuantity(String quantity) { this.quantity = quantity; }
         public String getBranch() { return branch; }
         public void setBranch(String branch) { this.branch = branch; }
+        public String getItemCategory() { return itemCategory; }
+        public void setItemCategory(String itemCategory) { this.itemCategory = itemCategory; }
     }
 }
