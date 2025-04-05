@@ -1,7 +1,6 @@
 package Controllers;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -32,7 +31,7 @@ public class Adistribute extends HttpServlet {
 
     private void distributeItems(Item[] items) {
         String updateSql = "UPDATE items SET total_quantity = total_quantity - ? WHERE item_code = ?";
-        String insertSql = "INSERT INTO %s (item_code, item_name, item_category, total_quantity) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE total_quantity = total_quantity + ?";
+        String insertSql = "INSERT INTO %s (item_code, total_quantity) VALUES (?, ?) ON DUPLICATE KEY UPDATE total_quantity = total_quantity + ?";
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement updateStatement = connection.prepareStatement(updateSql)) {
@@ -49,10 +48,8 @@ public class Adistribute extends HttpServlet {
                     String formattedInsertSql = String.format(insertSql, branchTable);
                     try (PreparedStatement insertStatement = connection.prepareStatement(formattedInsertSql)) {
                         insertStatement.setString(1, item.getItemCode());
-                        insertStatement.setString(2, item.getItemName());
-                        insertStatement.setString(3, item.getItemCategory());
-                        insertStatement.setInt(4, Integer.parseInt(item.getQuantity()));
-                        insertStatement.setInt(5, Integer.parseInt(item.getQuantity())); // For ON DUPLICATE KEY UPDATE
+                        insertStatement.setInt(2, Integer.parseInt(item.getQuantity())); // Insert quantity
+                        insertStatement.setInt(3, Integer.parseInt(item.getQuantity())); // For ON DUPLICATE KEY UPDATE
                         insertStatement.executeUpdate();
                     }
                 } else {
@@ -68,7 +65,7 @@ public class Adistribute extends HttpServlet {
         // Map branch names to table names
         switch (branch) {
             case "Branch1":
-                return "items"; // Ensure this matches your actual branch table name
+                return "malabon"; // Ensure this matches your actual branch table name
             case "Branch2":
                 return "branch2";
             case "Branch3":
@@ -81,21 +78,15 @@ public class Adistribute extends HttpServlet {
 
     private static class Item {
         private String itemCode;
-        private String itemName;
         private String quantity;
-        private String itemCategory;
-        private String branch; // Add branch property
+        private String branch;
 
         // Getters and Setters
         public String getItemCode() { return itemCode; }
         public void setItemCode(String itemCode) { this.itemCode = itemCode; }
-        public String getItemName() { return itemName; }
-        public void setItemName(String itemName) { this.itemName = itemName; }
         public String getQuantity() { return quantity; }
         public void setQuantity(String quantity) { this.quantity = quantity; }
         public String getBranch() { return branch; }
         public void setBranch(String branch) { this.branch = branch; }
-        public String getItemCategory() { return itemCategory; }
-        public void setItemCategory(String itemCategory) { this.itemCategory = itemCategory; }
     }
 }

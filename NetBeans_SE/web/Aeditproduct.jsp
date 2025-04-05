@@ -134,6 +134,18 @@
         font-weight: bold;
         unicode-bidi: isolate;
     }
+    
+    .pet-category-options {
+        display: flex;
+        flex-direction: center; /* Stack radio buttons vertically */
+        gap: 15px; /* Space between radio buttons */
+    }
+
+    .pet-category-options label {
+        display: flex;
+        align-items: center; /* Center align the radio button and text */
+        margin: 0; /* Remove default margin */
+    }
     </style>
     <script>
         $(document).ready(function() {
@@ -146,6 +158,7 @@
                     { "data": "itemCode" },
                     { "data": "itemName" },
                     { "data": "itemCategory" },
+                    { "data": "petCategory" },
                     { "data": "totalQuantity" }
                 ]
             });
@@ -158,6 +171,12 @@
                     $('#itemCodeInput').val(data.itemCode);
                     $('#itemNameInput').val(data.itemName);
                     $('#itemCategorySelect').val(data.itemCategory);
+                    $('#petCategoryInput').val(data.petCategory);
+                    
+                    $('input[name="petCategory"]').prop('checked', false); // Uncheck all radio buttons
+                    if (data.petCategory) {
+                       $('input[name="petCategory"][value="' + data.petCategory + '"]').prop('checked', true); // Check the corresponding radio button
+                    }
                 }
             });
 
@@ -166,6 +185,7 @@
                 var itemCode = $('#itemCodeInput').val();
                 var itemName = $('#itemNameInput').val();
                 var itemCategory = $('#itemCategorySelect').val();
+                var petCategory = $('input[name="petCategory"]:checked').val();
 
                 $.ajax({
                     url: 'Aeditproduct', // Your servlet to handle the edit
@@ -173,7 +193,8 @@
                     data: {
                         itemCode: itemCode,
                         itemName: itemName,
-                        itemCategory: itemCategory
+                        itemCategory: itemCategory,
+                        petCategory: petCategory
                     },
                     success: function(response) {
                         alert("Item updated successfully!");
@@ -228,8 +249,9 @@
                 <thead>
                     <tr>
                         <th>Item Code</th>
- <th>Item Name</th>
+                        <th>Item Name</th>
                         <th>Category</th>
+                        <th>Pet Category</th>
                         <th>Total Quantity</th>
                     </tr>
                 </thead>
@@ -240,18 +262,33 @@
 
         <div class="edit-section">
             <h3>Edit Selected Item</h3>
+            <h4>Item Code:</h4>
             <input type="text" id="itemCodeInput" placeholder="Item Code" required>
+            <h4>Item Name:</h4>
             <input type="text" id="itemNameInput" placeholder="Item Name" required>
+            <h4>Item Category:</h4>
             <select id="itemCategorySelect" required>
-                <option value="category1">CODE 1</option>
-                <option value="category2">CODE 2</option>
-                <option value="category3">CODE 3</option>
-                <option value="category4">CODE 4</option>
-                <option value="category5">CODE 5</option>
-                <option value="category6">CODE 6</option>
-                <option value="category7">CODE 7</option>
+                <option value="CODE1">CODE 1</option>
+                <option value="CODE2">CODE 2</option>
+                <option value="CODE3">CODE 3</option>
+                <option value="CODE4">CODE 4</option>
+                <option value="CODE5">CODE 5</option>
+                <option value="CODE6">CODE 6</option>
+                <option value="CODE7">CODE 7</option>
                 <!-- Add more categories as needed -->
             </select>
+            <h4>Pet Category:</h4>
+            <div class="pet-category-options">
+                <label>
+                    <input type="radio" name="petCategory" value="Cat" id="petCategoryCat"> Cat
+                </label>
+                <label>
+                    <input type="radio" name="petCategory" value="Dog" id="petCategoryDog"> Dog
+                </label>
+                <label>
+                    <input type="radio" name="petCategory" value="Both" id="petCategoryBoth"> Both
+                </label>
+            </div>
             <button type="button" class="confirm-btn">Confirm Edit</button>
             <button type="button" id="deleteButton" class="confirm-btn">Delete Item</button>
         </div>

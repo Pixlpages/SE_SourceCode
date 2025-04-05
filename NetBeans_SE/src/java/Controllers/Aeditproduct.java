@@ -19,9 +19,10 @@ public class Aeditproduct extends HttpServlet {
         String itemCode = request.getParameter("itemCode");
         String itemName = request.getParameter("itemName");
         String itemCategory = request.getParameter("itemCategory");
+        String petCategory = request.getParameter("petCategory");
 
         try {
-            updateItemInDatabase(itemCode, itemName, itemCategory);
+            updateItemInDatabase(itemCode, itemName, itemCategory, petCategory);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -29,14 +30,15 @@ public class Aeditproduct extends HttpServlet {
         }
     }
 
-    private void updateItemInDatabase(String itemCode, String itemName, String itemCategory) throws SQLException {
-        String sql = "UPDATE items SET item_name = ?, item_category = ? WHERE item_code = ?";
+    private void updateItemInDatabase(String itemCode, String itemName, String itemCategory, String petCategory) throws SQLException {
+        String sql = "UPDATE items SET item_name = ?, item_category = ?, pet_category = ? WHERE item_code = ?";
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, itemName);
             preparedStatement.setString(2, itemCategory);
-            preparedStatement.setString(3, itemCode);
+            preparedStatement.setString(3, petCategory);
+            preparedStatement.setString(4, itemCode);
             preparedStatement.executeUpdate();
         }
     }

@@ -112,7 +112,6 @@
                     // Display selected item details
                     $('#selectedItemCode').text(data.itemCode);
                     $('#selectedItemName').text(data.itemName);
-                    $('#selectedItemCategory').text(data.itemCategory);
                     $('#selectedItemQuantity').text(data.totalQuantity);
                     $('#quantityInput').val(''); // Clear previous input
                     $('#selectedItem').show();
@@ -125,7 +124,6 @@
                 var selectedItemCode = $('#selectedItemCode').text();
                 var selectedItemName = $('#selectedItemName').text();
                 var targetBranch = $('#branchSelect').val(); // Get selected branch
-                var itemCategory = $('#itemCategorySelect').val();
 
                 if (selectedItemCode && quantityToDistribute && targetBranch) {
                     // Add item to the batch list
@@ -133,7 +131,6 @@
                         itemCode: selectedItemCode,
                         itemName: selectedItemName,
                         quantity: quantityToDistribute,
-                        itemCategory: itemCategory,
                         branch: targetBranch // Include the target branch
                     });
                 }
@@ -180,7 +177,7 @@
                     <tr>
                         <th>Item Code</th>
                         <th>Item Name</th>
-                        <th>Total Quantity</th>
+                        <th >Total Quantity</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -193,13 +190,12 @@
                 <h3>Selected Item</h3>
                 <p><strong>Item Code:</strong> <span id="selectedItemCode"></span></p>
                 <p><strong>Item Name:</strong> <span id="selectedItemName"></span></p>
-                <p><strong>Item Category:</strong> <span id="selectedItemCategory"></span></p>
                 <p><strong>Total Quantity:</strong> <span id="selectedItemQuantity"></span></p>
                 <input type="number" id="quantityInput" placeholder="Enter quantity to distribute" />
                 <label for="branchSelect">Select Branch:</label>
                 <select id="branchSelect">
                     <option value="">Select a branch</option>
-                    <option value="Branch1">Branch 1</option>
+                    <option value="Branch1">malabon</option>
                     <option value="Branch2">Branch 2</option>
                     <option value="Branch3">Branch 3</option>
                     <!-- Add more branches as needed -->
