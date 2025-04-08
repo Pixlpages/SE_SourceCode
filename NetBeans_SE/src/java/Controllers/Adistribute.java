@@ -107,11 +107,21 @@ public class Adistribute extends HttpServlet {
         // Map branch names to table names
         switch (branch) {
             case "Branch1":
-                return "malabon"; // Ensure this matches your actual branch table name
+                return "bacolod"; // Ensure this matches your actual branch table name
             case "Branch2":
-                return "branch2";
+                return "cebu";
             case "Branch3":
-                return "branch3";
+                return "marquee";
+            case "Branch4":
+                return "olongapo";
+            case "Branch5":
+                return "subic";
+            case "Branch6":
+                return "tacloban";
+            case "Branch7":
+                return "tagaytay";
+            case "Branch8":
+                return "udraneta";
             // Add more branches as needed
             default:
                 throw new IllegalArgumentException("Invalid branch: " + branch);

@@ -208,9 +208,14 @@
                 <input type="number" id="quantityInput" placeholder="Enter quantity" min="1">
                 <select id="branchSelect">
                     <option value="">Select Branch</option>
-                    <option value="Branch1">Malabon</option>
-                    <option value="Branch2">Branch 2</option>
-                    <option value="Branch3">Branch 3</option>
+                    <option value="Branch1">Bacolod</option>
+                    <option value="Branch2">Cebu</option>
+                    <option value="Branch3">Marquee</option>
+                    <option value="Branch4">Olongapo</option>
+                    <option value="Branch5">Subic</option>
+                    <option value="Branch6">Tacloban</option>
+                    <option value="Branch7">Tagaytay</option>
+                    <option value="Branch8">Urdaneta</option>
                 </select>
                 <button id="addToBatchButton">Add to Batch</button>
             </div>
