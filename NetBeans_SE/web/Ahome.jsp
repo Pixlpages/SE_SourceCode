@@ -241,9 +241,9 @@
             </div>
         </div>
         <div class="welcome-admin">
-            <span>Welcome</span>
+            <span>WELCOME</span>
             <div class="admin-circle"></div>
-            <span>ADMIN</span>
+            <span style="text-transform:uppercase"><%= (String)session.getAttribute("username") %></span>
         </div>
         <h2 class="access-title">What would you like to access?</h2>
         <div class="access-cards">
