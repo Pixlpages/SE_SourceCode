@@ -113,10 +113,23 @@
 
                     // Update the batch list display
                     updateBatchList();
+
+                    // Reset item information
+                    resetItemInformation();
                 } else {
                     alert("Please select an item, quantity, and branch.");
                 }
             });
+
+            // Function to reset item information
+            function resetItemInformation() {
+                $('#selectedItemCode').text('');
+                $('#selectedItemName').text('');
+                $('#selectedItemQuantity').text('');
+                $('#quantityInput').val(''); // Clear input
+                $('#branchSelect').val(''); // Reset branch selection
+                $('#selectedItem').hide(); // Hide selected item details
+            }
 
             // Function to update the batch list display
             function updateBatchList() {
@@ -151,6 +164,7 @@
                             alert("Items distributed successfully!");
                             itemsToDistribute = []; // Clear the batch list
                             updateBatchList(); // Refresh the display
+                            table.ajax.reload(); // Reload the items table to reflect updated quantities
                         },
                         error: function(xhr, status, error) {
                             alert("Error distributing items: " + error);

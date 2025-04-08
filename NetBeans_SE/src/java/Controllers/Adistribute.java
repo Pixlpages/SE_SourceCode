@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,8 +17,7 @@ import com.google.gson.Gson;
 public class Adistribute extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         StringBuilder jsonBuffer = new StringBuilder();
         String line;
         BufferedReader reader = request.getReader();
@@ -29,18 +29,47 @@ public class Adistribute extends HttpServlet {
         // Parse the JSON data
         Gson gson = new Gson();
         Item[] items = gson.fromJson(jsonData, Item[].class);
-        
-        // Call the method to distribute items
-        distributeItems(items);
+
+        // Generate the next DR code
+        String drCode = generateNextDRCode();
+
+        // Call the method to distribute items and save delivery receipt
+        distributeItems(items, drCode);
         response.setStatus(HttpServletResponse.SC_OK);
     }
 
-    private void distributeItems(Item[] items) {
-        String updateSql = "UPDATE items SET total_quantity = total_quantity - ? WHERE item_code = ?";
-        String insertSql = "INSERT INTO %s (item_code, item_name, total_quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE total_quantity = total_quantity + ?";
+    private String generateNextDRCode() {
+        String nextDRCode = "DR-0001"; // Default value
+        String query = "SELECT MAX(dr_code) FROM delivery_receipt";
 
         try (Connection connection = DatabaseUtil.getConnection();
-             PreparedStatement updateStatement = connection.prepareStatement(updateSql)) {
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            if (resultSet.next()) {
+                String maxDRCode = resultSet.getString(1);
+                if (maxDRCode != null) {
+                    // Extract the numeric part and increment it
+                    String numericPart = maxDRCode.substring(3); // Get the part after "DR-"
+                    int nextNumber = Integer.parseInt(numericPart) + 1;
+                    nextDRCode = String.format("DR-%04d", nextNumber); // Format to DR-0001, DR-0002, etc.
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return nextDRCode;
+    }
+
+    private void distributeItems(Item[] items, String drCode) {
+        String updateSql = "UPDATE items SET total_quantity = total_quantity - ? WHERE item_code = ?";
+        String insertReceiptSql = "INSERT INTO delivery_receipt (dr_code, item_code, quantity, branch) VALUES (?, ?, ?, ?)";
+        String insertBranchSql = "INSERT INTO %s (item_code, item_name, total_quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE total_quantity = total_quantity + ?";
+
+        try (Connection connection = DatabaseUtil.getConnection();
+             PreparedStatement updateStatement = connection.prepareStatement(updateSql);
+             PreparedStatement insertReceiptStatement = connection.prepareStatement(insertReceiptSql)) {
 
             for (Item item : items) {
                 // Update the quantity in items
@@ -49,15 +78,21 @@ public class Adistribute extends HttpServlet {
                 int rowsUpdated = updateStatement.executeUpdate();
 
                 if (rowsUpdated > 0) {
-                    // Only insert into the branch table if the update was successful
+                    // Insert into delivery_receipt for each item
+                    insertReceiptStatement.setString(1, drCode); // Use the same DR code for all items
+                    insertReceiptStatement.setString(2, item.getItemCode());
+                    insertReceiptStatement.setInt(3, Integer.parseInt(item.getQuantity()));
+                    insertReceiptStatement.setString(4, item.getBranch());
+                    insertReceiptStatement.executeUpdate();
+
+                    // Insert into the appropriate branch table
                     String branchTable = getBranchTable(item.getBranch());
-                    String formattedInsertSql = String.format(insertSql, branchTable);
-                    try (PreparedStatement insertStatement = connection.prepareStatement(formattedInsertSql)) {
-                        insertStatement.setString(1, item.getItemCode());
-                        insertStatement.setString(2, item.getItemName());
-                        insertStatement.setInt(3, Integer.parseInt(item.getQuantity())); // Insert quantity
-                        insertStatement.setInt(4, Integer.parseInt(item.getQuantity())); // For ON DUPLICATE KEY UPDATE
-                        insertStatement.executeUpdate();
+                    try (PreparedStatement insertBranchStatement = connection.prepareStatement(String.format(insertBranchSql, branchTable))) {
+                        insertBranchStatement.setString(1, item.getItemCode());
+                        insertBranchStatement.setString(2, item.getItemName());
+                        insertBranchStatement.setInt(3, Integer.parseInt(item.getQuantity()));
+                        insertBranchStatement.setInt(4, Integer.parseInt(item.getQuantity())); // For ON DUPLICATE KEY UPDATE
+                        insertBranchStatement.executeUpdate();
                     }
                 } else {
                     System.out.println("No rows updated for item code: " + item.getItemCode());
