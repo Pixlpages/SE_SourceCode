@@ -66,45 +66,16 @@ public class DBManager {
             this.totalQuantity = totalQuantity;
         }
 
-        // Getters and Setters for Item properties
-        public String getItemCode() {
-            return itemCode;
-        }
-
-        public void setItemCode(String itemCode) {
-            this.itemCode = itemCode;
-        }
-
-        public String getItemName() {
-            return itemName;
-        }
-
-        public void setItemName(String itemName) {
-            this.itemName = itemName;
-        }
-
-        public String getItemCategory() {
-            return itemCategory;
-        }
-
-        public void setItemCategory(String itemCategory) {
-            this.itemCategory = itemCategory;
-        }
-
-        public String getPetCategory() {
-            return petCategory;
-        }
-
-        public void setPetCategory(String petCategory) {
-            this.petCategory = petCategory;
-        }
-
-        public int getTotalQuantity() {
-            return totalQuantity;
-        }
-
-        public void setTotalQuantity(int totalQuantity) {
-            this.totalQuantity = totalQuantity;
-        }
+        // Getters and Setters
+        public String getItemCode() { return itemCode; }
+        public void setItemCode(String itemCode) { this.itemCode = itemCode; }
+        public String getItemName() { return itemName; }
+        public void setItemName(String itemName) { this.itemName = itemName; }
+        public String getItemCategory() { return itemCategory; }
+        public void setItemCategory(String itemCategory) { this.itemCategory = itemCategory; }
+        public String getPetCategory() { return petCategory; }
+        public void setPetCategory(String petCategory) { this.petCategory = petCategory; }
+        public int getTotalQuantity() { return totalQuantity; }
+        public void setTotalQuantity(int totalQuantity) { this.totalQuantity = totalQuantity; }
     }
 }

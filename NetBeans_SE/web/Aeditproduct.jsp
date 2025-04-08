@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@ page session="true" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
     response.setHeader("Pragma", "no-cache"); // HTTP 1.0
@@ -14,6 +15,7 @@
         response.sendRedirect("error_session.jsp"); // Redirect unauthorized users
     }
 %>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -25,9 +27,9 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
             margin: 0;
             padding: 0;
+            background-color: #f5f5f5;
         }
         .header {
             background-color: #5cb5c9;
@@ -45,109 +47,28 @@
             color: black;
             margin-right: 10px;
         }
-
-    .container {
-        display: flex;
-        gap: 20px;
-        padding: 20px;
-    }
-
-    .search-section {
-        background-color: #ECE3F0;
-        border-radius: 10px;
-        padding: 10px;
-        width: 50%;
-    }
-
-    .search-box {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 5px;
-        border-bottom: 1px solid #ccc;
-    }
-
-    .search-box input {
-        flex: 1;
-        border: none;
-        background: none;
-        outline: none;
-    }
-
-    .search-results {
-        max-height: 300px;
-        overflow-y: auto;
-    }
-
-    .search-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px;
-        background-color: white;
-        border-radius: 5px;
-        margin-top: 5px;
-    }
-
-    .search-item img {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background-color: purple;
-    }
-
-    .edit-section {
-        flex-grow: 1;
-        width: 50%;
-    }
-
-    .radio-group {
-        display: flex;
-        gap: 10px;
-        margin-top: 10px;
-    }
-
-    input, select {
-        display: block;
-        margin-top: 10px;
-        padding: 5px;
-        width: 100%;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-
-    .confirm-btn {
-        margin-top: 10px;
-        padding: 10px;
-        background-color: lightgray;
-        border: none;
-        cursor: pointer;
-    }
-
-    h2 {
-        display: block;
-        font-size: 1.5em;
-        margin-block-start: 0.83em;
-        margin-block-end: 0.83em;
-        margin-inline-start: 0px;
-        margin-inline-end: 0px;
-        font-weight: bold;
-        unicode-bidi: isolate;
-    }
-    
-    .pet-category-options {
-        display: flex;
-        flex-direction: center; /* Stack radio buttons vertically */
-        gap: 15px; /* Space between radio buttons */
-    }
-
-    .pet-category-options label {
-        display: flex;
-        align-items: center; /* Center align the radio button and text */
-        margin: 0; /* Remove default margin */
-    }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .left-side, .right-side {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 45%;
+        }
+        .selected-item {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e0f7fa;
+            border-radius: 5px;
+        }
     </style>
     <script>
+        let itemsToEdit = []; // Array to hold items to edit
+
         $(document).ready(function() {
             var table = $('#itemsTable').DataTable({
                 "ajax": {
@@ -158,8 +79,7 @@
                     { "data": "itemCode" },
                     { "data": "itemName" },
                     { "data": "itemCategory" },
-                    { "data": "petCategory" },
-                    { "data": "totalQuantity" }
+                    { "data": "totalQuantity" }                 
                 ]
             });
 
@@ -167,91 +87,115 @@
             $('#itemsTable tbody').on('click', 'tr', function() {
                 var data = table.row(this).data();
                 if (data) {
-                    // Populate the edit form with selected item data
-                    $('#itemCodeInput').val(data.itemCode);
-                    $('#itemNameInput').val(data.itemName);
-                    $('#itemCategorySelect').val(data.itemCategory);
-                    $('#petCategoryInput').val(data.petCategory);
-                    
-                    $('input[name="petCategory"]').prop('checked', false); // Uncheck all radio buttons
-                    if (data.petCategory) {
-                       $('input[name="petCategory"][value="' + data.petCategory + '"]').prop('checked', true); // Check the corresponding radio button
-                    }
+                    // Display selected item details
+                    $('#selectedItemCode').text(data.itemCode);
+                    $('#selectedItemName').text(data.itemName);
+                    $('#selectedItemCategory').text(data.itemCategory);
+                    $('#selectedItemQuantity').text(data.totalQuantity); 
+                    $('#quantityInput').val(''); // Clear previous input
+                    $('#selectedItem').show();
                 }
             });
 
-            // Handle confirm edit button click
-            $('.confirm-btn').on('click', function() {
-                var itemCode = $('#itemCodeInput').val();
-                var itemName = $('#itemNameInput').val();
-                var itemCategory = $('#itemCategorySelect').val();
+            // Add item to batch list
+            $('#addToBatchButton').on('click', function() {
+                var itemCode = $('#selectedItemCode').text();
+                var itemName = $('#selectedItemName').text();
+                var itemCategory = $('#itemCategorySelect').val(); // Get the selected item category
                 var petCategory = $('input[name="petCategory"]:checked').val();
 
-                $.ajax({
-                    url: 'Aeditproduct', // Your servlet to handle the edit
-                    type: 'POST',
-                    data: {
+                if (itemCode && itemName && itemCategory && petCategory) {
+                    // Add item to the batch list
+                    itemsToEdit.push({
                         itemCode: itemCode,
                         itemName: itemName,
-                        itemCategory: itemCategory,
+                        itemCategory: itemCategory, // Include item category
                         petCategory: petCategory
-                    },
-                    success: function(response) {
-                        alert("Item updated successfully!");
-                        table.ajax.reload(); // Reload the table data
-                    },
-                    error: function() {
-                        alert("Error updating item. Please try again.");
-                    }
-                });
+                    });
+
+                    // Update the batch list display
+                    updateBatchList();
+                } else {
+                    alert("Please select an item and fill in all fields.");
+                }
             });
 
-            // Handle delete button click
-            $('#deleteButton').on('click', function() {
-                var itemCode = $('#itemCodeInput').val();
+            // Function to update the batch list display
+            function updateBatchList() {
+                var batchListHtml = '';
+                itemsToEdit.forEach(function(item, index) {
+                    batchListHtml += '<tr>' +
+                        '<td>' + item.itemCode + '</td>' +
+                        '<td>' + item.itemName + '</td>' +
+                        '<td>' + item.itemCategory + '</td>' + // Display item category
+                        '<td>' + item.petCategory + '</td>' +
+                        '<td><button onclick="removeFromBatch(' + index + ')">Remove</button></td>' +
+                        '</tr>';
+                });
+                $('#batchList tbody').html(batchListHtml);
+            }
 
-                if (itemCode) {
+            // Function to update the batch list display
+            function updateBatchList() {
+                var batchListHtml = '';
+                itemsToEdit.forEach(function(item, index) {
+                    batchListHtml += '<tr>' +
+                        '<td>' + item.itemCode + '</td>' +
+                        '<td>' + item.itemName + '</td>' +
+                        '<td>' + item.itemCategory + '</td>' +
+                        '<td>' + item.petCategory + '</td>' +
+                        '<td><button onclick="removeFromBatch(' + index + ')">Remove</button></td>' +
+                        '</tr>';
+                });
+                $('#batchList tbody').html(batchListHtml);
+            }
+
+            // Function to remove an item from the batch list
+            window.removeFromBatch = function(index) {
+                itemsToEdit.splice(index, 1);
+                updateBatchList();
+            };
+
+            // Submit the batch list for editing
+            $('#editButton').on('click', function() {
+                if (itemsToEdit.length > 0) {
                     $.ajax({
-                        url: 'Aeditproduct_delete', // Your servlet to handle the delete
+                        url: 'Aeditproduct', // Your servlet to handle editing
                         type: 'POST',
-                        data: {
-                            itemCode: itemCode
-                        },
+                        contentType: 'application/json',
+                        data: JSON.stringify(itemsToEdit), // Send the items as JSON
                         success: function(response) {
-                            alert("Item deleted successfully!");
-                            table.ajax.reload(); // Reload the table data
-                            $('#itemCodeInput').val(''); // Clear the input field
-                            $('#itemNameInput').val('');
-                            $('#itemCategorySelect').val('');
+                            alert("Items edited successfully!");
+                            itemsToEdit = []; // Clear the batch list
+                            updateBatchList(); // Refresh the display
                         },
-                        error: function() {
-                            alert("Error deleting item. Please try again.");
+                        error: function(xhr, status, error) {
+                            alert("Error editing items: " + error);
                         }
                     });
                 } else {
-                    alert("No item selected for deletion.");
+                    alert("No items in the batch list to edit.");
                 }
             });
         });
     </script>
 </head>
-
 <body>
     <div class="header">
-        <h1>MV88 Ventures Inventory System</h1>
+        <h1>Edit Product</h1>
     </div>
     <div class="sub-header">
         <a href="Ahome.jsp">&#8592; back</a>
     </div>
     <div class="container">
-        <div class="search-section">
+        <div class="left-side">
+            <h2>Available Items</h2>
             <table id="itemsTable" class="display">
                 <thead>
                     <tr>
                         <th>Item Code</th>
                         <th>Item Name</th>
-                        <th>Category</th>
-                        <th>Pet Category</th>
+                        <th>Item Category</th>
                         <th>Total Quantity</th>
                     </tr>
                 </thead>
@@ -259,38 +203,51 @@
                 </tbody>
             </table>
         </div>
-
-        <div class="edit-section">
-            <h3>Edit Selected Item</h3>
-            <h4>Item Code:</h4>
-            <input type="text" id="itemCodeInput" placeholder="Item Code" required>
-            <h4>Item Name:</h4>
-            <input type="text" id="itemNameInput" placeholder="Item Name" required>
-            <h4>Item Category:</h4>
-            <select id="itemCategorySelect" required>
-                <option value="CODE1">CODE 1</option>
-                <option value="CODE2">CODE 2</option>
-                <option value="CODE3">CODE 3</option>
-                <option value="CODE4">CODE 4</option>
-                <option value="CODE5">CODE 5</option>
-                <option value="CODE6">CODE 6</option>
-                <option value="CODE7">CODE 7</option>
-                <!-- Add more categories as needed -->
-            </select>
-            <h4>Pet Category:</h4>
-            <div class="pet-category-options">
-                <label>
-                    <input type="radio" name="petCategory" value="Cat" id="petCategoryCat"> Cat
-                </label>
-                <label>
-                    <input type="radio" name="petCategory" value="Dog" id="petCategoryDog"> Dog
-                </label>
-                <label>
-                    <input type="radio" name="petCategory" value="Both" id="petCategoryBoth"> Both
-                </label>
+        <div class="right-side">
+            <h2>Selected Item</h2>
+            <div id="selectedItem" style="display:none;">
+                <p><strong>Item Code:</strong> <span id="selectedItemCode"></span></p>
+                <p><strong>Item Name:</strong> <span id="selectedItemName"></span></p>
+                <p><strong>Total Quantity:</strong> <span id="selectedItemQuantity"></span></p>
+                <select id="itemCategorySelect">
+                    <option value="CODE1">CODE 1</option>
+                    <option value="CODE2">CODE 2</option>
+                    <option value="CODE3">CODE 3</option>
+                    <option value="CODE4">CODE 4</option>
+                    <option value="CODE5">CODE 5</option>
+                    <option value="CODE6">CODE 6</option>
+                    <option value="CODE7">CODE 7</option>
+                    <!-- Add more categories as needed -->
+                </select>
+                <div class="pet-category-options">
+                    <label>
+                        <input type="radio" name="petCategory" value="Dog" id="petCategoryDog"> Dog
+                    </label>
+                    <label>
+                        <input type="radio" name="petCategory" value="Cat" id="petCategoryCat"> Cat
+                    </label>
+                    <label>
+                        <input type="radio" name="petCategory" value="Both" id="petCategoryBoth"> Both
+                    </label>
+                </div>
+                <button id="addToBatchButton">Add to Batch</button>
             </div>
-            <button type="button" class="confirm-btn">Confirm Edit</button>
-            <button type="button" id="deleteButton" class="confirm-btn">Delete Item</button>
+            <h2>Batch List</h2>
+            <table id="batchList">
+                <thead>
+                    <tr>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Item Category</th>
+                        <th>Pet Category</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Batch items will be populated here -->
+                </tbody>
+            </table>
+            <button id="editButton">Edit Items</button>
         </div>
     </div>
 </body>

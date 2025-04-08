@@ -1,5 +1,6 @@
 package Controllers;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,27 +18,32 @@ public class Adistribute extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String action = request.getParameter("action");
-        if ("distributeItems".equals(action)) {
-            String itemsData = request.getParameter("itemsToDistribute");
-            Gson gson = new Gson();
-            Item[] items = gson.fromJson(itemsData, Item[].class);
-            distributeItems(items);
-            response.setStatus(HttpServletResponse.SC_OK);
-        } else {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        StringBuilder jsonBuffer = new StringBuilder();
+        String line;
+        BufferedReader reader = request.getReader();
+        while ((line = reader.readLine()) != null) {
+            jsonBuffer.append(line);
         }
+        String jsonData = jsonBuffer.toString();
+
+        // Parse the JSON data
+        Gson gson = new Gson();
+        Item[] items = gson.fromJson(jsonData, Item[].class);
+        
+        // Call the method to distribute items
+        distributeItems(items);
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     private void distributeItems(Item[] items) {
         String updateSql = "UPDATE items SET total_quantity = total_quantity - ? WHERE item_code = ?";
-        String insertSql = "INSERT INTO %s (item_code, total_quantity) VALUES (?, ?) ON DUPLICATE KEY UPDATE total_quantity = total_quantity + ?";
+        String insertSql = "INSERT INTO %s (item_code, item_name, total_quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE total_quantity = total_quantity + ?";
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement updateStatement = connection.prepareStatement(updateSql)) {
 
             for (Item item : items) {
-                // Update the quantity in products_test
+                // Update the quantity in items
                 updateStatement.setInt(1, Integer.parseInt(item.getQuantity()));
                 updateStatement.setString(2, item.getItemCode());
                 int rowsUpdated = updateStatement.executeUpdate();
@@ -48,8 +54,9 @@ public class Adistribute extends HttpServlet {
                     String formattedInsertSql = String.format(insertSql, branchTable);
                     try (PreparedStatement insertStatement = connection.prepareStatement(formattedInsertSql)) {
                         insertStatement.setString(1, item.getItemCode());
-                        insertStatement.setInt(2, Integer.parseInt(item.getQuantity())); // Insert quantity
-                        insertStatement.setInt(3, Integer.parseInt(item.getQuantity())); // For ON DUPLICATE KEY UPDATE
+                        insertStatement.setString(2, item.getItemName());
+                        insertStatement.setInt(3, Integer.parseInt(item.getQuantity())); // Insert quantity
+                        insertStatement.setInt(4, Integer.parseInt(item.getQuantity())); // For ON DUPLICATE KEY UPDATE
                         insertStatement.executeUpdate();
                     }
                 } else {
@@ -78,12 +85,15 @@ public class Adistribute extends HttpServlet {
 
     private static class Item {
         private String itemCode;
+        private String itemName; // Add itemName property
         private String quantity;
-        private String branch;
+        private String branch; // Add branch property
 
         // Getters and Setters
         public String getItemCode() { return itemCode; }
         public void setItemCode(String itemCode) { this.itemCode = itemCode; }
+        public String getItemName() { return itemName; }
+        public void setItemName(String itemName) { this.itemName = itemName; }
         public String getQuantity() { return quantity; }
         public void setQuantity(String quantity) { this.quantity = quantity; }
         public String getBranch() { return branch; }

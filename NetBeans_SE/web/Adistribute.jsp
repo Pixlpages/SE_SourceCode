@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <%@ page session="true" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
@@ -16,6 +15,7 @@
     }
 %>
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -59,29 +59,6 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 45%;
         }
-        .search-bar {
-            display: flex;
-            align-items: center;
-            background-color: #e0e0e0;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .search-bar input {
-            border: none;
-            background: none;
-            flex-grow: 1;
-            padding: 5px;
-            font-size: 16px;
-        }
-        .da_button {
-            background-color: #5cb5c9;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
         .selected-item {
             margin-top: 20px;
             padding: 10px;
@@ -118,8 +95,8 @@
                 }
             });
 
-            // Update database functionality
-            $('#distributeButton').on('click', function() {
+            // Add item to batch list
+            $('#addToBatchButton').on('click', function() {
                 var quantityToDistribute = $('#quantityInput').val();
                 var selectedItemCode = $('#selectedItemCode').text();
                 var selectedItemName = $('#selectedItemName').text();
@@ -133,51 +110,75 @@
                         quantity: quantityToDistribute,
                         branch: targetBranch // Include the target branch
                     });
-                }
 
-                if (itemsToDistribute.length === 0) {
-                    alert("No items to distribute.");
-                    return;
+                    // Update the batch list display
+                    updateBatchList();
+                } else {
+                    alert("Please select an item, quantity, and branch.");
                 }
+            });
 
-                $.ajax({
-                    url: 'Adistribute', // Your servlet to handle distribution
-                    type: 'POST',
-                    data: {
-                        action: 'distributeItems',
-                        itemsToDistribute: JSON.stringify(itemsToDistribute)
-                    },
-                    success: function(response) {
-                        alert("Items distributed successfully!");
-                        $('#itemsTable').DataTable().ajax.reload(); // Reload the table data
-                        itemsToDistribute = []; // Clear the batch list
-                        $('#selectedItem').hide(); // Hide the selected item details
-                        $('#quantityInput').val(''); // Clear the input field
-                    },
-                    error: function() {
-                        alert("Error distributing items. Please try again.");
-                    }
+            // Function to update the batch list display
+            function updateBatchList() {
+                var batchListHtml = '';
+                itemsToDistribute.forEach(function(item, index) {
+                    batchListHtml += '<tr>' +
+                        '<td>' + item.itemCode + '</td>' +
+                        '<td>' + item.itemName + '</td>' +
+                        '<td>' + item.quantity + '</td>' +
+                        '<td>' + item.branch + '</td>' +
+                        '<td><button onclick="removeFromBatch(' + index + ')">Remove</button></td>' +
+                        '</tr>';
                 });
+                $('#batchList tbody').html(batchListHtml);
+            }
+
+            // Function to remove an item from the batch list
+            window.removeFromBatch = function(index) {
+                itemsToDistribute.splice(index, 1);
+                updateBatchList();
+            };
+
+            // Submit the batch list for distribution
+            $('#distributeButton').on('click', function() {
+                if (itemsToDistribute.length > 0) {
+                    $.ajax({
+                        url: 'Adistribute', // Your servlet to handle distribution
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(itemsToDistribute), // Send the items as JSON
+                        success: function(response) {
+                            alert("Items distributed successfully!");
+                            itemsToDistribute = []; // Clear the batch list
+                            updateBatchList(); // Refresh the display
+                        },
+                        error: function(xhr, status, error) {
+                            alert("Error distributing items: " + error);
+                        }
+                    });
+                } else {
+                    alert("No items in the batch list to distribute.");
+                }
             });
         });
     </script>
 </head>
 <body>
     <div class="header">
-        <h1>MV88 Ventures Inventory System</h1>
+        <h1>Distribute Items</h1>
     </div>
     <div class="sub-header">
         <a href="Ahome.jsp">&#8592; back</a>
-        <input type="text" id="searchInput" placeholder="Search items..." />
     </div>
     <div class="container">
         <div class="left-side">
+            <h2>Available Items</h2>
             <table id="itemsTable" class="display">
                 <thead>
                     <tr>
                         <th>Item Code</th>
                         <th>Item Name</th>
-                        <th >Total Quantity</th>
+                        <th>Total Quantity</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -185,23 +186,36 @@
             </table>
         </div>
         <div class="right-side">
-            <h3>Item Details</h3>
-            <div id="selectedItem" class="selected-item" style="display:none;">
-                <h3>Selected Item</h3>
+            <h2>Selected Item</h2>
+            <div id="selectedItem" style="display:none;">
                 <p><strong>Item Code:</strong> <span id="selectedItemCode"></span></p>
                 <p><strong>Item Name:</strong> <span id="selectedItemName"></span></p>
                 <p><strong>Total Quantity:</strong> <span id="selectedItemQuantity"></span></p>
-                <input type="number" id="quantityInput" placeholder="Enter quantity to distribute" />
-                <label for="branchSelect">Select Branch:</label>
+                <input type="number" id="quantityInput" placeholder="Enter quantity" min="1">
                 <select id="branchSelect">
-                    <option value="">Select a branch</option>
-                    <option value="Branch1">malabon</option>
+                    <option value="">Select Branch</option>
+                    <option value="Branch1">Malabon</option>
                     <option value="Branch2">Branch 2</option>
                     <option value="Branch3">Branch 3</option>
-                    <!-- Add more branches as needed -->
                 </select>
-                <button id="distributeButton" class="da_button">Distribute Items</button>
-            </div> 
+                <button id="addToBatchButton">Add to Batch</button>
+            </div>
+            <h2>Batch List</h2>
+            <table id="batchList">
+                <thead>
+                    <tr>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Quantity</th>
+                        <th>Branch</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Batch items will be populated here -->
+                </tbody>
+            </table>
+            <button id="distributeButton">Distribute Items</button>
         </div>
     </div>
 </body>

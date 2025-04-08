@@ -114,21 +114,21 @@
                 <input type="text" name="item_code" placeholder="Item Code" required>
                 <input type="text" name="item_name" placeholder="Item Name" required>
                 <div>
-                    <input type="radio" id="dog" name="pet_category" value="dog" required>
+                    <input type="radio" id="dog" name="pet_category" value="Dog" required>
                     <label for="dog">Dog</label>
-                    <input type="radio" id="cat" name="pet_category" value="cat">
+                    <input type="radio" id="cat" name="pet_category" value="Cat">
                     <label for="cat">Cat</label>
-                    <input type="radio" id="dog-cat" name="pet_category" value="dog-cat">
+                    <input type="radio" id="dog-cat" name="pet_category" value="Both">
                     <label for="dog-cat">Dog & Cat</label>
                 </div>
                 <select name="item_category" required>
-                    <option value="category1">CODE 1</option>
-                    <option value="category2">CODE 2</option>
-                    <option value="category2">CODE 3</option>
-                    <option value="category2">CODE 4</option>
-                    <option value="category2">CODE 5</option>
-                    <option value="category2">CODE 6</option>
-                    <option value="category2">CODE 7</option>
+                    <option value="CODE1">CODE 1</option>
+                    <option value="CODE2">CODE 2</option>
+                    <option value="CODE3">CODE 3</option>
+                    <option value="CODE4">CODE 4</option>
+                    <option value="CODE5">CODE 5</option>
+                    <option value="CODE6">CODE 6</option>
+                    <option value="CODE7">CODE 7</option>
                     <!-- Add more categories as needed -->
                 </select>
                 <input type="number" name="total_quantity" placeholder="Total Quantity" min="0" max="99999" required>

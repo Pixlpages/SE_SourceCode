@@ -18,7 +18,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MV88 Ventures Inventory System</title>
+    <title>Manage Defective Items</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -54,21 +57,6 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 45%;
         }
-        .search-bar {
-            display: flex;
-            align-items: center;
-            background-color: #e0e0e0;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .search-bar input {
-            border: none;
-            background: none;
-            flex-grow: 1;
-            padding: 5px;
-            font-size: 16px;
-        }
         .da_button {
             background-color: #5cb5c9;
             color: white;
@@ -77,13 +65,13 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .items-list, .distribution-list {
+        .defective-list {
             background-color: #f0f0f0;
             padding: 10px;
             border-radius: 5px;
             margin-bottom: 20px;
         }
-        .items-list h3, .distribution-list h3 {
+        .defective-list h3 {
             margin-top: 0;
         }
         .item {
@@ -94,24 +82,6 @@
         }
         .item:last-child {
             border-bottom: none;
-        }
-        .amount-location {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .amount-location input, .amount-location select {
-            margin-right: 10px;
-            padding: 5px;
-            font-size: 16px;
-        }
-        .confirm-mark {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .confirm-mark input {
-            margin-right: 10px;
         }
     </style>
 </head>
@@ -124,53 +94,93 @@
     </div>
     <div class="container">
         <div class="left-side">
-            <div class="search-bar">
-                <input type="text" placeholder="Search Item Name/Code">
-                <button class="da_button">Search</button>
-            </div>
-            <div class="items-list">
-                <h3>Items Code</h3>
-                <div class="item">
-                    <span>Supporting line text lorem ipsum dolor sit</span>
-                </div>
-                <div class="item">
-                    <span>Supporting line text lorem ipsum dolor sit</span>
-                </div>
-                <div class="item">
-                    <span>Supporting line text lorem ipsum dolor sit</span>
-                </div>
-            </div>
-            <div class="amount-location">
-                <input type="number" placeholder="0-99999">
-                <select>
-                    <option>Reason</option>
-                    <!-- Add more locations as needed -->
-                </select>
-                <button class="da_button">Add to List</button>
-            </div>
+            <h3>Items List</h3>
+            <table id="itemsTable" class="display">
+                <thead>
+                    <tr>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Total Quantity</th>
+                        <th>Is Defective</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be populated by DataTable -->
+                </tbody>
+            </table>
         </div>
         <div class="right-side">
-            <div class="distribution-list">
-                <h3>List of Items to Mark as Defective</h3>
-                <div class="item">
-                    <span>List item</span>
-                    <span>100+</span>
-                </div>
-                <div class="item">
-                    <span>List item</span>
-                    <span>100+</span>
-                </div>
-                <div class="item">
-                    <span>List item</span>
-                    <span>100+</span>
-                </div>
+            <h3>Mark Item as Defective</h3>
+            <div id="selectedItemDetails" style="display:none;">
+                <p><strong>Item Code:</strong> <span id="selectedItemCode"></span></p>
+                <p><strong>Item Name:</strong> <span id="selected ItemName"></span></p>
+                <p><strong>Total Quantity:</strong> <span id="selectedItemQuantity"></span></p>
+                <label for="isDefective">Mark as Defective:</label>
+                <select id="isDefective">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+                <button id="markDefectiveButton" class="da_button">Update Defective Status</button>
             </div>
-            <div class="confirm-mark">
-                <input type="checkbox" id="confirm-items">
-                <label for="confirm-items">Confirm Items</label>
-            </div>
-            <button class="da_button">Mark as Defective</button>
         </div>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            var table = $('#itemsTable').DataTable({
+                "ajax": {
+                    "url": "Agetproducts", // Your servlet to fetch products
+                    "dataSrc": ""
+                },
+                "columns": [
+                    { "data": "itemCode" },
+                    { "data": "itemName" },
+                    { "data": "totalQuantity" },
+                    { 
+                        "data": "is_defective", 
+                        "render": function(data) {
+                            return String(data) === "1" ? "Yes" : "No"; // Ensure comparison is done correctly
+                        }
+                    }
+                ]
+            });
+
+            // Handle row click event for item selection
+            $('#itemsTable tbody').on('click', 'tr', function() {
+                var data = table.row(this).data();
+                if (data) {
+                    // Populate the selected item details
+                    $('#selectedItemCode').text(data.itemCode);
+                    $('#selectedItemName').text(data.itemName);
+                    $('#selectedItemQuantity').text(data.totalQuantity);
+                    $('#isDefective').val(data.is_defective); // Set the dropdown based on current status
+                    $('#selectedItemDetails').show(); // Show the details section
+                }
+            });
+
+            // Handle marking item as defective
+            $('#markDefectiveButton').on('click', function() {
+                var itemCode = $('#selectedItemCode').text();
+                var isDefective = $('#isDefective').val();
+
+                $.ajax({
+                    url: 'Amanagedefective', // Your servlet to update the defective status
+                    type: 'POST',
+                    data: {
+                        itemCode: itemCode,
+                        isDefective: isDefective
+                    },
+                    success: function(response) {
+                        alert("Defective status updated successfully!");
+                        table.ajax.reload(); // Reload the table data
+                        $('#selectedItemDetails').hide(); // Hide the details section
+                    },
+                    error: function() {
+                        alert("Error updating defective status. Please try again.");
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
