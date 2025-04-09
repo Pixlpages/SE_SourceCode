@@ -1,6 +1,7 @@
 package Controllers;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -49,22 +50,6 @@ public class DBManager {
 
     public void setItemList(List<Item> itemList) {
         this.itemList = itemList;
-    }
-
-    // Methods for managing delivery receipts
-    public void addDeliveryReceipt(DeliveryReceipt receipt) throws SQLException {
-        // SQL statement to insert a delivery receipt into the database
-        String sql = "INSERT INTO delivery_receipt (dr_code, item_code, quantity, branch, delivery_date) VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection connection = DatabaseUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, receipt.getDrCode());
-            preparedStatement.setString(2, receipt.getItemCode());
-            preparedStatement.setInt(3, receipt.getQuantity());
-            preparedStatement.setString(4, receipt.getBranch());
-            preparedStatement.setTimestamp(5, receipt.getDeliveryDate());
-            preparedStatement.executeUpdate(); // Execute the insert
-        }
     }
 
     public List<DeliveryReceipt> getDeliveryReceipts() {
