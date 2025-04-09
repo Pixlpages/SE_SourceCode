@@ -71,20 +71,32 @@ public class Anewproduct extends HttpServlet {
     }
 
     private void addAllItemsToDatabase(List<DBManager.Item> itemList) throws SQLException {
-        String sql = "INSERT INTO items (item_code, item_name, item_category, pet_category, total_quantity) VALUES (?, ?, ?, ?, ?)";
-        
+        String insertItemsSql = "INSERT INTO items (item_code, item_name, item_category, pet_category, total_quantity) VALUES (?, ?, ?, ?, ?)";
+        String insertMalabonSql = "INSERT INTO malabon (item_code, item_name, total_quantity) VALUES (?, ?, ?)";
+
         try (Connection connection = DatabaseUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-             
+             PreparedStatement insertItemsStatement = connection.prepareStatement(insertItemsSql);
+             PreparedStatement insertMalabonStatement = connection.prepareStatement(insertMalabonSql)) {
+
             for (DBManager.Item item : itemList) {
-                preparedStatement.setString(1, item.getItemCode());
-                preparedStatement.setString(2, item.getItemName());
-                preparedStatement.setString(3, item.getItemCategory());
-                preparedStatement.setString(4, item.getPetCategory());
-                preparedStatement.setInt(5, item.getTotalQuantity());
-                preparedStatement.addBatch(); // Add to batch
+                // Insert into items table
+                insertItemsStatement.setString(1, item.getItemCode());
+                insertItemsStatement.setString(2, item.getItemName());
+                insertItemsStatement.setString(3, item.getItemCategory());
+                insertItemsStatement.setString(4, item.getPetCategory());
+                insertItemsStatement.setInt(5, item.getTotalQuantity());
+                insertItemsStatement.addBatch(); // Add to batch for items
+
+                // Insert into malabon table
+                insertMalabonStatement.setString(1, item.getItemCode());
+                insertMalabonStatement.setString(2, item.getItemName());
+                insertMalabonStatement.setInt(3, item.getTotalQuantity());
+                insertMalabonStatement.addBatch(); // Add to batch for malabon
             }
-            preparedStatement.executeBatch(); // Execute batch insert
+
+            // Execute batch inserts
+            insertItemsStatement.executeBatch();
+            insertMalabonStatement.executeBatch();
         }
     }
 }

@@ -68,7 +68,7 @@ public class Aincreasequantity extends HttpServlet {
     }
 
     private boolean increaseItemQuantity(String itemCode, int quantity) throws SQLException {
-        String sql = "UPDATE items SET total_quantity = total_quantity + ? WHERE item_code = ?";
+        String sql = "UPDATE malabon SET total_quantity = total_quantity + ? WHERE item_code = ?";
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {

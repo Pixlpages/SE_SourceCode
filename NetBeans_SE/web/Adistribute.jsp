@@ -217,14 +217,14 @@
                 <input type="number" id="quantityInput" placeholder="Enter quantity" min="1">
                 <select id="branchSelect">
                     <option value="">Select Branch</option>
-                    <option value="Bacolod">Bacolod</option>
-                    <option value="Cebu">Cebu</option>
-                    <option value="Marquee">Marquee</option>
-                    <option value="Olongapo">Olongapo</option>
-                    <option value="Subic">Subic</option>
-                    <option value="Tacloban">Tacloban</option>
-                    <option value="Tagaytay">Tagaytay</option>
-                    <option value="Urdaneta">Urdaneta</option>
+                    <option value="bacolod">Bacolod</option>
+                    <option value="cebu">Cebu</option>
+                    <option value="marquee">Marquee</option>
+                    <option value="olongapo">Olongapo</option>
+                    <option value="subic">Subic</option>
+                    <option value="tacloban">Tacloban</option>
+                    <option value="tagaytay">Tagaytay</option>
+                    <option value="urdaneta">Urdaneta</option>
                 </select>
                 <button id="addToBatchButton">Add to Batch</button>
             </div>
