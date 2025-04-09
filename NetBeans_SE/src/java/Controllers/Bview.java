@@ -1,87 +1,101 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package Controllers;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
+import java.io.*;
+import java.sql.*;
 
-/**
- *
- * @author Sad.PENGUIN
- */
-@WebServlet(name = "Bview", urlPatterns = {"/Bview"})
 public class Bview extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet Bview</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet Bview at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+
+        // Get the username from the session
+        HttpSession session = request.getSession();
+        String branch = (String) session.getAttribute("username");
+
+        // If the username doesn't match a branch, return an error
+        if (!isValidBranch(branch)) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid branch for username");
+            return;
+        }
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "inline; filename=" + branch + "-report.pdf");
+
+        try {
+            Document document = new Document();
+            PdfWriter.getInstance(document, response.getOutputStream());
+            document.open();
+
+            // Title
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
+            Paragraph title = new Paragraph("Branch Report: " + capitalize(branch), titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+            document.add(Chunk.NEWLINE);
+
+            // Use DatabaseUtil to get connection
+            Connection conn = DatabaseUtil.getConnection();
+
+            // Query specific to the branch (e.g., malabon, tagaytay, etc.)
+            String query = "SELECT item_code, item_name, critically_low, total_quantity FROM " + branch;
+            try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+
+                // Create PDF Table
+                PdfPTable table = new PdfPTable(4); // 4 columns
+                table.setWidthPercentage(100);
+                table.setSpacingBefore(10f);
+                table.setSpacingAfter(10f);
+
+                // Table headers
+                Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+                String[] headers = {"Item Code", "Item Name", "Critically Low", "Total Quantity"};
+                for (String header : headers) {
+                    PdfPCell cell = new PdfPCell(new Phrase(header, headFont));
+                    cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    table.addCell(cell);
+                }
+
+                // Table rows
+                while (rs.next()) {
+                    table.addCell(rs.getString("item_code"));
+                    table.addCell(rs.getString("item_name"));
+                    table.addCell(String.valueOf(rs.getBoolean("critically_low")));
+                    table.addCell(String.valueOf(rs.getInt("total_quantity")));
+                }
+
+                document.add(table);
+            } finally {
+                if (conn != null) conn.close();
+            }
+
+            document.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServletException("Error generating PDF", e);
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
+    private boolean isValidBranch(String branch) {
+        // List of valid branch names to check against
+        String[] validBranches = {
+            "malabon", "tagaytay", "cebu", "olongapo", "marquee", "subic", "urdaneta", "bacolod", "tacloban"
+        };
+        for (String b : validBranches) {
+            if (b.equals(branch)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
+    private String capitalize(String input) {
+        if (input == null || input.isEmpty()) return input;
+        return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
 }

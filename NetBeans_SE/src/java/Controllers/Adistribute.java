@@ -7,13 +7,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 
-@WebServlet("/Adistribute")
 public class Adistribute extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -63,7 +61,7 @@ public class Adistribute extends HttpServlet {
     }
 
     private void distributeItems(Item[] items, String drCode) {
-        String updateSql = "UPDATE malabon SET total_quantity = total_quantity - ? WHERE item_code = ?";
+        String updateSql = "UPDATE items SET total_quantity = total_quantity - ? WHERE item_code = ?";
         String insertReceiptSql = "INSERT INTO delivery_receipt (dr_code, item_code, quantity, branch) VALUES (?, ?, ?, ?)";
 
         try (Connection connection = DatabaseUtil.getConnection();

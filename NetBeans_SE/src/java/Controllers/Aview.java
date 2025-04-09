@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.sql.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
-import javax.servlet.annotation.WebServlet;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 
-@WebServlet("/Aview")
 public class Aview extends HttpServlet {
     private static final long serialVersionUID = 1L;
 

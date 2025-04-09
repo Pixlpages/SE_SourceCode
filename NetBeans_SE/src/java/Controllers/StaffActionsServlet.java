@@ -16,13 +16,13 @@ public class StaffActionsServlet extends HttpServlet {
         } else if ("pull".equals(action)) {
             // Handle editing item information logic
             response.sendRedirect("Bpullout.jsp");
+        } else if ("sales".equals(action)) {
+            // Handle editing item information logic
+            response.sendRedirect("Bsales.jsp");
         } else if ("view".equals(action)) {
             // Handle editing item information logic
             response.sendRedirect("Bview.jsp");
-        } else if ("manage".equals(action)) {
-            // Handle editing item information logic
-            response.sendRedirect("Bmanagedefective.jsp");
-        } else {
+        }  else {
             response.sendRedirect("error.jsp"); // Redirect to an error page if action is unknown
         }
     }
