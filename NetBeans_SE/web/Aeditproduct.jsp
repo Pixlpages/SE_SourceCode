@@ -16,7 +16,9 @@
     }
 %>
 
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,34 +33,41 @@
             padding: 0;
             background-color: #f5f5f5;
         }
+
         .header {
             background-color: #5cb5c9;
             color: white;
             padding: 20px;
             text-align: center;
         }
+
         .sub-header {
             padding: 10px;
             display: flex;
             align-items: center;
         }
+
         .sub-header a {
             text-decoration: none;
             color: black;
             margin-right: 10px;
         }
+
         .container {
             display: flex;
             justify-content: space-between;
             padding: 20px;
         }
-        .left-side, .right-side {
+
+        .left-side,
+        .right-side {
             background-color: white;
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 45%;
         }
+
         .selected-item {
             margin-top: 20px;
             padding: 10px;
@@ -69,7 +78,7 @@
     <script>
         let itemsToEdit = []; // Array to hold items to edit
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             var table = $('#itemsTable').DataTable({
                 "ajax": {
                     "url": "Agetproducts", // Servlet to fetch products
@@ -79,26 +88,26 @@
                     { "data": "itemCode" },
                     { "data": "itemName" },
                     { "data": "itemCategory" },
-                    { "data": "totalQuantity" }                 
+                    { "data": "totalQuantity" }
                 ]
             });
 
             // Handle row click event for item selection
-            $('#itemsTable tbody').on('click', 'tr', function() {
+            $('#itemsTable tbody').on('click', 'tr', function () {
                 var data = table.row(this).data();
                 if (data) {
                     // Display selected item details
                     $('#selectedItemCode').text(data.itemCode);
                     $('#selectedItemName').text(data.itemName);
                     $('#selectedItemCategory').text(data.itemCategory);
-                    $('#selectedItemQuantity').text(data.totalQuantity); 
+                    $('#selectedItemQuantity').text(data.totalQuantity);
                     $('#quantityInput').val(''); // Clear previous input
                     $('#selectedItem').show();
                 }
             });
 
             // Add item to batch list
-            $('#addToBatchButton').on('click', function() {
+            $('#addToBatchButton').on('click', function () {
                 var itemCode = $('#selectedItemCode').text();
                 var itemName = $('#selectedItemName').text();
                 var itemCategory = $('#itemCategorySelect').val(); // Get the selected item category
@@ -123,7 +132,7 @@
             // Function to update the batch list display
             function updateBatchList() {
                 var batchListHtml = '';
-                itemsToEdit.forEach(function(item, index) {
+                itemsToEdit.forEach(function (item, index) {
                     batchListHtml += '<tr>' +
                         '<td>' + item.itemCode + '</td>' +
                         '<td>' + item.itemName + '</td>' +
@@ -138,7 +147,7 @@
             // Function to update the batch list display
             function updateBatchList() {
                 var batchListHtml = '';
-                itemsToEdit.forEach(function(item, index) {
+                itemsToEdit.forEach(function (item, index) {
                     batchListHtml += '<tr>' +
                         '<td>' + item.itemCode + '</td>' +
                         '<td>' + item.itemName + '</td>' +
@@ -151,25 +160,25 @@
             }
 
             // Function to remove an item from the batch list
-            window.removeFromBatch = function(index) {
+            window.removeFromBatch = function (index) {
                 itemsToEdit.splice(index, 1);
                 updateBatchList();
             };
 
             // Submit the batch list for editing
-            $('#editButton').on('click', function() {
+            $('#editButton').on('click', function () {
                 if (itemsToEdit.length > 0) {
                     $.ajax({
                         url: 'Aeditproduct', // Your servlet to handle editing
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify(itemsToEdit), // Send the items as JSON
-                        success: function(response) {
+                        success: function (response) {
                             alert("Items edited successfully!");
                             itemsToEdit = []; // Clear the batch list
                             updateBatchList(); // Refresh the display
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             alert("Error editing items: " + error);
                         }
                     });
@@ -180,6 +189,7 @@
         });
     </script>
 </head>
+
 <body>
     <div class="header">
         <h1>Edit Product</h1>
@@ -217,8 +227,7 @@
                     <option value="CODE5">CODE 5</option>
                     <option value="CODE6">CODE 6</option>
                     <option value="CODE7">CODE 7</option>
-                    <!-- Add more categories as needed -->
-                </select>
+                    </select>
                 <div class="pet-category-options">
                     <label>
                         <input type="radio" name="petCategory" value="Dog" id="petCategoryDog"> Dog
@@ -244,11 +253,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Batch items will be populated here -->
-                </tbody>
+                    </tbody>
             </table>
             <button id="editButton">Edit Items</button>
         </div>
     </div>
 </body>
+
 </html>

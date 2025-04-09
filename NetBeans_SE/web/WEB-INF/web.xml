@@ -71,6 +71,10 @@
         <servlet-name>Bview</servlet-name>
         <servlet-class>Controllers.Bview</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Agetmal</servlet-name>
+        <servlet-class>Controllers.Agetmal</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/LoginServlet</url-pattern>
@@ -138,6 +142,10 @@
     <servlet-mapping>
         <servlet-name>Bview</servlet-name>
         <url-pattern>/Bview</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Agetmal</servlet-name>
+        <url-pattern>/Agetmal</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

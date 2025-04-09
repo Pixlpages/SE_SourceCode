@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@ page session="true" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
     response.setHeader("Pragma", "no-cache"); // HTTP 1.0
@@ -16,6 +17,7 @@
 %>
 
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,30 +31,32 @@
             flex-direction: column;
             min-height: 100vh;
             margin: 0;
-            overflow: hidden; /* Prevent scrolling */
+            overflow: hidden;
+            /* Prevent scrolling */
         }
 
         /* Header Styles */
         .header {
-    background-color: #5cb5c9;
-    color: white;
-    padding: 20px;
-    display: flex;
-    justify-content: center; /* Centers everything in the header */
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
-}
-
+            background-color: #5cb5c9;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            /* Centers everything in the header */
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
         .header-left {
-    display: flex;
-    align-items: center;
-    flex: 1; /* Allows it to take up available space */
-    justify-content: center; /* Centers content horizontally */
-    text-align: center;
-}
-
+            display: flex;
+            align-items: center;
+            flex: 1;
+            /* Allows it to take up available space */
+            justify-content: center;
+            /* Centers content horizontally */
+            text-align: center;
+        }
 
         .header-right {
             display: flex;
@@ -61,7 +65,8 @@
 
         .logout-button {
             padding: 8px 12px;
-            background-color: #e0b354; /* Use button color */
+            background-color: #e0b354;
+            /* Use button color */
             border: none;
             color: black;
             border-radius: 4px;
@@ -77,10 +82,13 @@
 
         /* Main Content Styles */
         .main-content {
-            background-color: #f5f5f5; /* Dirty white background */
+            background-color: #f5f5f5;
+            /* Dirty white background */
             padding: 20px;
-            width: 1920px; /* Fixed width */
-            height: 1080px; /* Fixed height */
+            width: 1920px;
+            /* Fixed width */
+            height: 1080px;
+            /* Fixed height */
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -95,7 +103,8 @@
             align-self: flex-start;
             display: flex;
             align-items: center;
-            margin-top: 20px; /* Add margin to push it down */
+            margin-top: 20px;
+            /* Add margin to push it down */
         }
 
         .admin-circle {
@@ -110,7 +119,8 @@
         .access-title {
             font-size: 24px;
             margin-bottom: 20px;
-            margin-top: 60px; /* Add more margin to push it down */
+            margin-top: 60px;
+            /* Add more margin to push it down */
         }
 
         .access-cards {
@@ -121,17 +131,23 @@
         }
 
         .card {
-            background-color: #FFFBDD; /* Fill color */
+            background-color: #FFFBDD;
+            /* Fill color */
             padding: 20px;
             text-align: left;
-            border-radius: 8px; /* Rounded corners */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow for modern look */
-            border: 2px solid #FFD085; /* Stroke color */
-            transition: transform 0.3s ease; /* Smooth transition for hover effect */
+            border-radius: 8px;
+            /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            /* Box shadow for modern look */
+            border: 2px solid #FFD085;
+            /* Stroke color */
+            transition: transform 0.3s ease;
+            /* Smooth transition for hover effect */
         }
 
         .card:hover {
-            transform: translateY(-10px); /* Lift card on hover */
+            transform: translateY(-10px);
+            /* Lift card on hover */
         }
 
         .card h3 {
@@ -160,7 +176,8 @@
         }
 
         .card ul li::before {
-            content: "\25BA \0020"; /* Triangle bullet */
+            content: "\25BA \0020";
+            /* Triangle bullet */
             color: #5cb5c9;
         }
 
@@ -173,15 +190,18 @@
         .content-right {
             align-self: flex-end;
             text-align: right;
-            margin-top: -20px; /* Adjust margin to position it higher */
+            margin-top: -20px;
+            /* Adjust margin to position it higher */
         }
 
         /* Footer Styles */
         .footer {
             width: 1920px;
             height: 40px;
-            background-color: #D9D9D9; /* Fill color */
-            opacity: 1; /* 100% opacity */
+            background-color: #D9D9D9;
+            /* Fill color */
+            opacity: 1;
+            /* 100% opacity */
             position: absolute;
             bottom: 0;
             left: 50%;
@@ -218,8 +238,8 @@
         updateDateTime();
     </script>
 </head>
+
 <body>
-    <!-- Header Section -->
     <header class="header" role="navigation">
         <div class="header-left">
             <h1>MV88 Ventures Inventory System</h1>
@@ -231,7 +251,6 @@
         </div>
     </header>
 
-    <!-- Main Content Section -->
     <main class="main-content">
         <div class="content-right">
             <div class="datetime">
@@ -243,11 +262,12 @@
         <div class="welcome-admin">
             <span>WELCOME</span>
             <div class="admin-circle"></div>
-            <span style="text-transform:uppercase"><%= (String)session.getAttribute("username") %> Staff</span>
+            <span style="text-transform:uppercase">
+                <%= (String) session.getAttribute("username")%> Staff
+            </span>
         </div>
         <h2 class="access-title">What would you like to access?</h2>
         <div class="access-cards">
-            <!-- Receive Items Card -->
             <section class="card" aria-labelledby="receive-items-title">
                 <h3 id="receive-items-title">Receive Items</h3>
                 <ul>
@@ -255,16 +275,14 @@
                 </ul>
             </section>
 
-            <!-- Pullout Items Card -->
             <section class="card" aria-labelledby="pullout-items-title">
                 <h3 id="pullout-items-title">Out</h3>
                 <ul>
-                    <li><a href="StaffActionsServlet?action=pull">Pullout</a></li>
+                    <li><a href="StaffActionsServlet?action=pull">Pull Out</a></li>
                     <li><a href="StaffActionsServlet?action=sales">Sales</a></li>
                 </ul>
             </section>
 
-            <!-- Reports Card -->
             <section class="card" aria-labelledby="reports-title">
                 <h3 id="reports-title">Reports</h3>
                 <ul>
@@ -274,8 +292,8 @@
         </div>
     </main>
 
-    <!-- Footer Section -->
     <footer class="footer">
     </footer>
 </body>
+
 </html>

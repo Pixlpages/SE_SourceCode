@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@ page session="true" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
     response.setHeader("Pragma", "no-cache"); // HTTP 1.0
@@ -175,15 +176,14 @@
             <label for="branch">Select Branch:</label>
             <select name="branch" id="branch">
                 <option value="items">Collated</option>
-                <option value="malabon">Malabon</option>
-                <option value="tagaytay">Tagaytay</option>
-                <option value="cebu">Cebu</option>
-                <option value="olongapo">Olongapo</option>
-                <option value="marquee">Marquee</option>
-                <option value="subic">Subic</option>
-                <option value="urdaneta">Urdaneta</option>
                 <option value="bacolod">Bacolod</option>
+                <option value="cebu">Cebu</option>
+                <option value="marquee">Marquee</option>
+                <option value="olongapo">Olongapo</option>
+                <option value="subic">Subic</option>
                 <option value="tacloban">Tacloban</option>
+                <option value="tagaytay">Tagaytay</option>
+                <option value="urdaneta">Urdaneta</option>
             </select>
             <button type="submit">Generate Report</button>
         </form>

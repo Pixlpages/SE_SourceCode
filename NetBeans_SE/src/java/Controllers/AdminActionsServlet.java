@@ -25,6 +25,9 @@ public class AdminActionsServlet extends HttpServlet {
         } else if ("view".equals(action)) {
             // Handle editing item information logic
             response.sendRedirect("Aview.jsp"); 
+        } else if ("manage".equals(action)) {
+            // Handle editing item information logic
+            response.sendRedirect("Amanagedefective.jsp"); 
         } else {
             response.sendRedirect("error.jsp"); // Redirect to an error page if action is unknown
         }

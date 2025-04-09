@@ -80,7 +80,7 @@
         $(document).ready(function () {
             var table = $('#itemsTable').DataTable({
                 "ajax": {
-                    "url": "Agetproducts", // Servlet to fetch products
+                    "url": "Agetmal", // Servlet to fetch products
                     "dataSrc": ""
                 },
                 "columns": [

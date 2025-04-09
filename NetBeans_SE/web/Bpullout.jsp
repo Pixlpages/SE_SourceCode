@@ -173,7 +173,7 @@
     </div>
     <div class="container">
         <div class="left-side">
-            <h1>Pullout Items</h1>
+            <h1>Pull Out Items</h1>
             <table id="itemsTable" class="display">
                 <thead>
                     <tr>

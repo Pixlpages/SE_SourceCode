@@ -11,12 +11,14 @@
 %>
 
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MV88 Ventures Inventory System</title>
     <link rel="stylesheet" href="Styles.css">
 </head>
+
 <body>
     <div class="container">
         <div class="title">MV88 Ventures <br> Inventory System</div>
@@ -40,4 +42,5 @@
         </div>
     </div>
 </body>
+
 </html>

@@ -21,6 +21,7 @@
 %>
 
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,50 +33,63 @@
             padding: 0;
             background-color: #f5f5f5;
         }
+
         .header {
             background-color: #5cb5c9;
             color: white;
             padding: 20px;
             text-align: center;
         }
+
         .sub-header {
             padding: 10px;
             display: flex;
             align-items: center;
         }
+
         .sub-header a {
             text-decoration: none;
             color: black;
             margin-right: 10px;
         }
+
         .container {
             display: flex;
             justify-content: space-between;
             padding: 20px;
         }
-        .left-side, .right-side {
+
+        .left-side,
+        .right-side {
             background-color: white;
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 45%;
         }
+
         .left-side h2 {
             margin-top: 0;
         }
-        .left-side input[type="text"], .left-side select, .left-side input[type="number"] {
+
+        .left-side input[type="text"],
+        .left-side select,
+        .left-side input[type="number"] {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
         .left-side input[type="radio"] {
             margin-right: 5px;
         }
+
         .left-side label {
             margin-right: 20px;
         }
+
         .da_button {
             background-color: #5cb5c9;
             color: white;
@@ -84,21 +98,25 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
         .message {
             margin: 10px 0;
             padding: 10px;
             border-radius: 5px;
         }
+
         .success {
             background-color: #d4edda;
             color: #155724;
         }
+
         .error {
             background-color: #f8d7da;
             color: #721c24;
         }
     </style>
 </head>
+
 <body>
     <div class="header">
         <h1>MV88 Ventures Inventory System</h1>
@@ -129,13 +147,11 @@
                     <option value="CODE5">CODE 5</option>
                     <option value="CODE6">CODE 6</option>
                     <option value="CODE7">CODE 7</option>
-                    <!-- Add more categories as needed -->
-                </select>
+                    </select>
                 <input type="number" name="total_quantity" placeholder="Total Quantity" min="0" max="99999" required>
                 <button type="submit" class="da_button">Add to List</button>
             </form>
 
-            <!-- Display success or error message -->
             <c:if test="${not empty message}">
                 <div class="message ${messageType}">
                     ${message}
@@ -148,10 +164,10 @@
                 <ul>
                     <c:forEach var="item" items="${itemList}">
                         <li>
-                            <strong>Item Code:</strong> ${item.itemCode}, 
-                            <strong>Item Name:</strong> ${item.itemName}, 
-                            <strong>Category:</strong> ${item.itemCategory}, 
-                            <strong>Pet Category:</strong> ${item.petCategory}, 
+                            <strong>Item Code:</strong> ${item.itemCode},
+                            <strong>Item Name:</strong> ${item.itemName},
+                            <strong>Category:</strong> ${item.itemCategory},
+                            <strong>Pet Category:</strong> ${item.petCategory},
                             <strong>Quantity:</strong> ${item.totalQuantity}
                         </li>
                     </c:forEach>
@@ -167,4 +183,5 @@
         </div>
     </div>
 </body>
+
 </html>

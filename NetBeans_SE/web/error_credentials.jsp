@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,9 +11,11 @@
             font-family: Arial, sans-serif;
             margin-top: 100px;
         }
+
         h1 {
             color: red;
         }
+
         a {
             display: inline-block;
             margin-top: 20px;
@@ -22,14 +25,17 @@
             text-decoration: none;
             border-radius: 5px;
         }
+
         a:hover {
             background-color: #0056b3;
         }
     </style>
 </head>
+
 <body>
     <h1>Incorrect Credentials</h1>
     <p>Your credentials are incorrect. Please log in again.</p>
     <a href="LandingPage.jsp">Return to Login</a>
 </body>
+
 </html>

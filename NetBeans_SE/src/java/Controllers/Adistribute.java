@@ -63,6 +63,7 @@ public class Adistribute extends HttpServlet {
     private void distributeItems(Item[] items, String drCode) {
         String updateSql = "UPDATE malabon SET total_quantity = total_quantity - ? WHERE item_code = ?";
         String insertReceiptSql = "INSERT INTO delivery_receipt (dr_code, item_code, quantity, branch) VALUES (?, ?, ?, ?)";
+        String insertBranchSql = "INSERT INTO %s (item_code, item_name, total_quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE total_quantity = total_quantity + ?";
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement updateStatement = connection.prepareStatement(updateSql);
@@ -81,12 +82,46 @@ public class Adistribute extends HttpServlet {
                     insertReceiptStatement.setInt(3, Integer.parseInt(item.getQuantity()));
                     insertReceiptStatement.setString(4, item.getBranch());
                     insertReceiptStatement.executeUpdate();
+                    
+                    // Insert into the appropriate branch table
+                    String branchTable = getBranchTable(item.getBranch());
+                    try (PreparedStatement insertBranchStatement = connection.prepareStatement(String.format(insertBranchSql, branchTable))) {
+                        insertBranchStatement.setString(1, item.getItemCode());
+                        insertBranchStatement.setString(2, item.getItemName());
+                        insertBranchStatement.setInt(3, Integer.parseInt(item.getQuantity()));
+                        insertBranchStatement.setInt(4, Integer.parseInt(item.getQuantity())); // For ON DUPLICATE KEY UPDATE
+                        insertBranchStatement.executeUpdate();
+                    }
                 } else {
                     System.out.println("No rows updated for item code: " + item.getItemCode());
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+    private String getBranchTable(String branch) {
+        // Map branch names to table names
+        switch (branch) {
+            case "bacolod":
+                return "bacolod"; // Ensure this matches your actual branch table name
+            case "cebu":
+                return "cebu";
+            case "marquee":
+                return "marquee";
+            case "olongapo":
+                return "olongapo";
+            case "subic":
+                return "subic";
+            case "tacloban":
+                return "tacloban";
+            case "tagaytay":
+                return "tagaytay";
+            case "urdaneta":
+                return "urdaneta";
+            // Add more branches as needed
+            default:
+                throw new IllegalArgumentException("Invalid branch: " + branch);
         }
     }
 
