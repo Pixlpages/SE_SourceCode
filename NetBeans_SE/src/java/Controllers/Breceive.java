@@ -20,12 +20,13 @@ public class Breceive extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Assuming you have a way to get the logged-in user's branch
+        // Get the logged-in user's branch from session
         String userBranch = (String) request.getSession().getAttribute("username");
 
+        // Fetch delivery receipts for the branch
         List<DeliveryReceipt> receipts = fetchDeliveryReceipts(userBranch);
 
-        // Send the response
+        // Send the response back as JSON
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         Gson gson = new Gson();
@@ -36,7 +37,7 @@ public class Breceive extends HttpServlet {
 
     private List<DeliveryReceipt> fetchDeliveryReceipts(String branch) {
         List<DeliveryReceipt> receipts = new ArrayList<>();
-        String query = "SELECT dr_code, item_code, quantity, branch, delivery_date FROM delivery_receipt WHERE branch = ?";
+        String query = "SELECT dr_code, item_code, quantity, branch, item_name, delivery_date FROM delivery_receipt WHERE branch = ?";
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -44,14 +45,16 @@ public class Breceive extends HttpServlet {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
+                    // Create and populate a DeliveryReceipt object
                     DeliveryReceipt receipt = new DeliveryReceipt();
                     receipt.setDrCode(resultSet.getString("dr_code"));
                     receipt.setItemCode(resultSet.getString("item_code"));
                     receipt.setQuantity(resultSet.getInt("quantity"));
                     receipt.setBranch(resultSet.getString("branch"));
                     receipt.setDeliveryDate(resultSet.getTimestamp("delivery_date"));
+                    receipt.setItemName(resultSet.getString("item_name"));
 
-                    // Add each receipt to the list
+                    // Add the receipt to the list
                     receipts.add(receipt);
                 }
             }
@@ -68,6 +71,7 @@ public class Breceive extends HttpServlet {
         private int quantity;
         private String branch;
         private java.sql.Timestamp deliveryDate;
+        private String itemName;
 
         // Getters and Setters
         public String getDrCode() { return drCode; }
@@ -80,6 +84,8 @@ public class Breceive extends HttpServlet {
         public void setBranch(String branch) { this.branch = branch; }
         public java.sql.Timestamp getDeliveryDate() { return deliveryDate; }
         public void setDeliveryDate(java.sql.Timestamp deliveryDate) { this.deliveryDate = deliveryDate; }
+        public String getItemName() { return itemName; } // Getter for itemName
+        public void setItemName(String itemName) { this.itemName = itemName; } // Setter for itemName
     }
 
     private static class ResponseData {

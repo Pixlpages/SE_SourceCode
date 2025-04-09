@@ -115,6 +115,7 @@
                     <tr>
                         <th>DR Code</th>
                         <th>Item Code</th>
+                        <th>Item Name</th>
                         <th>Quantity</th>
                         <th>Branch</th>
                         <th>Delivery Date</th>
@@ -134,7 +135,6 @@
                 <p>Branch: <span id="selectedBranch"></span></p>
                 <p>Delivery Date: <span id="selectedDeliveryDate"></span></p>
             </div>
-            <button class="confirm-button" id="confirmButton">Confirm Items</button>
         </div>
     </div>
 
@@ -149,6 +149,7 @@
                 "columns": [
                     { "data": "drCode" },
                     { "data": "itemCode" },
+                    { "data": "itemName" },
                     { "data": "quantity" },
                     { "data": "branch" },
                     { "data": "deliveryDate" }
@@ -165,6 +166,7 @@
                     $('#selectedQuantity').text(data.quantity);
                     $('#selectedBranch').text(data.branch);
                     $('#selectedDeliveryDate').text(data.deliveryDate);
+                    $('#selectedItemName').text(data.itemName);
                     $('#selectedReceipt').show();
                 }
             });
@@ -176,6 +178,7 @@
                 const selectedQuantity = $('#selectedQuantity').text();
                 const selectedBranch = $('#selectedBranch').text();
                 const selectedDeliveryDate = $('#selectedDeliveryDate').text();
+                const selectedItemName = $('#selectedItemName').text();
 
                 // Prepare data to send to the server
                 const dataToSend = {
@@ -183,7 +186,8 @@
                     itemCode: selectedItemCode,
                     quantity: selectedQuantity,
                     branch: selectedBranch,
-                    deliveryDate: selectedDeliveryDate
+                    deliveryDate: selectedDeliveryDate,
+                    itemName: selectedItemName
                 };
 
                 // Send data to the server

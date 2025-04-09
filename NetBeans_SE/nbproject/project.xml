@@ -40,7 +40,7 @@
             </test-roots>
         </data>
         <libraries xmlns="http://www.netbeans.org/ns/ant-project-libraries/1">
-            <definitions>C:\Users\Lenovo\Documents\NetBeansProjects\DRIVERS\nblibraries.properties</definitions>
+            <definitions>../../RedStone Website\nblibraries.properties</definitions>
         </libraries>
     </configuration>
 </project>
