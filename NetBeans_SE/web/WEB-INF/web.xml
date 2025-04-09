@@ -75,6 +75,14 @@
         <servlet-name>Agetmal</servlet-name>
         <servlet-class>Controllers.Agetmal</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Aviewdefective</servlet-name>
+        <servlet-class>Controllers.Aviewdefective</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Aviewcritical</servlet-name>
+        <servlet-class>Controllers.Aviewcritical</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/LoginServlet</url-pattern>
@@ -146,6 +154,14 @@
     <servlet-mapping>
         <servlet-name>Agetmal</servlet-name>
         <url-pattern>/Agetmal</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Aviewdefective</servlet-name>
+        <url-pattern>/Aviewdefective</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Aviewcritical</servlet-name>
+        <url-pattern>/Aviewcritical</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

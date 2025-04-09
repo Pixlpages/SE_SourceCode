@@ -65,17 +65,40 @@ public class Aincreasequantity extends HttpServlet {
         }
     }
 
-    private boolean increaseItemQuantity(String itemCode, int quantity) throws SQLException {
-        String sql = "UPDATE malabon SET total_quantity = total_quantity + ? WHERE item_code = ?";
+private boolean increaseItemQuantity(String itemCode, int quantity) throws SQLException {
+    String sql = "UPDATE malabon SET total_quantity = total_quantity + ? WHERE item_code = ?";
 
-        try (Connection connection = DatabaseUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, quantity);
-            preparedStatement.setString(2, itemCode);
-            int rowsUpdated = preparedStatement.executeUpdate();
-            return rowsUpdated > 0; // Return true if the update was successful
+    try (Connection connection = DatabaseUtil.getConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        preparedStatement.setInt(1, quantity);
+        preparedStatement.setString(2, itemCode);
+        int rowsUpdated = preparedStatement.executeUpdate();
+
+        if (rowsUpdated > 0) {
+            // After successful quantity update, check if the item total quantity exceeds 100
+            String checkQuantitySql = "SELECT total_quantity FROM malabon WHERE item_code = ?";
+            try (PreparedStatement checkQuantityStmt = connection.prepareStatement(checkQuantitySql)) {
+                checkQuantityStmt.setString(1, itemCode);
+                try (ResultSet resultSet = checkQuantityStmt.executeQuery()) {
+                    if (resultSet.next()) {
+                        int newQuantity = resultSet.getInt("total_quantity");
+                        // If total quantity exceeds 100, update the critically_low column to false
+                        if (newQuantity > 100) {
+                            String updateCriticallyLowSql = "UPDATE malabon SET critically_low = false WHERE item_code = ?";
+                            try (PreparedStatement updateCriticallyLowStmt = connection.prepareStatement(updateCriticallyLowSql)) {
+                                updateCriticallyLowStmt.setString(1, itemCode);
+                                updateCriticallyLowStmt.executeUpdate();
+                            }
+                        }
+                    }
+                }
+            }
         }
+
+        return rowsUpdated > 0;
     }
+}
+
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

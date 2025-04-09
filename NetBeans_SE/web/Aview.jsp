@@ -172,7 +172,7 @@
     <div id="report" class="content-section active">
         <h3>Branch Report</h3>
 
-        <form method="get" action="Aview" target="pdf-frame">
+        <form method="get" action="Aview" target="report-frame">
             <label for="branch">Select Branch:</label>
             <select name="branch" id="branch">
                 <option value="items">Collated</option>
@@ -189,54 +189,37 @@
             <button type="submit">Generate Report</button>
         </form>
 
-        <iframe name="pdf-frame" width="100%" height="400px"></iframe>
+        <iframe name="report-frame" width="100%" height="400px"></iframe>
     </div>
 
-    <div id="defective" class="content-section">
-        <h3>Defective</h3>
-        <div class="items">
-            <div class="item">
-                <img src="grey-placeholder.png" alt="Item">
-                <div class="item-info">
-                    <p><strong>Item Name</strong></p>
-                    <p>Item Code</p>
-                    <p>Item Quantity</p>
-                </div>
-            </div>
-            <div class="item">
-                <img src="grey-placeholder.png" alt="Item">
-                <div class="item-info">
-                    <p><strong>Item Name</strong></p>
-                    <p>Item Code</p>
-                    <p>Item Quantity</p>
-                </div>
-            </div>
-        </div>
-    </div>
+<div id="defective" class="content-section">
+    <h3>Defective Items Report</h3>
+    <form method="get" action="Aviewdefective" target="defective-frame">
+        <button type="submit">Generate Defective Report</button>
+    </form>
+    <iframe name="defective-frame" width="100%" height="400px"></iframe>
+</div>
+    
+<div id="critical" class="content-section">
+    <h3>Critical Condition Items</h3>
+    <form method="get" action="Aviewcritical" target="critical-frame">
+        <label for="branch">Select Branch:</label>
+        <select name="branch" id="branch">
+            <option value="malabon">Main Warehouse</option>
+            <option value="bacolod">Bacolod</option>
+            <option value="cebu">Cebu</option>
+            <option value="marquee">Marquee</option>
+            <option value="olongapo">Olongapo</option>
+            <option value="subic">Subic</option>
+            <option value="tacloban">Tacloban</option>
+            <option value="tagaytay">Tagaytay</option>
+            <option value="urdaneta">Urdaneta</option>
+        </select>
+        <button type="submit">Generate Critical Report</button>
+    </form>
+    <iframe name="critical-frame" width="100%" height="400px"></iframe>
+</div>
 
-    <div id="critical" class="content-section">
-        <h3>Critical Condition</h3>
-        <div class="items">
-            <div class="item">
-                <img src="grey-placeholder.png" alt="Item">
-                <div class="item-info">
-                    <p><strong>Item Name</strong></p>
-                    <p>Item Code</p>
-                    <p>Item Location</p>
-                    <p>Item Quantity</p>
-                </div>
-            </div>
-            <div class="item">
-                <img src="grey-placeholder.png" alt="Item">
-                <div class="item-info">
-                    <p><strong>Item Name</strong></p>
-                    <p>Item Code</p>
-                    <p>Item Location</p>
-                    <p>Item Quantity</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div id="logs" class="content-section">
         <h3>Logs</h3>

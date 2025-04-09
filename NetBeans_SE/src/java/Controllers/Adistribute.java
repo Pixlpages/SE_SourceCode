@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -31,9 +33,15 @@ public class Adistribute extends HttpServlet {
         // Generate the next DR code
         String drCode = generateNextDRCode();
 
+        // Create a list to hold critically low items
+        List<String> criticallyLowItems = new ArrayList<>();
+
         // Call the method to distribute items and save delivery receipt
-        distributeItems(items, drCode);
-        response.setStatus(HttpServletResponse.SC_OK);
+        distributeItems(items, drCode, criticallyLowItems);
+
+        // Return the critically low items as JSON
+        response.setContentType("application/json");
+        response.getWriter().write(new Gson().toJson(criticallyLowItems));
     }
 
     private String generateNextDRCode() {
@@ -60,14 +68,16 @@ public class Adistribute extends HttpServlet {
         return nextDRCode;
     }
 
-    private void distributeItems(Item[] items, String drCode) {
+    private void distributeItems(Item[] items, String drCode, List<String> criticallyLowItems) {
         String updateSql = "UPDATE malabon SET total_quantity = total_quantity - ? WHERE item_code = ?";
         String insertReceiptSql = "INSERT INTO delivery_receipt (dr_code, item_code, item_name, quantity, branch) VALUES (?, ?, ?, ?, ?)";
         String insertBranchSql = "INSERT INTO %s (item_code, item_name, total_quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE total_quantity = total_quantity + ?";
+        String updateCriticalLowSql = "UPDATE malabon SET critically_low = 1 WHERE item_code = ? AND total_quantity <= 100";
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement updateStatement = connection.prepareStatement(updateSql);
-             PreparedStatement insertReceiptStatement = connection.prepareStatement(insertReceiptSql)) {
+             PreparedStatement insertReceiptStatement = connection.prepareStatement(insertReceiptSql);
+             PreparedStatement updateCriticalLowStatement = connection.prepareStatement(updateCriticalLowSql)) {
 
             for (Item item : items) {
                 // Update the quantity in malabon
@@ -83,8 +93,15 @@ public class Adistribute extends HttpServlet {
                     insertReceiptStatement.setInt(4, Integer.parseInt(item.getQuantity()));
                     insertReceiptStatement.setString(5, item.getBranch());
                     insertReceiptStatement.executeUpdate();
-                    
-                    // Insert into the appropriate branch table
+
+                    // Check if the item is critically low in the malabon table
+                    updateCriticalLowStatement.setString(1, item.getItemCode());
+                    int affectedRows = updateCriticalLowStatement.executeUpdate();
+                    if (affectedRows > 0) {
+                        criticallyLowItems.add(item.getItemName()); // Add item name to the list
+                    }
+
+                    // Insert into the appropriate branch table (staff table)
                     String branchTable = getBranchTable(item.getBranch());
                     try (PreparedStatement insertBranchStatement = connection.prepareStatement(String.format(insertBranchSql, branchTable))) {
                         insertBranchStatement.setString(1, item.getItemCode());
@@ -92,6 +109,33 @@ public class Adistribute extends HttpServlet {
                         insertBranchStatement.setInt(3, Integer.parseInt(item.getQuantity()));
                         insertBranchStatement.setInt(4, Integer.parseInt(item.getQuantity())); // For ON DUPLICATE KEY UPDATE
                         insertBranchStatement.executeUpdate();
+
+                        // After inserting into the branch table, check if the quantity is below or above 100
+                        String checkQuantitySql = "SELECT total_quantity FROM " + branchTable + " WHERE item_code = ?";
+                        try (PreparedStatement checkStmt = connection.prepareStatement(checkQuantitySql)) {
+                            checkStmt.setString(1, item.getItemCode());
+                            ResultSet rs = checkStmt.executeQuery();
+
+                            if (rs.next()) {
+                                int totalQuantity = rs.getInt("total_quantity");
+
+                                // If total_quantity is less than or equal to 100, set critically_low to true
+                                if (totalQuantity <= 100) {
+                                    String updateCriticallyLowSql = "UPDATE " + branchTable + " SET critically_low = 1 WHERE item_code = ?";
+                                    try (PreparedStatement updateCriticallyLowStmt = connection.prepareStatement(updateCriticallyLowSql)) {
+                                        updateCriticallyLowStmt.setString(1, item.getItemCode());
+                                        updateCriticallyLowStmt.executeUpdate();
+                                    }
+                                } else {
+                                    // If total_quantity is above 100, set critically_low to false
+                                    String updateCriticallyLowSql = "UPDATE " + branchTable + " SET critically_low = 0 WHERE item_code = ?";
+                                    try (PreparedStatement updateCriticallyLowStmt = connection.prepareStatement(updateCriticallyLowSql)) {
+                                        updateCriticallyLowStmt.setString(1, item.getItemCode());
+                                        updateCriticallyLowStmt.executeUpdate();
+                                    }
+                                }
+                            }
+                        }
                     }
                 } else {
                     System.out.println("No rows updated for item code: " + item.getItemCode());
@@ -101,6 +145,7 @@ public class Adistribute extends HttpServlet {
             e.printStackTrace();
         }
     }
+
     private String getBranchTable(String branch) {
         // Map branch names to table names
         switch (branch) {

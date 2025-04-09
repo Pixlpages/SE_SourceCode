@@ -156,6 +156,44 @@
                 align-items: flex-start;
             }
         }
+        /* Modal styles */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+            max-width: 500px; 
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
     <script>
         let itemsToDistribute = [];
@@ -244,8 +282,14 @@
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify(itemsToDistribute),
-                        success: function () {
+                        success: function (criticallyLowItems) {
                             alert("Items distributed successfully!");
+
+                            // Check if there are critically low items
+                            if (criticallyLowItems.length > 0) {
+                                showModal(criticallyLowItems);
+                            }
+
                             itemsToDistribute = [];
                             updateBatchList();
                             table.ajax.reload();
@@ -257,6 +301,21 @@
                     });
                 } else {
                     alert("No items to distribute.");
+                }
+            });
+
+            function showModal(criticallyLowItems) {
+                $('#modalContent').text("Warning: The following items are critically low: " + criticallyLowItems.join(", "));
+                $('#myModal').css("display", "block");
+            }
+
+            $('.close').on('click', function () {
+                $('#myModal').css("display", "none");
+            });
+
+            $(window).on('click', function (event) {
+                if ($(event.target).is('#myModal')) {
+                    $('#myModal').css("display", "none");
                 }
             });
         });
@@ -319,6 +378,14 @@
                 <option value="urdaneta">Urdaneta</option>
             </select>
             <button id="distributeButton">Distribute Items</button>
+        </div>
+    </div>
+
+    <!-- Modal for Critical Low Items -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="modalContent"></p>
         </div>
     </div>
 </body>
