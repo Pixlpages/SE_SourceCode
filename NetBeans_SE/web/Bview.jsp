@@ -169,26 +169,7 @@
 
     <div id="critical" class="content-section">
         <h3>Critical Condition</h3>
-        <div class="items">
-            <div class="item">
-                <img src="grey-placeholder.png" alt="Item">
-                <div class="item-info">
-                    <p><strong>Item Name</strong></p>
-                    <p>Item Code</p>
-                    <p>Item Location</p>
-                    <p>Item Quantity</p>
-                </div>
-            </div>
-            <div class="item">
-                <img src="grey-placeholder.png" alt="Item">
-                <div class="item-info">
-                    <p><strong>Item Name</strong></p>
-                    <p>Item Code</p>
-                    <p>Item Location</p>
-                    <p>Item Quantity</p>
-                </div>
-            </div>
-        </div>
+        <iframe src="Bviewcritical" width="100%" height="400px"></iframe>
     </div>
 </body>
 

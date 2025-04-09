@@ -221,29 +221,10 @@
 </div>
 
 
-    <div id="logs" class="content-section">
-        <h3>Logs</h3>
-        <div class="items">
-            <div class="item">
-                <img src="grey-placeholder.png" alt="Item">
-                <div class="item-info">
-                    <p><strong>Item Name</strong></p>
-                    <p>Item Code</p>
-                    <p>Item Location</p>
-                    <p>Item Quantity</p>
-                </div>
-            </div>
-            <div class="item">
-                <img src="grey-placeholder.png" alt="Item">
-                <div class="item-info">
-                    <p><strong>Item Name</strong></p>
-                    <p>Item Code</p>
-                    <p>Item Location</p>
-                    <p>Item Quantity</p>
-                </div>
-            </div>
-        </div>
-    </div>
+<div id="logs" class="content-section">
+    <h3>Logs Report</h3>
+    <iframe src="Aviewlogs" width="100%" height="400px"></iframe>
+</div>
 </body>
 
 </html>

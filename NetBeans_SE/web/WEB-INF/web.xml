@@ -83,6 +83,14 @@
         <servlet-name>Aviewcritical</servlet-name>
         <servlet-class>Controllers.Aviewcritical</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Bviewcritical</servlet-name>
+        <servlet-class>Controllers.Bviewcritical</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Aviewlogs</servlet-name>
+        <servlet-class>Controllers.Aviewlogs</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/LoginServlet</url-pattern>
@@ -162,6 +170,14 @@
     <servlet-mapping>
         <servlet-name>Aviewcritical</servlet-name>
         <url-pattern>/Aviewcritical</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Bviewcritical</servlet-name>
+        <url-pattern>/Bviewcritical</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Aviewlogs</servlet-name>
+        <url-pattern>/Aviewlogs</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

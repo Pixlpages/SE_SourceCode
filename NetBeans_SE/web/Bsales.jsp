@@ -37,7 +37,9 @@
 
         .container {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
+            gap: 20px;
             padding: 20px;
         }
 
@@ -47,7 +49,8 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 45%;
+            flex: 1 1 45%;
+            min-width: 300px;
         }
 
         .selected-item {
@@ -55,6 +58,125 @@
             padding: 10px;
             background-color: #e0f7fa;
             border-radius: 5px;
+        }
+
+        table.dataTable {
+            width: 100% !important;
+        }
+
+        #itemsTable,
+        #pulloutList {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        #itemsTable th,
+        #itemsTable td,
+        #pulloutList th,
+        #pulloutList td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        #quantityInput {
+            width: auto;
+            max-width: 300px;
+            padding: 6px 12px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            display: block;
+        }
+
+        #addToPulloutButton,
+        #submitPulloutButton,
+        #pulloutList button {
+            background-color: #5cb5c9;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: auto;
+            min-width: 120px;
+        }
+
+        #pulloutList button {
+            background-color: #f44336;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 auto;
+            display: block;
+            text-align: center;
+        }
+
+        #pulloutList td {
+            text-align: center;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            .left-side,
+            .right-side {
+                width: 100%;
+            }
+
+            #addToPullOutButton,
+            #submitPullOutButton {
+                width: 100%;
+            }
+
+            .sub-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        /* Modal styles */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+            max-width: 500px; 
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
     <script>
@@ -69,8 +191,7 @@
                 "columns": [
                     { "data": "itemCode" },
                     { "data": "itemName" },
-                    { "data": "totalQuantity" },
-                    { "data": "criticallyLow" }
+                    { "data": "totalQuantity" }
                 ]
             });
 
@@ -180,7 +301,6 @@
                         <th>Item Code</th>
                         <th>Item Name</th>
                         <th>Total Quantity</th>
-                        <th>Critically Low</th>
                     </tr>
                 </thead>
                 <tbody>

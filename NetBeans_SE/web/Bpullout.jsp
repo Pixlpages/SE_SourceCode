@@ -37,7 +37,9 @@
 
         .container {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
+            gap: 20px;
             padding: 20px;
         }
 
@@ -47,7 +49,8 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 45%;
+            flex: 1 1 45%;
+            min-width: 300px;
         }
 
         .selected-item {
@@ -55,6 +58,125 @@
             padding: 10px;
             background-color: #e0f7fa;
             border-radius: 5px;
+        }
+
+        table.dataTable {
+            width: 100% !important;
+        }
+
+        #itemsTable,
+        #pulloutList {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        #itemsTable th,
+        #itemsTable td,
+        #pulloutList th,
+        #pulloutList td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        #quantityInput {
+            width: auto;
+            max-width: 300px;
+            padding: 6px 12px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            display: block;
+        }
+
+        #addToPulloutButton,
+        #submitPulloutButton,
+        #pulloutList button {
+            background-color: #5cb5c9;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: auto;
+            min-width: 120px;
+        }
+
+        #pulloutList button {
+            background-color: #f44336;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 auto;
+            display: block;
+            text-align: center;
+        }
+
+        #pulloutList td {
+            text-align: center;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            .left-side,
+            .right-side {
+                width: 100%;
+            }
+
+            #addToPullOutButton,
+            #submitPullOutButton {
+                width: 100%;
+            }
+
+            .sub-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        /* Modal styles */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+            max-width: 500px; 
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
     <script>
@@ -69,8 +191,7 @@
                 "columns": [
                     { "data": "itemCode" },
                     { "data": "itemName" },
-                    { "data": "totalQuantity" },
-                    { "data": "criticallyLow" }
+                    { "data": "totalQuantity" }
                 ]
             });
 
@@ -78,7 +199,6 @@
             $('#itemsTable tbody').on('click', 'tr', function () {
                 var data = table.row(this).data();
                 if (data) {
-                    // Display selected item details
                     $('#selectedItemCode').text(data.itemCode);
                     $('#selectedItemName').text(data.itemName);
                     $('#selectedItemQuantity').text(data.totalQuantity);
@@ -94,18 +214,64 @@
                 var selectedItemName = $('#selectedItemName').text();
 
                 if (selectedItemCode && quantityToPullout) {
-                    // Add item to the pullout list
                     itemsToPullout.push({
                         itemCode: selectedItemCode,
                         itemName: selectedItemName,
                         quantity: quantityToPullout
                     });
 
-                    // Update the pullout list display
                     updatePulloutList();
                     resetItemInformation(); // Reset item information after adding
                 } else {
                     alert("Please select an item and enter a quantity.");
+                }
+            });
+
+// Submit the pullout request
+$('#submitPulloutButton').on('click', function () {
+    if (itemsToPullout.length === 0) {
+        alert("No items to pull out.");
+        return;
+    }
+
+    $.ajax({
+        url: 'Bpullout',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(itemsToPullout),
+        success: function (criticallyLowItems) {
+            alert("Items pulled out and transferred successfully!");
+
+            // Check if there are critically low items
+            if (criticallyLowItems.length > 0) {
+                showModal(criticallyLowItems);
+            }
+
+            // Clear the list and reset UI elements
+            itemsToPullout = []; // Clear the list after successful submission
+            updatePulloutList(); // Refresh the displayed list
+            resetItemInformation(); // Reset selected item information
+            table.ajax.reload(); // Reload the items table
+        },
+        error: function (xhr) {
+            alert("Error: " + xhr.responseText);
+        }
+    });
+});
+
+            // Function to show critical condition pop-up
+            function showModal(criticallyLowItems) {
+                $('#modalContent').text("Warning: The following items are critically low: " + criticallyLowItems.join(", "));
+                $('#myModal').css("display", "block");
+            }
+
+            $('.close').on('click', function () {
+                $('#myModal').css("display", "none");
+            });
+
+            $(window).on('click', function (event) {
+                if ($(event.target).is('#myModal')) {
+                    $('#myModal').css("display", "none");
                 }
             });
 
@@ -120,16 +286,16 @@
 
             // Function to update the pullout list display
             function updatePulloutList() {
-                var pulloutListHtml = '';
+                var html = '';
                 itemsToPullout.forEach(function (item, index) {
-                    pulloutListHtml += '<tr>' +
+                    html += '<tr>' +
                         '<td>' + item.itemCode + '</td>' +
                         '<td>' + item.itemName + '</td>' +
                         '<td>' + item.quantity + '</td>' +
                         '<td><button onclick="removeFromPullout(' + index + ')">Remove</button></td>' +
                         '</tr>';
                 });
-                $('#pulloutList tbody').html(pulloutListHtml);
+                $('#pulloutList tbody').html(html);
             }
 
             // Function to remove an item from the pullout list
@@ -137,29 +303,6 @@
                 itemsToPullout.splice(index, 1);
                 updatePulloutList();
             };
-
-            // // Submit the pullout request
-            $('#submitPulloutButton').on('click', function () {
-                if (itemsToPullout.length === 0) {
-                    alert("No items to pull out.");
-                    return;
-                }
-
-                $.ajax({
-                    url: 'Bpullout',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(itemsToPullout),
-                    success: function (response) {
-                        alert(response.message);
-                        itemsToPullout = []; // Clear the list after successful submission
-                        updatePulloutList(); // Refresh the displayed list
-                    },
-                    error: function (xhr) {
-                        alert("Error: " + xhr.responseText);
-                    }
-                });
-            });
         });
     </script>
 </head>
@@ -180,7 +323,6 @@
                         <th>Item Code</th>
                         <th>Item Name</th>
                         <th>Total Quantity</th>
-                        <th>Critically Low</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -212,6 +354,12 @@
             </table>
 
             <button id="submitPulloutButton">Submit Pullout</button>
+        </div>
+    </div>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="modalContent"></p>
         </div>
     </div>
 </body>

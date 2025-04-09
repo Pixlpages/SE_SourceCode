@@ -19,6 +19,9 @@ public class AdminActionsServlet extends HttpServlet {
         } else if ("edit".equals(action)) {
             // Handle editing item information logic
             response.sendRedirect("Aeditproduct.jsp"); 
+        } else if ("receive".equals(action)) {
+            // Handle editing item information logic
+            response.sendRedirect("Areceive.jsp"); 
         } else if ("distribute".equals(action)) {
             // Handle editing item information logic
             response.sendRedirect("Adistribute.jsp");

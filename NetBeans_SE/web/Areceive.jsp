@@ -8,7 +8,7 @@
     String role = (String) session.getAttribute("role");
     Boolean loggedIn = (Boolean) session.getAttribute("LoggedIn");
 
-    if (loggedIn == null || !loggedIn || !"staff".equals(role)) {
+    if (loggedIn == null || !loggedIn || !"admin".equals(role)) {
         response.sendRedirect("error_session.jsp");
     }
 %>
@@ -16,7 +16,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Receive Shipments</title>
+    <title>MV88 Ventures Inventory System</title>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
@@ -88,12 +88,17 @@
             // Left table: DR Code list
             const drTable = $('#drTable').DataTable({
                 ajax: {
-                    url: 'Breceive',
-                    dataSrc: 'data'
+                    url: 'Areceive',
+                    dataSrc: 'data',
                 },
                 columns: [
-                    { data: 'drCode' },
-                    { data: 'deliveryDate' }
+                    { data: 'PoCode' },
+                    {
+                        data: 'deliveryDate',
+                        render: function(data) {
+                            return new Date(data).toLocaleDateString(); // Format date to readable format
+                        }
+                    }
                 ],
                 lengthChange: false
             });
@@ -101,63 +106,62 @@
             // Click row to load items
             $('#drTable tbody').on('click', 'tr', function () {
                 const data = drTable.row(this).data();
-                if (data && data.drCode) {
-                    loadDRDetails(data.drCode);
+                if (data && data.PoCode) {
+                    loadDRDetails(data.PoCode);
                 }
             });
 
             // Load items for selected DR code
-            function loadDRDetails(drCode) {
-    $.ajax({
-        url: 'Breceive?drCode=' + encodeURIComponent(drCode),
-        method: 'GET',
-        success: function (response) {
-            console.log("Response:", response);
+            function loadDRDetails(PoCode) {
+                $.ajax({
+                    url: 'Areceive?PoCode=' + encodeURIComponent(PoCode),
+                    method: 'GET',
+                    success: function (response) {
+                        console.log("Response:", response);
 
-            // Destroy existing DataTable if exists
-            if ($.fn.DataTable.isDataTable('#detailsTable')) {
-                $('#detailsTable').DataTable().clear().destroy();
+                        // Destroy existing DataTable if exists
+                        if ($.fn.DataTable.isDataTable('#detailsTable')) {
+                            $('#detailsTable').DataTable().clear().destroy();
+                        }
+
+                        // Reinitialize with new data
+                        $('#detailsTable').DataTable({
+                            data: response.data,
+                            columns: [
+                                { data: 'itemCode' },
+                                { data: 'itemName' },
+                                { data: 'quantity' },
+                                { data: 'branch' }
+                            ],
+                            destroy: true,
+                            lengthChange: false
+                        });
+
+                        $('#rightPanelTitle').text("Details for Pull Out Code: " + PoCode);
+                        $('#detailsTable').removeClass('hidden');
+                    },
+                    error: function () {
+                        alert("Failed to fetch DR details.");
+                    }
+                });
             }
-
-            // Reinitialize with new data
-            $('#detailsTable').DataTable({
-                data: response.data,
-                columns: [
-                    { data: 'itemCode' },
-                    { data: 'itemName' },
-                    { data: 'quantity' },
-                    { data: 'branch' },
-                ],
-                destroy: true,
-                lengthChange: false
-            });
-
-            $('#rightPanelTitle').text("Details for DR Code: " + drCode);
-            $('#detailsTable').removeClass('hidden');
-        },
-        error: function () {
-            alert("Failed to fetch DR details.");
-        }
-    });
-}
-
         });
     </script>
 </head>
 <body>
 <div class="header">
-    <h1>Receive Shipments</h1>
+    <h1>View Pull Outs</h1>
 </div>
 <div class="sub-header">
-    <a href="Bhome.jsp">&#8592; Back</a>
+    <a href="Ahome.jsp">&#8592; Back</a>
 </div>
 <div class="container">
     <div class="left-side">
-        <h2>Delivery Receipts</h2>
+        <h2>Pull Out Receipts</h2>
         <table id="drTable" class="display">
             <thead>
                 <tr>
-                    <th>DR Code</th>
+                    <th>PO Code</th>
                     <th>Delivery Date</th>
                 </tr>
             </thead>

@@ -29,7 +29,7 @@ public class Anewproduct extends HttpServlet {
             String petCategory = request.getParameter("pet_category");
             int totalQuantity = Integer.parseInt(request.getParameter("total_quantity"));
 
-            // Create a new item
+            // Create a new item without critically_low
             DBManager.Item newItem = new DBManager.Item(itemCode, itemName, itemCategory, petCategory, totalQuantity);
 
             // Store items in the session's item list
@@ -83,14 +83,14 @@ public class Anewproduct extends HttpServlet {
 
     private void addAllItemsToDatabase(List<DBManager.Item> itemList) throws SQLException {
         String insertItemsSql = "INSERT INTO items (item_code, item_name, item_category, pet_category, total_quantity) VALUES (?, ?, ?, ?, ?)";
-        String insertMalabonSql = "INSERT INTO malabon (item_code, item_name, total_quantity) VALUES (?, ?, ?)";
+        String insertMalabonSql = "INSERT INTO malabon (item_code, item_name, total_quantity, critically_low) VALUES (?, ?, ?, ?)";
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement insertItemsStatement = connection.prepareStatement(insertItemsSql);
              PreparedStatement insertMalabonStatement = connection.prepareStatement(insertMalabonSql)) {
 
             for (DBManager.Item item : itemList) {
-                // Insert into items table
+                // Insert into items table (without critically_low)
                 insertItemsStatement.setString(1, item.getItemCode());
                 insertItemsStatement.setString(2, item.getItemName());
                 insertItemsStatement.setString(3, item.getItemCategory());
@@ -98,10 +98,12 @@ public class Anewproduct extends HttpServlet {
                 insertItemsStatement.setInt(5, item.getTotalQuantity());
                 insertItemsStatement.addBatch(); // Add to batch for items
 
-                // Insert into malabon table
+                // Insert into malabon table with critically_low
+                boolean criticallyLow = item.getTotalQuantity() < 100; // Set critically_low based on total_quantity
                 insertMalabonStatement.setString(1, item.getItemCode());
                 insertMalabonStatement.setString(2, item.getItemName());
                 insertMalabonStatement.setInt(3, item.getTotalQuantity());
+                insertMalabonStatement.setBoolean(4, criticallyLow); // Insert critically_low value
                 insertMalabonStatement.addBatch(); // Add to batch for malabon
             }
 
