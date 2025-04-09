@@ -107,7 +107,7 @@ public class Aincreasequantity extends HttpServlet {
 
     private List<DBManager.Item> fetchItems() {
         List<DBManager.Item> items = new ArrayList<>();
-        String sql = "SELECT item_code, item_name, total_quantity FROM items"; // Adjust the query as needed
+        String sql = "SELECT item_code, item_name, total_quantity FROM malabon"; // Adjust the query as needed
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql);
