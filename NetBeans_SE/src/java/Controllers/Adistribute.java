@@ -61,7 +61,7 @@ public class Adistribute extends HttpServlet {
     }
 
     private void distributeItems(Item[] items, String drCode) {
-        String updateSql = "UPDATE malabon SET total_quantity = total_quantity - ? WHERE item_code = ?";
+        String updateSql = "UPDATE items SET total_quantity = total_quantity - ? WHERE item_code = ?";
         String insertReceiptSql = "INSERT INTO delivery_receipt (dr_code, item_code, quantity, branch) VALUES (?, ?, ?, ?)";
         String insertBranchSql = "INSERT INTO %s (item_code, item_name, total_quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE total_quantity = total_quantity + ?";
 
@@ -104,22 +104,22 @@ public class Adistribute extends HttpServlet {
     private String getBranchTable(String branch) {
         // Map branch names to table names
         switch (branch) {
-            case "Branch1":
+            case "Bacolod":
                 return "bacolod"; // Ensure this matches your actual branch table name
-            case "Branch2":
+            case "Cebu":
                 return "cebu";
-            case "Branch3":
+            case "Marquee":
                 return "marquee";
-            case "Branch4":
+            case "Olongapo":
                 return "olongapo";
-            case "Branch5":
+            case "Subic":
                 return "subic";
-            case "Branch6":
+            case "Tacloban":
                 return "tacloban";
-            case "Branch7":
+            case "Tagaytay":
                 return "tagaytay";
-            case "Branch8":
-                return "udraneta";
+            case "Urdaneta":
+                return "urdaneta";
             // Add more branches as needed
             default:
                 throw new IllegalArgumentException("Invalid branch: " + branch);

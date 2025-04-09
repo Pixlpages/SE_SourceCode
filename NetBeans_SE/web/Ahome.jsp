@@ -270,8 +270,6 @@
                 <h3 id="reports-title">Reports</h3>
                 <ul>
                     <li><a href="AdminActionsServlet?action=view">View Items</a></li>
-                    <!-- Backend: Implement view items report functionality here -->
-                    <li><a href="AdminActionsServlet?action=managedefective">Manage Defective Items</a></li>
                 </ul>
             </section>
         </div>
