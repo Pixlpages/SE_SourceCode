@@ -38,7 +38,7 @@
         <property file="nbproject/private/private.properties"/>
     </target>
     <target name="-pre-init-libraries">
-        <property location="C:\Users\Lenovo\Documents\NetBeansProjects\DRIVERS\nblibraries.properties" name="libraries.path"/>
+        <property location="D:\Codes for School\SE_SourceCode\RedStone Website\nblibraries.properties" name="libraries.path"/>
         <dirname file="${libraries.path}" property="libraries.dir.nativedirsep"/>
         <pathconvert dirsep="/" property="libraries.dir">
             <path path="${libraries.dir.nativedirsep}"/>

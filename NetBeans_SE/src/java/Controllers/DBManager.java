@@ -52,6 +52,7 @@ public class DBManager {
         private String itemCategory;
         private String petCategory;
         private int totalQuantity;
+        private int criticallyLow;
 
         // No-argument constructor
         public Item() {
@@ -77,5 +78,7 @@ public class DBManager {
         public void setPetCategory(String petCategory) { this.petCategory = petCategory; }
         public int getTotalQuantity() { return totalQuantity; }
         public void setTotalQuantity(int totalQuantity) { this.totalQuantity = totalQuantity; }
+        public int getCriticallyLow(){return criticallyLow;}
+        public void setCriticallyLow(int criticallyLow) {this.criticallyLow = criticallyLow; }
     }
 }

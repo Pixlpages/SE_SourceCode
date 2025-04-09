@@ -1,177 +1,156 @@
 <!DOCTYPE html>
-<%@ page session="true" %>
-<%
-    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
-    response.setHeader("Expires", "0"); // Proxies
-
-    // Session validation
-    String username = (String) session.getAttribute("username");
-    String role = (String) session.getAttribute("role");
-    Boolean loggedIn = (Boolean) session.getAttribute("LoggedIn");
-
-    if (loggedIn == null || !loggedIn || !"staff".equals(role)) {
-        response.sendRedirect("error_session.jsp"); // Redirect unauthorized users
-    }
-%>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MV88 Ventures Inventory System</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #4a90e2;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            font-size: 24px;
-        }
-        .container {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px;
-        }
-        .left-side, .right-side {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 45%;
-        }
-        .search-bar {
-            display: flex;
-            align-items: center;
-            background-color: #e0e0e0;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .search-bar input {
-            border: none;
-            background: none;
-            flex-grow: 1;
-            padding: 5px;
-            font-size: 16px;
-        }
-        .search-bar button {
-            background-color: #4a90e2;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .items-list, .distribution-list {
-            background-color: #f0f0f0;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .items-list h3, .distribution-list h3 {
-            margin-top: 0;
-        }
-        .item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-        }
-        .item:last-child {
-            border-bottom: none;
-        }
-        .amount-location {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .amount-location input, .amount-location select {
-            margin-right: 10px;
-            padding: 5px;
-            font-size: 16px;
-        }
-        .confirm-mark {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .confirm-mark input {
-            margin-right: 10px;
-        }
-        .mark-button {
-            background-color: #4a90e2;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
+    <title>Pull Out Items</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script>
+        let itemsToPullout = []; // Array to hold items to pull out
+
+        $(document).ready(function() {
+            var table = $('#itemsTable').DataTable({
+                "ajax": {
+                    "url": "Bgetproducts", // Servlet to fetch products from the branch
+                    "dataSrc": ""
+                },
+                "columns": [
+                    { "data": "itemCode" },
+                    { "data": "itemName" },
+                    { "data": "totalQuantity" },
+                    { "data": "criticallyLow" }
+                ]
+            });
+
+            // Handle row click event for item selection
+            $('#itemsTable tbody').on('click', 'tr', function() {
+                var data = table.row(this).data();
+                if (data) {
+                    // Display selected item details
+                    $('#selectedItemCode').text(data.itemCode);
+                    $('#selectedItemName').text(data.itemName);
+                    $('#selectedItemQuantity').text(data.totalQuantity);
+                    $('#quantityInput').val(''); // Clear previous input
+                    $('#selectedItem').show();
+                }
+            });
+
+            // Add item to pullout list
+            $('#addToPulloutButton').on('click', function() {
+                var quantityToPullout = $('#quantityInput').val();
+                var selectedItemCode = $('#selectedItemCode').text();
+                var selectedItemName = $('#selectedItemName').text();
+
+                if (selectedItemCode && quantityToPullout) {
+                    // Add item to the pullout list
+                    itemsToPullout.push({
+                        itemCode: selectedItemCode,
+                        itemName: selectedItemName,
+                        quantity: quantityToPullout
+                    });
+
+                    // Update the pullout list display
+                    updatePulloutList();
+                    resetItemInformation(); // Reset item information after adding
+                } else {
+                    alert("Please select an item and enter a quantity.");
+                }
+            });
+
+            // Function to reset item information
+            function resetItemInformation() {
+                $('#selectedItemCode').text('');
+                $('#selectedItemName').text('');
+                $('#selectedItemQuantity').text('');
+                $('#quantityInput').val(''); // Clear input
+                $('#selectedItem').hide(); // Hide selected item details
+            }
+
+            // Function to update the pullout list display
+            function updatePulloutList() {
+                var pulloutListHtml = '';
+                itemsToPullout.forEach(function(item, index) {
+                    pulloutListHtml += '<tr>' +
+                        '<td>' + item.itemCode + '</td>' +
+                        '<td>' + item.itemName + '</td>' +
+                        '<td>' + item.quantity + '</td>' +
+                        '<td><button onclick="removeFromPullout(' + index + ')">Remove</button></td>' +
+                        '</tr>';
+                });
+                $('#pulloutList tbody').html(pulloutListHtml);
+            }
+
+            // Function to remove an item from the pullout list
+            window.removeFromPullout = function(index) {
+                itemsToPullout.splice(index, 1);
+                updatePulloutList();
+            };
+
+            // // Submit the pullout request
+            $('#submitPulloutButton').on('click', function() {
+                if (itemsToPullout.length === 0) {
+                    alert("No items to pull out.");
+                    return;
+                }
+
+                $.ajax({
+                    url: 'Bpullout',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(itemsToPullout),
+                    success: function(response) {
+                        alert(response.message);
+                        itemsToPullout = []; // Clear the list after successful submission
+                        updatePulloutList(); // Refresh the displayed list
+                    },
+                    error: function(xhr) {
+                        alert("Error: " + xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
 </head>
-<body>
-    <header>
-        MV88 Ventures Inventory System
-    </header>
-    <div class="container">
-        <div class="left-side">
-            <div class="search-bar">
-                <input type="text" placeholder="Search Item Name/Code">
-                <button>Search</button>
-            </div>
-            <div class="items-list">
-                <h3>Items Code</h3>
-                <div class="item">
-                    <span>A Item Code</span>
-                    <span>Supporting line text lorem ipsum dolor sit...</span>
-                </div>
-                <div class="item">
-                    <span>A Item Code</span>
-                    <span>Supporting line text lorem ipsum dolor sit...</span>
-                </div>
-                <div class="item">
-                    <span>A Item Code</span>
-                    <span>Supporting line text lorem ipsum dolor sit...</span>
-                </div>
-            </div>
-            <div class="amount-location">
-                <input type="number" placeholder="0-99999">
-                <select>
-                    <option>Location 1</option>
-                    <option>Location 2</option>
-                    <option>Location 3</option>
-                </select>
-                <button>Add to List</button>
-            </div>
+    <body>
+        <h1>Pull Out Items</h1>
+        <table id="itemsTable" class="display">
+            <thead>
+                <tr>
+                    <th>Item Code</th>
+                    <th>Item Name</th>
+                    <th>Total Quantity</th>
+                    <th>Critically Low</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+        <div id="selectedItem" style="display:none;">
+            <h2>Selected Item</h2>
+            <p>Item Code: <span id="selectedItemCode"></span></p>
+            <p>Item Name: <span id="selectedItemName"></span></p>
+            <p>Total Quantity: <span id="selectedItemQuantity"></span></p>
+            <input type="number" id="quantityInput" placeholder="Enter quantity" />
+            <button id="addToPulloutButton">Add to Pullout</button>
         </div>
-        <div class="right-side">
-            <div class="distribution-list">
-                <h3>List of Items to Distribute</h3>
-                <div class="item">
-                    <span>A List item</span>
-                </div>
-                <div class="item">
-                    <span>A List item</span>
-                </div>
-                <div class="item">
-                    <span>A List item</span>
-                </div>
-                <div class="item">
-                    <span>A List item</span>
-                </div>
-            </div>
-            <div class="confirm-mark">
-                <input type="checkbox" id="confirm-items">
-                <label for="confirm-items">Confirm Items</label>
-            </div>
-            <button class="mark-button">Distribute</button>
-        </div>
-    </div>
-</body>
+
+        <h2>Pullout List</h2>
+        <table id="pulloutList">
+            <thead>
+                <tr>
+                    <th>Item Code</th>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+        <button id="submitPulloutButton">Submit Pullout</button>
+    </body>
 </html>
