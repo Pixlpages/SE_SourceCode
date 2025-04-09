@@ -115,6 +115,25 @@ body {
 }
 
     </style>
+    <script>
+            function showView(view, selectedButton) {
+                let buttons = document.querySelectorAll(".tab");    
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(view).classList.add('active');
+                buttons.forEach(button => {
+                    let img = button.querySelector(".folder-icon");
+                    if (button === selectedButton) {
+                        img.src = "./Icons/open-folder.png"; // Open the selected folder
+                        button.classList.add("active");
+                    } else {
+                        img.src = "./Icons/folder.png"; // Close all other folders
+                        button.classList.remove("active");
+                    }
+                });
+            }
+        </script>
 </head>
 
 <body>
@@ -142,7 +161,7 @@ body {
 
     <div id="report" class="content-section active">
         <h3>Branch Report</h3>
-        <iframe src="branch-report.pdf" width="100%" height="400px"></iframe>
+        <iframe src="Aview" width="100%" height="400px"></iframe>
     </div>
 
     <div id="defective" class="content-section">
@@ -216,26 +235,6 @@ body {
                 </div>
             </div>
         </div>
-
-        <script>
-            function showView(view, selectedButton) {
-                let buttons = document.querySelectorAll(".tab");    
-                document.querySelectorAll('.content-section').forEach(section => {
-                    section.classList.remove('active');
-                });
-                document.getElementById(view).classList.add('active');
-                buttons.forEach(button => {
-                    let img = button.querySelector(".folder-icon");
-                    if (button === selectedButton) {
-                        img.src = "./Icons/open-folder.png"; // Open the selected folder
-                        button.classList.add("active");
-                    } else {
-                        img.src = "./Icons/folder.png"; // Close all other folders
-                        button.classList.remove("active");
-                    }
-                });
-            }
-        </script>
 </body>
 
 </html>
