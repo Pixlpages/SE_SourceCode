@@ -26,139 +26,138 @@
     <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
     <style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f5f5f5;
-}
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
 
-.header {
-    background-color: #5cb5c9;
-    color: white;
-    padding: 20px;
-    text-align: center;
-}
+        .header {
+            background-color: #5cb5c9;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
 
-.sub-header {
-    padding: 10px;
-    display: flex;
-    align-items: center;
-}
+        .sub-header {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
 
-.sub-header a {
-    text-decoration: none;
-    color: black;
-    margin-right: 10px;
-}
+        .sub-header a {
+            text-decoration: none;
+            color: black;
+            margin-right: 10px;
+        }
 
-.container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 20px;
-}
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 20px;
+        }
 
-.left-side,
-.right-side {
-    background-color: white;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    flex: 1 1 45%;
-    min-width: 300px;
-}
+        .left-side,
+        .right-side {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            flex: 1 1 45%;
+            min-width: 300px;
+        }
 
-.selected-item {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #e0f7fa;
-    border-radius: 5px;
-}
+        .selected-item {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e0f7fa;
+            border-radius: 5px;
+        }
 
-table.dataTable {
-    width: 100% !important;
-}
+        table.dataTable {
+            width: 100% !important;
+        }
 
-#itemsTable,
-#batchList {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
+        #itemsTable,
+        #batchList {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
 
-#itemsTable th,
-#itemsTable td,
-#batchList th,
-#batchList td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
+        #itemsTable th,
+        #itemsTable td,
+        #batchList th,
+        #batchList td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
 
-#quantityInput,
-#branchSelect {
-    width: auto;
-    max-width: 300px;
-    padding: 6px 12px;
-    margin: 8px 0;
-    box-sizing: border-box;
-    display: block;
-}
+        #quantityInput,
+        #branchSelect {
+            width: auto;
+            max-width: 300px;
+            padding: 6px 12px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            display: block;
+        }
 
-#addToBatchButton,
-#distributeButton,
-#batchList button {
-    background-color: #5cb5c9;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-    width: auto;
-    min-width: 120px;
-}
+        #addToBatchButton,
+        #distributeButton,
+        #batchList button {
+            background-color: #5cb5c9;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: auto;
+            min-width: 120px;
+        }
 
-#batchList button {
-    background-color: #f44336;
-    color: white;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 0 auto;
-    display: block;
-    text-align: center;
-}
+        #batchList button {
+            background-color: #f44336;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 auto;
+            display: block;
+            text-align: center;
+        }
 
-#batchList td {
-    text-align: center;
-}
+        #batchList td {
+            text-align: center;
+        }
 
-@media screen and (max-width: 768px) {
-    .container {
-        flex-direction: column;
-        padding: 10px;
-    }
+        @media screen and (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                padding: 10px;
+            }
 
-    .left-side,
-    .right-side {
-        width: 100%;
-    }
+            .left-side,
+            .right-side {
+                width: 100%;
+            }
 
-    #addToBatchButton,
-    #distributeButton {
-        width: 100%;
-    }
+            #addToBatchButton,
+            #distributeButton {
+                width: 100%;
+            }
 
-    .sub-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-}
-
+            .sub-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
     </style>
     <script>
         let itemsToDistribute = []; // Array to hold items to distribute
