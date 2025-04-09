@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <%@ page session="true" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
@@ -20,6 +19,7 @@
     String messageType = (String) request.getAttribute("messageType");
 %>
 
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -55,7 +55,9 @@
 
         .container {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
+            gap: 20px;
             padding: 20px;
         }
 
@@ -65,42 +67,60 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 45%;
+            flex: 1 1 45%;
+            min-width: 300px;
+            box-sizing: border-box;
         }
 
-        .left-side h2 {
+        .left-side h2,
+        .right-side h3 {
             margin-top: 0;
         }
 
         .left-side input[type="text"],
-        .left-side select,
-        .left-side input[type="number"] {
+        .left-side input[type="number"],
+        .left-side select {
             width: 100%;
             padding: 10px;
-            margin: 10px 0;
+            margin-top: 10px;
+            margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .left-side label {
+            margin-right: 15px;
         }
 
         .left-side input[type="radio"] {
             margin-right: 5px;
         }
 
-        .left-side label {
-            margin-right: 20px;
+        .left-side div {
+            margin-top: 10px;
+            margin-bottom: 10px;
         }
 
         .da_button {
             background-color: #5cb5c9;
             color: white;
+            padding: 8px 16px;
             border: none;
-            padding: 10px;
             border-radius: 5px;
             cursor: pointer;
+            margin-top: 10px;
+            width: auto;
+            min-width: 120px;
+            font-size: 14px;
+        }
+
+        .da_button:hover {
+            background-color: #4ca7bb;
         }
 
         .message {
-            margin: 10px 0;
+            margin-top: 10px;
             padding: 10px;
             border-radius: 5px;
         }
@@ -114,7 +134,26 @@
             background-color: #f8d7da;
             color: #721c24;
         }
+
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        li div {
+            display: inline-block;
+        }
+
+        li form {
+            display: inline-block;
+            margin-left: 10px;
+        }
     </style>
+
 </head>
 
 <body>
@@ -163,12 +202,19 @@
             <c:if test="${not empty itemList}">
                 <ul>
                     <c:forEach var="item" items="${itemList}">
-                        <li>
-                            <strong>Item Code:</strong> ${item.itemCode},
-                            <strong>Item Name:</strong> ${item.itemName},
-                            <strong>Category:</strong> ${item.itemCategory},
-                            <strong>Pet Category:</strong> ${item.petCategory},
-                            <strong>Quantity:</strong> ${item.totalQuantity}
+                        <li style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>Item Code:</strong> ${item.itemCode},
+                                <strong>Item Name:</strong> ${item.itemName},
+                                <strong>Category:</strong> ${item.itemCategory},
+                                <strong>Pet Category:</strong> ${item.petCategory},
+                                <strong>Quantity:</strong> ${item.totalQuantity}
+                            </div>
+                            <form action="Anewproduct" method="POST" style="margin-left: 10px;">
+                                <input type="hidden" name="action" value="removeItem">
+                                <input type="hidden" name="item_code" value="${item.itemCode}">
+                                <button type="submit" class="da_button" style="background-color: #e74c3c;">Remove</button>
+                            </form>
                         </li>
                     </c:forEach>
                 </ul>

@@ -1,21 +1,20 @@
-<!DOCTYPE html>
 <%@ page session="true" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
-    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
-    response.setHeader("Expires", "0"); // Proxies
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setHeader("Expires", "0");
 
-    // Session validation
     String username = (String) session.getAttribute("username");
     String role = (String) session.getAttribute("role");
     Boolean loggedIn = (Boolean) session.getAttribute("LoggedIn");
 
     if (loggedIn == null || !loggedIn || !"admin".equals(role)) {
-        response.sendRedirect("error_session.jsp"); // Redirect unauthorized users
+        response.sendRedirect("error_session.jsp");
     }
 %>
 
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -82,28 +81,47 @@
             background-color: #e0f7fa;
             border-radius: 5px;
         }
+
+        #quantityInput {
+            width: auto;
+            max-width: 300px;
+            padding: 6px 12px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            display: block;
+        }
+
+        table.display {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table.display th,
+        table.display td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
     </style>
     <script>
-        let itemsToUpdate = []; // Array to hold items to update
+        let itemsToUpdate = [];
 
         $(document).ready(function () {
-            var table = $('#itemsTable').DataTable({
-                "ajax": {
-                    "url": "Aincreasequantity", // Ensure this URL is correct
-                    "dataSrc": "aaData" // Use the correct data source
+            const table = $('#itemsTable').DataTable({
+                ajax: {
+                    url: 'Aincreasequantity',
+                    dataSrc: 'aaData'
                 },
-                "columns": [
-                    { "data": 0 }, // itemCode
-                    { "data": 1 }, // itemName
-                    { "data": 2 }  // totalQuantity
+                columns: [
+                    { data: 0 },
+                    { data: 1 },
+                    { data: 2 }
                 ]
             });
 
-            // Handle row click event for item selection
             $('#itemsTable tbody').on('click', 'tr', function () {
-                var data = table.row(this).data();
+                const data = table.row(this).data();
                 if (data) {
-                    // Display selected item details
                     $('#selectedItemCode').text(data[0]);
                     $('#selectedItemName').text(data[1]);
                     $('#selectedItemQuantity').text(data[2]);
@@ -111,14 +129,12 @@
                 }
             });
 
-            // Update database functionality
             $('#updateDatabaseButton').on('click', function () {
-                var quantityToAdd = $('#quantityInput').val();
-                var selectedItemCode = $('#selectedItemCode').text();
-                var selectedItemName = $('#selectedItemName').text();
+                const quantityToAdd = $('#quantityInput').val();
+                const selectedItemCode = $('#selectedItemCode').text();
+                const selectedItemName = $('#selectedItemName').text();
 
                 if (selectedItemCode && quantityToAdd) {
-                    // Add item to the batch list
                     itemsToUpdate.push({
                         itemCode: selectedItemCode,
                         itemName: selectedItemName,
@@ -132,18 +148,18 @@
                 }
 
                 $.ajax({
-                    url: 'Aincreasequantity', // Your servlet to handle quantity update
+                    url: 'Aincreasequantity',
                     type: 'POST',
                     data: {
                         action: 'updateQuantity',
                         itemsToUpdate: JSON.stringify(itemsToUpdate)
                     },
-                    success: function (response) {
+                    success: function () {
                         alert("Quantity updated successfully!");
-                        $('#itemsTable').DataTable().ajax.reload(); // Reload the table data
-                        itemsToUpdate = []; // Clear the batch list
-                        $('#selectedItem').hide(); // Hide the selected item details
-                        $('#quantityInput').val(''); // Clear the input field
+                        table.ajax.reload();
+                        itemsToUpdate = [];
+                        $('#selectedItem').hide();
+                        $('#quantityInput').val('');
                     },
                     error: function () {
                         alert("Error updating quantity. Please try again.");
@@ -171,8 +187,7 @@
                         <th>Total Quantity</th>
                     </tr>
                 </thead>
-                <tbody>
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
         <div class="right-side">

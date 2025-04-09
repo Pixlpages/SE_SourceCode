@@ -1,20 +1,18 @@
 <%@ page session="true" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
-    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
-    response.setHeader("Expires", "0"); // Proxies
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setHeader("Expires", "0");
 
-    // Session validation
     String username = (String) session.getAttribute("username");
     String role = (String) session.getAttribute("role");
     Boolean loggedIn = (Boolean) session.getAttribute("LoggedIn");
 
     if (loggedIn == null || !loggedIn || !"admin".equals(role)) {
-        response.sendRedirect("error_session.jsp"); // Redirect unauthorized users
+        response.sendRedirect("error_session.jsp");
     }
 %>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -160,12 +158,12 @@
         }
     </style>
     <script>
-        let itemsToDistribute = []; // Array to hold items to distribute
+        let itemsToDistribute = [];
 
         $(document).ready(function () {
             var table = $('#itemsTable').DataTable({
                 "ajax": {
-                    "url": "Agetmal", // Servlet to fetch products
+                    "url": "Agetmal",
                     "dataSrc": ""
                 },
                 "columns": [
@@ -175,96 +173,90 @@
                 ]
             });
 
-            // Handle row click event for item selection
             $('#itemsTable tbody').on('click', 'tr', function () {
                 var data = table.row(this).data();
                 if (data) {
-                    // Display selected item details
                     $('#selectedItemCode').text(data.itemCode);
                     $('#selectedItemName').text(data.itemName);
                     $('#selectedItemQuantity').text(data.totalQuantity);
-                    $('#quantityInput').val(''); // Clear previous input
+                    $('#quantityInput').val('');
                     $('#selectedItem').show();
                 }
             });
 
-            // Add item to batch list
             $('#addToBatchButton').on('click', function () {
-                var quantityToDistribute = $('#quantityInput').val();
-                var selectedItemCode = $('#selectedItemCode').text();
-                var selectedItemName = $('#selectedItemName').text();
-                var targetBranch = $('#branchSelect').val(); // Get selected branch
+                var quantity = $('#quantityInput').val();
+                var code = $('#selectedItemCode').text();
+                var name = $('#selectedItemName').text();
 
-                if (selectedItemCode && quantityToDistribute && targetBranch) {
-                    // Add item to the batch list
+                if (code && quantity) {
                     itemsToDistribute.push({
-                        itemCode: selectedItemCode,
-                        itemName: selectedItemName,
-                        quantity: quantityToDistribute,
-                        branch: targetBranch // Include the target branch
+                        itemCode: code,
+                        itemName: name,
+                        quantity: quantity
                     });
 
-                    // Update the batch list display
                     updateBatchList();
-
-                    // Reset item information
-                    resetItemInformation();
+                    resetItemSelection();
                 } else {
-                    alert("Please select an item, quantity, and branch.");
+                    alert("Please select an item and enter quantity.");
                 }
             });
 
-            // Function to reset item information
-            function resetItemInformation() {
+            function resetItemSelection() {
                 $('#selectedItemCode').text('');
                 $('#selectedItemName').text('');
                 $('#selectedItemQuantity').text('');
-                $('#quantityInput').val(''); // Clear input
-                $('#branchSelect').val(''); // Reset branch selection
-                $('#selectedItem').hide(); // Hide selected item details
+                $('#quantityInput').val('');
+                $('#selectedItem').hide();
             }
 
-            // Function to update the batch list display
             function updateBatchList() {
-                var batchListHtml = '';
+                let html = '';
                 itemsToDistribute.forEach(function (item, index) {
-                    batchListHtml += '<tr>' +
+                    html += '<tr>' +
                         '<td>' + item.itemCode + '</td>' +
                         '<td>' + item.itemName + '</td>' +
                         '<td>' + item.quantity + '</td>' +
-                        '<td>' + item.branch + '</td>' +
                         '<td><button onclick="removeFromBatch(' + index + ')">Remove</button></td>' +
                         '</tr>';
                 });
-                $('#batchList tbody').html(batchListHtml);
+                $('#batchList tbody').html(html);
             }
 
-            // Function to remove an item from the batch list
             window.removeFromBatch = function (index) {
                 itemsToDistribute.splice(index, 1);
                 updateBatchList();
             };
 
-            // Submit the batch list for distribution
             $('#distributeButton').on('click', function () {
+                var branch = $('#branchSelect').val();
+                if (!branch) {
+                    alert("Please select a branch for distribution.");
+                    return;
+                }
+
                 if (itemsToDistribute.length > 0) {
+                    itemsToDistribute.forEach(item => item.branch = branch);
+
                     $.ajax({
-                        url: 'Adistribute', // Your servlet to handle distribution
+                        url: 'Adistribute',
                         type: 'POST',
                         contentType: 'application/json',
-                        data: JSON.stringify(itemsToDistribute), // Send the items as JSON
-                        success: function (response) {
+                        data: JSON.stringify(itemsToDistribute),
+                        success: function () {
                             alert("Items distributed successfully!");
-                            itemsToDistribute = []; // Clear the batch list
-                            updateBatchList(); // Refresh the display
-                            table.ajax.reload(); // Reload the items table to reflect updated quantities
+                            itemsToDistribute = [];
+                            updateBatchList();
+                            table.ajax.reload();
+                            $('#branchSelect').val('');
                         },
                         error: function (xhr, status, error) {
-                            alert("Error distributing items: " + error);
+                            alert("Error: " + error);
                         }
                     });
                 } else {
-                    alert("No items in the batch list to distribute.");
+                    alert("No items to distribute.");
                 }
             });
         });
@@ -300,17 +292,6 @@
                 <p><strong>Item Name:</strong> <span id="selectedItemName"></span></p>
                 <p><strong>Total Quantity:</strong> <span id="selectedItemQuantity"></span></p>
                 <input type="number" id="quantityInput" placeholder="Enter quantity" min="1">
-                <select id="branchSelect">
-                    <option value="">Select Branch</option>
-                    <option value="bacolod">Bacolod</option>
-                    <option value="cebu">Cebu</option>
-                    <option value="marquee">Marquee</option>
-                    <option value="olongapo">Olongapo</option>
-                    <option value="subic">Subic</option>
-                    <option value="tacloban">Tacloban</option>
-                    <option value="tagaytay">Tagaytay</option>
-                    <option value="urdaneta">Urdaneta</option>
-                </select>
                 <button id="addToBatchButton">Add to Batch</button>
             </div>
             <h2>Batch List</h2>
@@ -320,13 +301,23 @@
                         <th>Item Code</th>
                         <th>Item Name</th>
                         <th>Quantity</th>
-                        <th>Branch</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    </tbody>
+                </tbody>
             </table>
+            <select id="branchSelect">
+                <option value="">Select Branch</option>
+                <option value="bacolod">Bacolod</option>
+                <option value="cebu">Cebu</option>
+                <option value="marquee">Marquee</option>
+                <option value="olongapo">Olongapo</option>
+                <option value="subic">Subic</option>
+                <option value="tacloban">Tacloban</option>
+                <option value="tagaytay">Tagaytay</option>
+                <option value="urdaneta">Urdaneta</option>
+            </select>
             <button id="distributeButton">Distribute Items</button>
         </div>
     </div>

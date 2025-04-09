@@ -62,6 +62,19 @@ public class Anewproduct extends HttpServlet {
                 request.setAttribute("message", "No items to add.");
                 request.setAttribute("messageType", "error");
             }
+        } else if ("removeItem".equals(action)) {
+            String itemCodeToRemove = request.getParameter("item_code");
+
+            List<DBManager.Item> itemList = (List<DBManager.Item>) request.getSession().getAttribute("itemList");
+            if (itemList != null) {
+                itemList.removeIf(item -> item.getItemCode().equals(itemCodeToRemove));
+                request.getSession().setAttribute("itemList", itemList);
+                request.setAttribute("message", "Item removed from list.");
+                request.setAttribute("messageType", "success");
+            } else {
+                request.setAttribute("message", "Item list is empty.");
+                request.setAttribute("messageType", "error");
+            }
         }
 
         // Forward back to the JSP page

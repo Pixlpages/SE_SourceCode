@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@ page session="true" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
     response.setHeader("Pragma", "no-cache"); // HTTP 1.0
@@ -14,6 +15,7 @@
         response.sendRedirect("error_session.jsp"); // Redirect unauthorized users
     }
 %>
+
 <html lang="en">
 
 <head>
@@ -153,10 +155,6 @@
                 <img src="./Icons/open-folder.png" width="42" height="42" alt="Folder Icon" class="folder-icon">
                 <span class="button-txt">Report</span>
             </button>
-            <button class="tab" onclick="showView('defective', this)">
-                <img src=".\Icons\folder.png" width="42" height="42" alt="Folder Icon" class="folder-icon">
-                <span class="button-txt">Defective</span>
-            </button>
             <button class="tab" onclick="showView('critical', this)">
                 <img src=".\Icons\folder.png" width="42" height="42" alt="Folder Icon" class="folder-icon">
                 <span class="button-txt">Critical Condition</span>
@@ -167,28 +165,6 @@
     <div id="report" class="content-section active">
         <h3>Branch Report</h3>
         <iframe src="Bview" width="100%" height="400px"></iframe>
-    </div>
-
-    <div id="defective" class="content-section">
-        <h3>Defective</h3>
-        <div class="items">
-            <div class="item">
-                <img src="grey-placeholder.png" alt="Item">
-                <div class="item-info">
-                    <p><strong>Item Name</strong></p>
-                    <p>Item Code</p>
-                    <p>Item Quantity</p>
-                </div>
-            </div>
-            <div class="item">
-                <img src="grey-placeholder.png" alt="Item">
-                <div class="item-info">
-                    <p><strong>Item Name</strong></p>
-                    <p>Item Code</p>
-                    <p>Item Quantity</p>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div id="critical" class="content-section">

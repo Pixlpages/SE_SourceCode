@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <%@ page session="true" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
@@ -57,6 +56,7 @@
             display: flex;
             justify-content: space-between;
             padding: 20px;
+            flex-wrap: wrap;
         }
 
         .left-side,
@@ -66,6 +66,8 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 45%;
+            min-width: 300px;
+            box-sizing: border-box;
         }
 
         .selected-item {
@@ -74,7 +76,89 @@
             background-color: #e0f7fa;
             border-radius: 5px;
         }
+
+        table.dataTable {
+            width: 100% !important;
+        }
+
+        #itemsTable,
+        #batchList {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        #itemsTable th,
+        #itemsTable td,
+        #batchList th,
+        #batchList td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        #quantityInput,
+        #branchSelect {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+
+        #addToBatchButton,
+        #distributeButton,
+        #batchList button,
+        #editButton {
+            background-color: #5cb5c9;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: auto;
+            min-width: 120px;
+        }
+
+        #batchList button {
+            background-color: #f44336;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 auto;
+            display: block;
+            text-align: center;
+        }
+
+        #batchList td {
+            text-align: center;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .left-side,
+            .right-side {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            #addToBatchButton,
+            #distributeButton {
+                width: 100%;
+            }
+
+            .sub-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
     </style>
+
     <script>
         let itemsToEdit = []; // Array to hold items to edit
 
@@ -137,21 +221,6 @@
                         '<td>' + item.itemCode + '</td>' +
                         '<td>' + item.itemName + '</td>' +
                         '<td>' + item.itemCategory + '</td>' + // Display item category
-                        '<td>' + item.petCategory + '</td>' +
-                        '<td><button onclick="removeFromBatch(' + index + ')">Remove</button></td>' +
-                        '</tr>';
-                });
-                $('#batchList tbody').html(batchListHtml);
-            }
-
-            // Function to update the batch list display
-            function updateBatchList() {
-                var batchListHtml = '';
-                itemsToEdit.forEach(function (item, index) {
-                    batchListHtml += '<tr>' +
-                        '<td>' + item.itemCode + '</td>' +
-                        '<td>' + item.itemName + '</td>' +
-                        '<td>' + item.itemCategory + '</td>' +
                         '<td>' + item.petCategory + '</td>' +
                         '<td><button onclick="removeFromBatch(' + index + ')">Remove</button></td>' +
                         '</tr>';
@@ -253,7 +322,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    </tbody>
+                </tbody>
             </table>
             <button id="editButton">Edit Items</button>
         </div>
