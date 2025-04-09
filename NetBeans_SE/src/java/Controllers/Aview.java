@@ -1,87 +1,158 @@
 package Controllers;
 
+import java.io.IOException;
+import java.sql.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.annotation.WebServlet;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
-import java.io.*;
-import java.sql.*;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 @WebServlet("/Aview")
 public class Aview extends HttpServlet {
+    private static final long serialVersionUID = 1L;
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    private static final String[] BRANCH_TABLES = {
+        "malabon", "tagaytay", "cebu", "olongapo", "marquee", "subic", "urdaneta", "bacolod", "tacloban"
+    };
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Optional query param: ?branch=cebu
+        String branch = request.getParameter("branch");
 
         response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "inline; filename=branch-report.pdf");
 
-        // Get branch parameter or default to "items"
-        String branch = request.getParameter("branch");
-        if (branch == null || branch.trim().isEmpty()) {
-            branch = "items";
-        }
-
-        // Validate table name against a whitelist
-        Set<String> validTables = new HashSet<>(Arrays.asList(
-    "items", "malabon", "tagaytay", "cebu", "olongapo",
-    "marquee", "subic", "urdaneta", "bacolod", "tacloban"
-));
-
-        if (!validTables.contains(branch)) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid branch/table name.");
-            return;
-        }
-
-        try {
+        try (Connection connection = DatabaseUtil.getConnection()) {
             Document document = new Document();
             PdfWriter.getInstance(document, response.getOutputStream());
             document.open();
 
-            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
-            Paragraph title = new Paragraph(branch.substring(0, 1).toUpperCase() + branch.substring(1) + " Report", titleFont);
-            title.setAlignment(Element.ALIGN_CENTER);
-            document.add(title);
-            document.add(Chunk.NEWLINE);
+            Font titleFont = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD);
+            Paragraph title;
 
-            try (Connection conn = DatabaseUtil.getConnection();
-                 Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery("SELECT item_code, item_name, total_quantity FROM " + branch)) {
+            PdfPTable table;
 
-                PdfPTable table = new PdfPTable(3); // 3 columns for branches
+            if (branch != null && isValidBranch(branch)) {
+                // Generate report for specific branch table
+                title = new Paragraph("Branch Report: " + capitalize(branch), titleFont);
+                title.setAlignment(Element.ALIGN_CENTER);
+                document.add(title);
+                document.add(Chunk.NEWLINE);
+
+                table = new PdfPTable(4); // Branch has 4 columns
                 table.setWidthPercentage(100);
-                table.setSpacingBefore(10f);
-                table.setSpacingAfter(10f);
+                Font headerFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
+                BaseColor headerColor = new BaseColor(220, 220, 220); // light gray
 
-                Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
-                String[] headers = {"Item Code", "Item Name", "Total Quantity"};
-                for (String header : headers) {
-                    PdfPCell cell = new PdfPCell(new Phrase(header, headFont));
-                    cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
-                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                String[] headers = {"Item Code", "Item Name", "Critically Low", "Total Quantity"};
+                for (String col : headers) {
+                    PdfPCell cell = new PdfPCell(new Phrase(col, headerFont));
+                    cell.setBackgroundColor(headerColor);
                     table.addCell(cell);
                 }
 
-                while (rs.next()) {
-                    table.addCell(rs.getString("item_code"));
-                    table.addCell(rs.getString("item_name"));
-                    table.addCell(String.valueOf(rs.getInt("total_quantity")));
+
+                String query = "SELECT * FROM " + branch;
+                try (Statement stmt = connection.createStatement();
+                     ResultSet rs = stmt.executeQuery(query)) {
+
+                    while (rs.next()) {
+                        table.addCell(rs.getString("item_code"));
+                        table.addCell(rs.getString("item_name"));
+                        table.addCell(String.valueOf(rs.getBoolean("critically_low")));
+                        table.addCell(String.valueOf(rs.getInt("total_quantity")));
+                    }
                 }
 
-                document.add(table);
+            } else {
+                // Default: recalculate total and show master items table
+                recalculateTotalQuantities();
 
+                title = new Paragraph("Master Item Report", titleFont);
+                title.setAlignment(Element.ALIGN_CENTER);
+                document.add(title);
+                document.add(Chunk.NEWLINE);
+
+                table = new PdfPTable(5); // Items table
+                table.setWidthPercentage(100);
+                Font headerFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
+                BaseColor headerColor = new BaseColor(220, 220, 220);
+
+                String[] headers = {"Item Code", "Item Name", "Item Category", "Total Quantity", "Pet Category"};
+                for (String col : headers) {
+                    PdfPCell cell = new PdfPCell(new Phrase(col, headerFont));
+                    cell.setBackgroundColor(headerColor);
+                    table.addCell(cell);
+                }
+
+
+                String query = "SELECT * FROM items";
+                try (Statement stmt = connection.createStatement();
+                     ResultSet rs = stmt.executeQuery(query)) {
+
+                    while (rs.next()) {
+                        table.addCell(rs.getString("item_code"));
+                        table.addCell(rs.getString("item_name"));
+                        table.addCell(rs.getString("item_category"));
+                        table.addCell(String.valueOf(rs.getInt("total_quantity")));
+                        table.addCell(rs.getString("pet_category"));
+                    }
+                }
             }
 
+            document.add(table);
             document.close();
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ServletException("Error generating PDF", e);
         }
     }
-}
 
+    private void recalculateTotalQuantities() {
+        try (Connection conn = DatabaseUtil.getConnection()) {
+            String selectItemsSql = "SELECT item_code FROM items";
+            PreparedStatement selectStmt = conn.prepareStatement(selectItemsSql);
+            ResultSet rs = selectStmt.executeQuery();
+
+            while (rs.next()) {
+                String itemCode = rs.getString("item_code");
+                int totalQuantity = 0;
+
+                for (String branch : BRANCH_TABLES) {
+                    String branchSql = "SELECT total_quantity FROM " + branch + " WHERE item_code = ?";
+                    try (PreparedStatement branchStmt = conn.prepareStatement(branchSql)) {
+                        branchStmt.setString(1, itemCode);
+                        ResultSet branchRs = branchStmt.executeQuery();
+                        if (branchRs.next()) {
+                            totalQuantity += branchRs.getInt("total_quantity");
+                        }
+                    }
+                }
+
+                String updateSql = "UPDATE items SET total_quantity = ? WHERE item_code = ?";
+                try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                    updateStmt.setInt(1, totalQuantity);
+                    updateStmt.setString(2, itemCode);
+                    updateStmt.executeUpdate();
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isValidBranch(String branch) {
+        for (String b : BRANCH_TABLES) {
+            if (b.equalsIgnoreCase(branch)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String capitalize(String input) {
+        if (input == null || input.isEmpty()) return input;
+        return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
+    }
+}

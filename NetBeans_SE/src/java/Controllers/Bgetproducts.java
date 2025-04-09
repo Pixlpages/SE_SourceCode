@@ -25,7 +25,7 @@ public class Bgetproducts extends HttpServlet {
         HttpSession session = request.getSession();
         
         // Assuming the branch name is stored in the session after login
-        String branch = (String) session.getAttribute("branch"); // Get the branch from session
+        String branch = (String) session.getAttribute("username"); // Get the branch from session
 
         if (branch != null) {
             fetchProductsFromDatabase(dbManager, branch); // Populate the DBManager with products from the branch

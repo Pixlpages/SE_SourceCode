@@ -21,7 +21,7 @@ public class Bpullout extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
         HttpSession session = request.getSession();
-        String branch = (String) session.getAttribute("branch"); // Get the branch from session
+        String branch = (String) session.getAttribute("username"); // Get the branch from session
 
         if (branch == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User  not logged in or branch not found.");

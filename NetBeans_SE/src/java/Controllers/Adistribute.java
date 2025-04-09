@@ -63,7 +63,7 @@ public class Adistribute extends HttpServlet {
     }
 
     private void distributeItems(Item[] items, String drCode) {
-        String updateSql = "UPDATE items SET total_quantity = total_quantity - ? WHERE item_code = ?";
+        String updateSql = "UPDATE malabon SET total_quantity = total_quantity - ? WHERE item_code = ?";
         String insertReceiptSql = "INSERT INTO delivery_receipt (dr_code, item_code, quantity, branch) VALUES (?, ?, ?, ?)";
         String insertBranchSql = "INSERT INTO %s (item_code, item_name, total_quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE total_quantity = total_quantity + ?";
 

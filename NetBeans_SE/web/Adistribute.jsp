@@ -17,6 +17,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,34 +32,41 @@
             padding: 0;
             background-color: #f5f5f5;
         }
+
         .header {
             background-color: #5cb5c9;
             color: white;
             padding: 20px;
             text-align: center;
         }
+
         .sub-header {
             padding: 10px;
             display: flex;
             align-items: center;
         }
+
         .sub-header a {
             text-decoration: none;
             color: black;
             margin-right: 10px;
         }
+
         .container {
             display: flex;
             justify-content: space-between;
             padding: 20px;
         }
-        .left-side, .right-side {
+
+        .left-side,
+        .right-side {
             background-color: white;
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 45%;
         }
+
         .selected-item {
             margin-top: 20px;
             padding: 10px;
@@ -69,7 +77,7 @@
     <script>
         let itemsToDistribute = []; // Array to hold items to distribute
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             var table = $('#itemsTable').DataTable({
                 "ajax": {
                     "url": "Agetproducts", // Servlet to fetch products
@@ -83,7 +91,7 @@
             });
 
             // Handle row click event for item selection
-            $('#itemsTable tbody').on('click', 'tr', function() {
+            $('#itemsTable tbody').on('click', 'tr', function () {
                 var data = table.row(this).data();
                 if (data) {
                     // Display selected item details
@@ -96,7 +104,7 @@
             });
 
             // Add item to batch list
-            $('#addToBatchButton').on('click', function() {
+            $('#addToBatchButton').on('click', function () {
                 var quantityToDistribute = $('#quantityInput').val();
                 var selectedItemCode = $('#selectedItemCode').text();
                 var selectedItemName = $('#selectedItemName').text();
@@ -134,7 +142,7 @@
             // Function to update the batch list display
             function updateBatchList() {
                 var batchListHtml = '';
-                itemsToDistribute.forEach(function(item, index) {
+                itemsToDistribute.forEach(function (item, index) {
                     batchListHtml += '<tr>' +
                         '<td>' + item.itemCode + '</td>' +
                         '<td>' + item.itemName + '</td>' +
@@ -147,26 +155,26 @@
             }
 
             // Function to remove an item from the batch list
-            window.removeFromBatch = function(index) {
+            window.removeFromBatch = function (index) {
                 itemsToDistribute.splice(index, 1);
                 updateBatchList();
             };
 
             // Submit the batch list for distribution
-            $('#distributeButton').on('click', function() {
+            $('#distributeButton').on('click', function () {
                 if (itemsToDistribute.length > 0) {
                     $.ajax({
                         url: 'Adistribute', // Your servlet to handle distribution
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify(itemsToDistribute), // Send the items as JSON
-                        success: function(response) {
+                        success: function (response) {
                             alert("Items distributed successfully!");
                             itemsToDistribute = []; // Clear the batch list
                             updateBatchList(); // Refresh the display
                             table.ajax.reload(); // Reload the items table to reflect updated quantities
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             alert("Error distributing items: " + error);
                         }
                     });
@@ -177,6 +185,7 @@
         });
     </script>
 </head>
+
 <body>
     <div class="header">
         <h1>Distribute Items</h1>
@@ -208,14 +217,14 @@
                 <input type="number" id="quantityInput" placeholder="Enter quantity" min="1">
                 <select id="branchSelect">
                     <option value="">Select Branch</option>
-                    <option value="Branch1">Bacolod</option>
-                    <option value="Branch2">Cebu</option>
-                    <option value="Branch3">Marquee</option>
-                    <option value="Branch4">Olongapo</option>
-                    <option value="Branch5">Subic</option>
-                    <option value="Branch6">Tacloban</option>
-                    <option value="Branch7">Tagaytay</option>
-                    <option value="Branch8">Urdaneta</option>
+                    <option value="Bacolod">Bacolod</option>
+                    <option value="Cebu">Cebu</option>
+                    <option value="Marquee">Marquee</option>
+                    <option value="Olongapo">Olongapo</option>
+                    <option value="Subic">Subic</option>
+                    <option value="Tacloban">Tacloban</option>
+                    <option value="Tagaytay">Tagaytay</option>
+                    <option value="Urdaneta">Urdaneta</option>
                 </select>
                 <button id="addToBatchButton">Add to Batch</button>
             </div>
@@ -231,11 +240,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Batch items will be populated here -->
-                </tbody>
+                    </tbody>
             </table>
             <button id="distributeButton">Distribute Items</button>
         </div>
     </div>
 </body>
+
 </html>
