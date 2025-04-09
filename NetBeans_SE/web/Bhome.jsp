@@ -257,9 +257,10 @@
 
             <!-- Pullout Items Card -->
             <section class="card" aria-labelledby="pullout-items-title">
-                <h3 id="pullout-items-title">Pullout Items</h3>
+                <h3 id="pullout-items-title">Out</h3>
                 <ul>
-                    <li><a href="StaffActionsServlet?action=pull">Search Item Name/Code</a></li>
+                    <li><a href="StaffActionsServlet?action=pull">Pullout</a></li>
+                    <li><a href="StaffActionsServlet?action=sales">Sales</a></li>
                 </ul>
             </section>
 
@@ -268,7 +269,6 @@
                 <h3 id="reports-title">Reports</h3>
                 <ul>
                     <li><a href="StaffActionsServlet?action=view">View Items</a></li>
-                    <li><a href="StaffActionsServlet?action=manage">Manage Defective Items</a></li>
                 </ul>
             </section>
         </div>

@@ -109,7 +109,7 @@
     <div class="container">
         <div class="left-side">
             <h2>Include Items</h2>
-            <form action="AddItemServlet" method="POST">
+            <form action="Anewproduct" method="POST">
                 <input type="hidden" name="action" value="addItem">
                 <input type="text" name="item_code" placeholder="Item Code" required>
                 <input type="text" name="item_name" placeholder="Item Name" required>
@@ -156,7 +156,7 @@
                         </li>
                     </c:forEach>
                 </ul>
-                <form action="AddItemServlet" method="POST">
+                <form action="Anewproduct" method="POST">
                     <input type="hidden" name="action" value="addAllItems">
                     <button type="submit" class="da_button">Include Items to Database</button>
                 </form>

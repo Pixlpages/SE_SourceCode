@@ -146,7 +146,7 @@
                 }
 
                 $.ajax({
-                    url: 'Bpullout',
+                    url: 'Bsales',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(itemsToPullout),
@@ -166,14 +166,14 @@
 
 <body>
     <div class="header">
-        <h1>Pullout Items</h1>
+        <h1>Sales</h1>
     </div>
     <div class="sub-header">
         <a href="Bhome.jsp">&#8592; back</a>
     </div>
     <div class="container">
         <div class="left-side">
-            <h1>Pullout Items</h1>
+            <h1>Items</h1>
             <table id="itemsTable" class="display">
                 <thead>
                     <tr>
@@ -197,7 +197,7 @@
                 <button id="addToPulloutButton">Add to Pullout</button>
             </div>
 
-            <h2>Pullout List</h2>
+            <h2>Item List</h2>
             <table id="pulloutList">
                 <thead>
                     <tr>
