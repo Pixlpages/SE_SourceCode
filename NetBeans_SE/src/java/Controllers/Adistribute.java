@@ -62,7 +62,7 @@ public class Adistribute extends HttpServlet {
 
     private void distributeItems(Item[] items, String drCode) {
         String updateSql = "UPDATE malabon SET total_quantity = total_quantity - ? WHERE item_code = ?";
-        String insertReceiptSql = "INSERT INTO delivery_receipt (dr_code, item_code, quantity, branch) VALUES (?, ?, ?, ?)";
+        String insertReceiptSql = "INSERT INTO delivery_receipt (dr_code, item_code, item_name, quantity, branch) VALUES (?, ?, ?, ?, ?)";
         String insertBranchSql = "INSERT INTO %s (item_code, item_name, total_quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE total_quantity = total_quantity + ?";
 
         try (Connection connection = DatabaseUtil.getConnection();
@@ -79,8 +79,9 @@ public class Adistribute extends HttpServlet {
                     // Insert into delivery_receipt for each item
                     insertReceiptStatement.setString(1, drCode); // Use the same DR code for all items
                     insertReceiptStatement.setString(2, item.getItemCode());
-                    insertReceiptStatement.setInt(3, Integer.parseInt(item.getQuantity()));
-                    insertReceiptStatement.setString(4, item.getBranch());
+                    insertReceiptStatement.setString(3, item.getItemName());
+                    insertReceiptStatement.setInt(4, Integer.parseInt(item.getQuantity()));
+                    insertReceiptStatement.setString(5, item.getBranch());
                     insertReceiptStatement.executeUpdate();
                     
                     // Insert into the appropriate branch table
