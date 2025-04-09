@@ -76,7 +76,7 @@ public class Aview extends HttpServlet {
                 Font headerFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
                 BaseColor headerColor = new BaseColor(220, 220, 220);
 
-                String[] headers = {"Item Code", "Item Name", "Item Category", "Total Quantity", "Pet Category"};
+                String[] headers = {"Item Code", "Item Name", "Item Category", "Pet Category", "Total Quantity"};
                 for (String col : headers) {
                     PdfPCell cell = new PdfPCell(new Phrase(col, headerFont));
                     cell.setBackgroundColor(headerColor);
@@ -92,8 +92,8 @@ public class Aview extends HttpServlet {
                         table.addCell(rs.getString("item_code"));
                         table.addCell(rs.getString("item_name"));
                         table.addCell(rs.getString("item_category"));
-                        table.addCell(String.valueOf(rs.getInt("total_quantity")));
                         table.addCell(rs.getString("pet_category"));
+                        table.addCell(String.valueOf(rs.getInt("total_quantity")));
                     }
                 }
             }

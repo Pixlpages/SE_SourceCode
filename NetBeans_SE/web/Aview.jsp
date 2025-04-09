@@ -176,6 +176,7 @@
             <label for="branch">Select Branch:</label>
             <select name="branch" id="branch">
                 <option value="items">Collated</option>
+                <option value="malabon">Main Warehouse</option>
                 <option value="bacolod">Bacolod</option>
                 <option value="cebu">Cebu</option>
                 <option value="marquee">Marquee</option>
