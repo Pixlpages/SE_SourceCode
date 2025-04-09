@@ -160,9 +160,27 @@ body {
     </div>
 
     <div id="report" class="content-section active">
-        <h3>Branch Report</h3>
-        <iframe src="Aview" width="100%" height="400px"></iframe>
-    </div>
+    <h3>Branch Report</h3>
+    
+    <form method="get" action="Aview" target="pdf-frame">
+        <label for="branch">Select Branch:</label>
+        <select name="branch" id="branch">
+            <option value="items">Main Inventory</option>
+            <option value="malabon">Malabon</option>
+            <option value="tagaytay">Tagaytay</option>
+            <option value="cebu">Cebu</option>
+            <option value="olongapo">Olongapo</option>
+            <option value="marquee">Marquee</option>
+            <option value="subic">Subic</option>
+            <option value="urdaneta">Urdaneta</option>
+            <option value="bacolod">Bacolod</option>
+            <option value="tacloban">Tacloban</option>
+        </select>
+        <button type="submit">Generate Report</button>
+    </form>
+
+    <iframe name="pdf-frame" width="100%" height="400px"></iframe>
+</div>
 
     <div id="defective" class="content-section">
         <h3>Defective</h3>

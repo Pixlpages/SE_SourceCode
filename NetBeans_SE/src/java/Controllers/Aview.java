@@ -7,6 +7,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.*;
 import java.sql.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @WebServlet("/Aview")
 public class Aview extends HttpServlet {
@@ -17,33 +20,45 @@ public class Aview extends HttpServlet {
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "inline; filename=branch-report.pdf");
 
+        // Get branch parameter or default to "items"
+        String branch = request.getParameter("branch");
+        if (branch == null || branch.trim().isEmpty()) {
+            branch = "items";
+        }
+
+        // Validate table name against a whitelist
+        Set<String> validTables = new HashSet<>(Arrays.asList(
+    "items", "malabon", "tagaytay", "cebu", "olongapo",
+    "marquee", "subic", "urdaneta", "bacolod", "tacloban"
+));
+
+        if (!validTables.contains(branch)) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid branch/table name.");
+            return;
+        }
+
         try {
             Document document = new Document();
             PdfWriter.getInstance(document, response.getOutputStream());
             document.open();
 
-            // Title
             Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
-            Paragraph title = new Paragraph("Branch Report", titleFont);
+            Paragraph title = new Paragraph(branch.substring(0, 1).toUpperCase() + branch.substring(1) + " Report", titleFont);
             title.setAlignment(Element.ALIGN_CENTER);
             document.add(title);
             document.add(Chunk.NEWLINE);
 
-            // Use DatabaseUtil to get connection
-            Connection conn = DatabaseUtil.getConnection();
+            try (Connection conn = DatabaseUtil.getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT item_code, item_name, total_quantity FROM " + branch)) {
 
-            String query = "SELECT item_code, item_name, item_category, total_quantity, pet_category FROM items";
-            try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
-
-                // Create PDF Table
-                PdfPTable table = new PdfPTable(5); // 5 columns
+                PdfPTable table = new PdfPTable(3); // 3 columns for branches
                 table.setWidthPercentage(100);
                 table.setSpacingBefore(10f);
                 table.setSpacingAfter(10f);
 
-                // Table headers
                 Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
-                String[] headers = {"Item Code", "Item Name", "Item Category", "Total Quantity", "Pet Category"};
+                String[] headers = {"Item Code", "Item Name", "Total Quantity"};
                 for (String header : headers) {
                     PdfPCell cell = new PdfPCell(new Phrase(header, headFont));
                     cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
@@ -51,18 +66,14 @@ public class Aview extends HttpServlet {
                     table.addCell(cell);
                 }
 
-                // Table rows
                 while (rs.next()) {
                     table.addCell(rs.getString("item_code"));
                     table.addCell(rs.getString("item_name"));
-                    table.addCell(rs.getString("item_category"));
                     table.addCell(String.valueOf(rs.getInt("total_quantity")));
-                    table.addCell(rs.getString("pet_category"));
                 }
 
                 document.add(table);
-            } finally {
-                if (conn != null) conn.close();
+
             }
 
             document.close();
@@ -73,3 +84,4 @@ public class Aview extends HttpServlet {
         }
     }
 }
+
