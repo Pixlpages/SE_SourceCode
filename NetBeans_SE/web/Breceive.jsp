@@ -1,3 +1,19 @@
+<%@ page session="true" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setHeader("Expires", "0"); // Proxies
+
+    // Session validation
+    String username = (String) session.getAttribute("username");
+    String role = (String) session.getAttribute("role");
+    Boolean loggedIn = (Boolean) session.getAttribute("LoggedIn");
+
+    if (loggedIn == null || !loggedIn || !"staff".equals(role)) {
+        response.sendRedirect("error_session.jsp"); // Redirect unauthorized users
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
