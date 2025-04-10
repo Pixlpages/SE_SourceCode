@@ -9,6 +9,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
     <style>
+        /* Same styles as before */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -119,48 +120,26 @@
             text-align: center;
         }
 
-        @media screen and (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                padding: 10px;
-            }
-
-            .left-side,
-            .right-side {
-                width: 100%;
-            }
-
-            #addToPullOutButton,
-            #submitPullOutButton {
-                width: 100%;
-            }
-
-            .sub-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
         /* Modal styles */
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
+            display: none;
+            position: fixed;
+            z-index: 1000;
             left: 0;
             top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgb(0,0,0); 
-            background-color: rgba(0,0,0,0.4); 
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto; 
+            margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%; 
-            max-width: 500px; 
+            width: 80%;
+            max-width: 500px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
@@ -179,8 +158,10 @@
             cursor: pointer;
         }
     </style>
+
     <script>
-        let itemsToPullout = []; // Array to hold items to pull out
+        let itemsToPullout = [];
+        let criticallyLowItems = []; // Array to store critically low items
 
         $(document).ready(function () {
             var table = $('#itemsTable').DataTable({
@@ -199,11 +180,10 @@
             $('#itemsTable tbody').on('click', 'tr', function () {
                 var data = table.row(this).data();
                 if (data) {
-                    // Display selected item details
                     $('#selectedItemCode').text(data.itemCode);
                     $('#selectedItemName').text(data.itemName);
                     $('#selectedItemQuantity').text(data.totalQuantity);
-                    $('#quantityInput').val(''); // Clear previous input
+                    $('#quantityInput').val('');
                     $('#selectedItem').show();
                 }
             });
@@ -215,31 +195,27 @@
                 var selectedItemName = $('#selectedItemName').text();
 
                 if (selectedItemCode && quantityToPullout) {
-                    // Add item to the pullout list
                     itemsToPullout.push({
                         itemCode: selectedItemCode,
                         itemName: selectedItemName,
                         quantity: quantityToPullout
                     });
 
-                    // Update the pullout list display
                     updatePulloutList();
-                    resetItemInformation(); // Reset item information after adding
+                    resetItemInformation();
                 } else {
                     alert("Please select an item and enter a quantity.");
                 }
             });
 
-            // Function to reset item information
             function resetItemInformation() {
                 $('#selectedItemCode').text('');
                 $('#selectedItemName').text('');
                 $('#selectedItemQuantity').text('');
-                $('#quantityInput').val(''); // Clear input
-                $('#selectedItem').hide(); // Hide selected item details
+                $('#quantityInput').val('');
+                $('#selectedItem').hide();
             }
 
-            // Function to update the pullout list display
             function updatePulloutList() {
                 var pulloutListHtml = '';
                 itemsToPullout.forEach(function (item, index) {
@@ -253,13 +229,12 @@
                 $('#pulloutList tbody').html(pulloutListHtml);
             }
 
-            // Function to remove an item from the pullout list
             window.removeFromPullout = function (index) {
                 itemsToPullout.splice(index, 1);
                 updatePulloutList();
             };
 
-            // // Submit the pullout request
+            // Submit the pullout request
             $('#submitPulloutButton').on('click', function () {
                 if (itemsToPullout.length === 0) {
                     alert("No items to pull out.");
@@ -267,19 +242,41 @@
                 }
 
                 $.ajax({
-                    url: 'Bsales',
+                    url: 'Bsales', 
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(itemsToPullout),
                     success: function (response) {
                         alert(response.message);
-                        itemsToPullout = []; // Clear the list after successful submission
-                        updatePulloutList(); // Refresh the displayed list
+
+                        criticallyLowItems = response.criticallyLowItems || []; // Update critically low items
+                        showCriticallyLowModal(); // Show the modal if there are critically low items
+
+                        itemsToPullout = [];
+                        updatePulloutList();
                     },
                     error: function (xhr) {
                         alert("Error: " + xhr.responseText);
                     }
                 });
+            });
+
+            // Function to show the critically low items modal
+            function showCriticallyLowModal() {
+                if (criticallyLowItems.length > 0) {
+                    let modalContent = '<h3>Critically Low Items</h3><ul>';
+                    criticallyLowItems.forEach(function (item) {
+                        modalContent += '<li>' + item + '</li>';
+                    });
+                    modalContent += '</ul>';
+                    $('#criticallyLowModal .modal-content').html(modalContent);
+                    $('#criticallyLowModal').show();
+                }
+            }
+
+            // Close the modal
+            $('.close').on('click', function () {
+                $('#criticallyLowModal').hide();
             });
         });
     </script>
@@ -303,8 +300,7 @@
                         <th>Total Quantity</th>
                     </tr>
                 </thead>
-                <tbody>
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
         <div class="right-side">
@@ -316,8 +312,7 @@
                 <input type="number" id="quantityInput" placeholder="Enter quantity" />
                 <button id="addToPulloutButton">Add to Pullout</button>
             </div>
-
-            <h2>Item List</h2>
+            <h2>Pullout List</h2>
             <table id="pulloutList">
                 <thead>
                     <tr>
@@ -327,11 +322,16 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody>
-                </tbody>
+                <tbody></tbody>
             </table>
-
             <button id="submitPulloutButton">Submit Pullout</button>
+        </div>
+    </div>
+
+    <!-- Critically Low Items Modal -->
+    <div id="criticallyLowModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
         </div>
     </div>
 </body>

@@ -137,7 +137,7 @@
                             lengthChange: false
                         });
 
-                        $('#rightPanelTitle').text("Details for Pull Out Code: " + PoCode);
+                        $('#rightPanelTitle').text("Details for Pullout Code: " + PoCode);
                         $('#detailsTable').removeClass('hidden');
                     },
                     error: function () {
@@ -150,14 +150,14 @@
 </head>
 <body>
 <div class="header">
-    <h1>View Pull Outs</h1>
+    <h1>View Pullouts</h1>
 </div>
 <div class="sub-header">
     <a href="Ahome.jsp">&#8592; Back</a>
 </div>
 <div class="container">
     <div class="left-side">
-        <h2>Pull Out Receipts</h2>
+        <h2>Pullout Receipts</h2>
         <table id="drTable" class="display">
             <thead>
                 <tr>
@@ -169,7 +169,7 @@
         </table>
     </div>
     <div class="right-side">
-        <h2 id="rightPanelTitle">Select a DR Code</h2>
+        <h2 id="rightPanelTitle">Select a Pullout Code</h2>
         <table id="detailsTable" class="display hidden">
             <thead>
                 <tr>

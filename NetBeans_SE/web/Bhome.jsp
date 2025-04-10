@@ -263,7 +263,7 @@
             <span>WELCOME</span>
             <div class="admin-circle"></div>
             <span style="text-transform:uppercase">
-                <%= (String) session.getAttribute("username")%> Staff
+                <%= (String) session.getAttribute("username")%> Manager
             </span>
         </div>
         <h2 class="access-title">What would you like to access?</h2>
@@ -276,10 +276,10 @@
             </section>
 
             <section class="card" aria-labelledby="pullout-items-title">
-                <h3 id="pullout-items-title">Out</h3>
+                <h3 id="pullout-items-title">Pullout Items</h3>
                 <ul>
-                    <li><a href="StaffActionsServlet?action=pull">Pull Out</a></li>
-                    <li><a href="StaffActionsServlet?action=sales">Sales</a></li>
+                    <li><a href="StaffActionsServlet?action=pull">Pullout Items to Admin</a></li>
+                    <li><a href="StaffActionsServlet?action=sales">Pullout Sales</a></li>
                 </ul>
             </section>
 

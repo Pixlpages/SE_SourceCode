@@ -40,6 +40,8 @@ public class Aviewlogs extends HttpServlet {
             String query = "SELECT 'Distribute' AS receipt_type, item_code, item_name, branch, delivery_date, quantity FROM delivery_receipt " +
                            "UNION ALL " +
                            "SELECT 'Pullout' AS receipt_type, item_code, item_name, branch, delivery_date, quantity FROM pullout_receipt " +
+                           "UNION ALL " +
+                           "SELECT 'Sales' AS receipt_type, item_code, item_name, branch, delivery_date, quantity FROM sales " +
                            "ORDER BY delivery_date ASC";  // Ordering by delivery_date
 
             try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
