@@ -117,6 +117,25 @@
             height: 400px;
             border: none;
         }
+        #daButton{
+            background-color: #5cb5c9;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: auto;
+            min-width: 120px;
+        }
+        #branch {
+            width: auto;
+            max-width: 300px;
+            padding: 6px 12px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            display: block;
+        }
     </style>
     <script>
         function showView(view, selectedButton) {
@@ -186,18 +205,18 @@
                 <option value="tagaytay">Tagaytay</option>
                 <option value="urdaneta">Urdaneta</option>
             </select>
-            <button type="submit">Generate Report</button>
+            <button type="submit" id="daButton">Generate Report</button><br><br>
         </form>
 
-        <iframe name="report-frame" width="100%" height="400px"></iframe>
+        <iframe name="report-frame" width="100%" height="600px"></iframe>
     </div>
 
 <div id="defective" class="content-section">
     <h3>Defective Items Report</h3>
     <form method="get" action="Aviewdefective" target="defective-frame">
-        <button type="submit">Generate Defective Report</button>
+        <button type="submit" id="daButton">Generate Defective Report</button><br><br>
     </form>
-    <iframe name="defective-frame" width="100%" height="400px"></iframe>
+    <iframe name="defective-frame" width="100%" height="600px"></iframe>
 </div>
     
 <div id="critical" class="content-section">
@@ -215,15 +234,26 @@
             <option value="tagaytay">Tagaytay</option>
             <option value="urdaneta">Urdaneta</option>
         </select>
-        <button type="submit">Generate Critical Report</button>
+        <button type="submit" id="daButton">Generate Critical Report</button><br><br>
     </form>
-    <iframe name="critical-frame" width="100%" height="400px"></iframe>
+    <iframe name="critical-frame" width="100%" height="600px"></iframe>
 </div>
 
 
 <div id="logs" class="content-section">
     <h3>Logs Report</h3>
-    <iframe src="Aviewlogs" width="100%" height="400px"></iframe>
+    <form method="get" action="Aviewlogs" target="logs-frame">
+    <label for="logType">Select Log Type:</label>
+    <select name="logType" id="branch">
+        <option value="all">All</option>
+        <option value="distribute">Distribute</option>
+        <option value="pullout">Pullout</option>
+        <option value="sales">Sales</option>
+    </select>
+    <button type="submit" id="daButton">Generate Logs</button><br><br>
+</form>
+<iframe name="logs-frame" width="100%" height="600px"></iframe>
+
 </div>
 </body>
 

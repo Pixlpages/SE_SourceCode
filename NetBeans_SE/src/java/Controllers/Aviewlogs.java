@@ -37,12 +37,26 @@ public class Aviewlogs extends HttpServlet {
             }
 
             // Fetch data from both tables (delivery_receipts and pullout_receipts), ordered by delivery_date
-            String query = "SELECT 'Distribute' AS receipt_type, item_code, item_name, branch, delivery_date, quantity FROM delivery_receipt " +
-                           "UNION ALL " +
-                           "SELECT 'Pullout' AS receipt_type, item_code, item_name, branch, delivery_date, quantity FROM pullout_receipt " +
-                           "UNION ALL " +
-                           "SELECT 'Sales' AS receipt_type, item_code, item_name, branch, delivery_date, quantity FROM sales " +
-                           "ORDER BY delivery_date ASC";  // Ordering by delivery_date
+            String logType = request.getParameter("logType");
+StringBuilder queryBuilder = new StringBuilder();
+
+if (logType == null || logType.equals("all")) {
+    queryBuilder.append("SELECT 'Distribute' AS receipt_type, item_code, item_name, branch, delivery_date, quantity FROM delivery_receipt ")
+                .append("UNION ALL ")
+                .append("SELECT 'Pullout' AS receipt_type, item_code, item_name, branch, delivery_date, quantity FROM pullout_receipt ")
+                .append("UNION ALL ")
+                .append("SELECT 'Sales' AS receipt_type, item_code, item_name, branch, delivery_date, quantity FROM sales ");
+} else if (logType.equals("distribute")) {
+    queryBuilder.append("SELECT 'Distribute' AS receipt_type, item_code, item_name, branch, delivery_date, quantity FROM delivery_receipt ");
+} else if (logType.equals("pullout")) {
+    queryBuilder.append("SELECT 'Pullout' AS receipt_type, item_code, item_name, branch, delivery_date, quantity FROM pullout_receipt ");
+} else if (logType.equals("sales")) {
+    queryBuilder.append("SELECT 'Sales' AS receipt_type, item_code, item_name, branch, delivery_date, quantity FROM sales ");
+}
+
+queryBuilder.append("ORDER BY delivery_date ASC");
+String query = queryBuilder.toString();
+
 
             try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
                 while (rs.next()) {
