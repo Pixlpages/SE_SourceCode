@@ -187,6 +187,7 @@
                         <option value="CODE6">6-Leash, Harnesses</option>
                         <option value="CODE7">7-Food</option>
                     </select>
+                <input type="text" name="item_description" placeholder="Item Description" required>
                 <input type="number" name="total_quantity" placeholder="Total Quantity" min="0" max="99999" required>
                 <input type="number" name="critical_condition" placeholder="Critical Condition Limit" min="0" max="99999" required>
                 <button type="submit" class="da_button">Add to List</button>

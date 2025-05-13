@@ -29,9 +29,10 @@ public class Anewproduct extends HttpServlet {
             String petCategory = request.getParameter("pet_category");
             int totalQuantity = Integer.parseInt(request.getParameter("total_quantity"));
             int criticalCondition = Integer.parseInt(request.getParameter("critical_condition"));
+            String itemDescription = request.getParameter("item_description");
 
             // Create a new item without critically_low
-            DBManager.Item newItem = new DBManager.Item(itemCode, itemName, itemCategory, petCategory, totalQuantity, criticalCondition);
+            DBManager.Item newItem = new DBManager.Item(itemCode, itemName, itemCategory, petCategory, totalQuantity, criticalCondition, itemDescription);
 
             // Store items in the session's item list
             List<DBManager.Item> itemList = (List<DBManager.Item>) request.getSession().getAttribute("itemList");
@@ -83,8 +84,8 @@ public class Anewproduct extends HttpServlet {
     }
 
     private void addAllItemsToDatabase(List<DBManager.Item> itemList) throws SQLException {
-        String insertItemsSql = "INSERT INTO items (item_code, item_name, item_category, pet_category, total_quantity, critical_condition) VALUES (?, ?, ?, ?, ?, ?)";
-        String insertMalabonSql = "INSERT INTO malabon (item_code, item_name, total_quantity, critically_low) VALUES (?, ?, ?, ?)";
+        String insertItemsSql = "INSERT INTO items (item_code, item_name, item_category, pet_category, total_quantity, critical_condition, item_description) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String insertMalabonSql = "INSERT INTO malabon (item_code, item_name, total_quantity, critically_low, item_description) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement insertItemsStatement = connection.prepareStatement(insertItemsSql);
@@ -98,6 +99,7 @@ public class Anewproduct extends HttpServlet {
                 insertItemsStatement.setString(4, item.getPetCategory());
                 insertItemsStatement.setInt(5, item.getTotalQuantity());
                 insertItemsStatement.setInt(6, item.getCriticalCondition());
+                insertItemsStatement.setString(7, item.getItemDescription());
                 insertItemsStatement.addBatch(); // Add to batch for items
 
                 // Insert into malabon table with critically_low
@@ -106,6 +108,7 @@ public class Anewproduct extends HttpServlet {
                 insertMalabonStatement.setString(2, item.getItemName());
                 insertMalabonStatement.setInt(3, item.getTotalQuantity());
                 insertMalabonStatement.setBoolean(4, criticallyLow); // Insert critically_low value
+                insertMalabonStatement.setString(5, item.getItemDescription());
                 insertMalabonStatement.addBatch(); // Add to batch for malabon
             }
 

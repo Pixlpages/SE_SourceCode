@@ -60,20 +60,22 @@ public class DBManager {
         private int totalQuantity;
         private int criticalCondition;
         private int criticallyLow;
+        private String itemDescription;
 
         // No-argument constructor
         public Item() {
         }
 
         // Constructor with parameters
-        public Item(String itemCode, String itemName, String itemCategory, String petCategory, int totalQuantity, int criticalCondition) {
+        public Item(String itemCode, String itemName, String itemCategory, String petCategory, int totalQuantity, int criticalCondition, String itemDescripion) {
             this.itemCode = itemCode;
             this.itemName = itemName;
             this.itemCategory = itemCategory;
             this.petCategory = petCategory;
             this.totalQuantity = totalQuantity;
             this.criticalCondition = criticalCondition;
-        }
+            this.itemDescription = itemDescription;
+       }
 
         // Getters and Setters
         public String getItemCode() { return itemCode; }
@@ -90,6 +92,8 @@ public class DBManager {
         public void setCriticalCondition(int criticalCondition) { this.criticalCondition = criticalCondition; }
         public int getCriticallyLow() { return criticallyLow; }
         public void setCriticallyLow(int criticallyLow) { this.criticallyLow = criticallyLow; }
+        public String getItemDescription() {return itemDescription;}
+        public void setItemDescription(String itemDescription) { this.itemDescription = itemDescription; }
     }
 
     // Inner DeliveryReceipt class
