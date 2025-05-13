@@ -126,65 +126,129 @@
                 width: 100%;
             }
         }
+        
+        /* Modal styles */
+#popupModal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.popup-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.popup-close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.popup-close:hover,
+.popup-close:focus {
+    color: black;
+    text-decoration: none;
+}
+
     </style>
     <script>
-        $(document).ready(function () {
-            var table = $('#itemsTable').DataTable({
-                "ajax": {
-                    "url": "Agetmal",
-                    "dataSrc": ""
+    function showPopup(message) {
+        $('#popupMessage').text(message);
+        $('#popupModal').fadeIn();
+    }
+
+    $(document).ready(function () {
+        var table = $('#itemsTable').DataTable({
+            "ajax": {
+                "url": "Agetmal",
+                "dataSrc": ""
+            },
+            "columns": [
+                { "data": "itemCode" },
+                { "data": "itemName" },
+                { "data": "totalQuantity" }
+            ]
+        });
+
+        $('#itemsTable tbody').on('click', 'tr', function () {
+            var data = table.row(this).data();
+            if (data) {
+                $('#selectedItemCode').text(data.itemCode);
+                $('#selectedItemName').text(data.itemName);
+                $('#selectedItemQuantity').text(data.totalQuantity);
+                $('#selectedItemDetails').show();
+            }
+        });
+
+        $('#markDefectiveButton').on('click', function () {
+            var itemCode = $('#selectedItemCode').text();
+            var cause = $('#defectCause').val();
+            var quantity = $('#defectQuantity').val();
+
+            if (!itemCode || !cause || !quantity) {
+                showPopup("Please complete all fields.");
+                return;
+            }
+
+            $.ajax({
+                url: 'Amanagedefective',
+                type: 'POST',
+                data: {
+                    itemCode: itemCode,
+                    cause: cause,
+                    quantity: quantity
                 },
-                "columns": [
-                    { "data": "itemCode" },
-                    { "data": "itemName" },
-                    { "data": "totalQuantity" }
-                ]
-            });
-
-            $('#itemsTable tbody').on('click', 'tr', function () {
-                var data = table.row(this).data();
-                if (data) {
-                    $('#selectedItemCode').text(data.itemCode);
-                    $('#selectedItemName').text(data.itemName);
-                    $('#selectedItemQuantity').text(data.totalQuantity);
-                    $('#selectedItemDetails').show();
-                }
-            });
-
-            $('#markDefectiveButton').on('click', function () {
-                var itemCode = $('#selectedItemCode').text();
-                var cause = $('#defectCause').val();
-                var quantity = $('#defectQuantity').val();
-
-                if (!itemCode || !cause || !quantity) {
-                    alert("Please complete all fields.");
-                    return;
-                }
-
-                $.ajax({
-                    url: 'Amanagedefective',
-                    type: 'POST',
-                    data: {
-                        itemCode: itemCode,
-                        cause: cause,
-                        quantity: quantity
-                    },
-                    success: function (response) {
-                        alert("Defective status updated successfully!");
-                        table.ajax.reload();
-                        $('#selectedItemDetails').hide();
-                    },
-                    error: function (xhr) {
-                        if (xhr.status === 409) {
-                            alert("Not enough quantity in stock.");
-                        } else {
-                            alert("Error updating defective status.");
-                        }
+                success: function () {
+                    $('#defectQuantity').val("");
+                    showPopup("Defective status updated successfully!");
+                    table.ajax.reload();
+                    $('#selectedItemDetails').hide();
+                },
+                error: function (xhr) {
+                    if (xhr.status === 409) {
+                        showPopup("Not enough quantity in stock.");
+                    } else if (xhr.status === 400) {
+                        showPopup("Invalid input. Please check your data.");
+                    } else if (xhr.status === 404) {
+                        showPopup("Item not found.");
+                    } else {
+                        showPopup("Error updating defective status.");
                     }
-                });
+                }
             });
         });
-    </script>
+
+        // Close popup on click
+        $('#popupClose').on('click', function () {
+            $('#popupModal').fadeOut();
+        });
+
+        // Close popup on click outside content
+        $(window).on('click', function (e) {
+            if (e.target.id === 'popupModal') {
+                $('#popupModal').fadeOut();
+            }
+        });
+    });
+</script>
+
 </head>
 
 <body>
@@ -232,6 +296,14 @@
             </div>
         </div>
     </div>
+<!-- Modal Popup -->
+<div id="popupModal" style="display:none;">
+    <div class="popup-content">
+        <span id="popupClose" class="popup-close">&times;</span>
+        <p id="popupMessage"></p>
+    </div>
+</div>
+
 </body>
 
 </html>

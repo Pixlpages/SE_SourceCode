@@ -24,25 +24,31 @@ public class Aviewdefective extends HttpServlet {
             document.add(title);
             document.add(Chunk.NEWLINE);
 
-            PdfPTable table = new PdfPTable(4); // Defective has 4 columns
+            // Adjusted to 5 columns now
+            PdfPTable table = new PdfPTable(5);
             table.setWidthPercentage(100);
             Font headerFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
             BaseColor headerColor = new BaseColor(220, 220, 220); // light gray
 
-            String[] headers = {"Defect Code", "Item Code", "Cause", "Quantity"};
+            String[] headers = {"Defect Code", "Item Code", "Item Name", "Cause", "Quantity"};
             for (String col : headers) {
                 PdfPCell cell = new PdfPCell(new Phrase(col, headerFont));
                 cell.setBackgroundColor(headerColor);
                 table.addCell(cell);
             }
 
-            String query = "SELECT * FROM defective";  // Query for defective table
+            // JOIN with items to get item_name
+            String query = "SELECT d.defect_code, d.item_code, i.item_name, d.cause, d.quantity " +
+                           "FROM defective d " +
+                           "JOIN items i ON d.item_code = i.item_code";
+
             try (Statement stmt = connection.createStatement();
                  ResultSet rs = stmt.executeQuery(query)) {
 
                 while (rs.next()) {
-                    table.addCell(String.valueOf(rs.getInt("defect_code")));
+                    table.addCell(rs.getString("defect_code"));
                     table.addCell(rs.getString("item_code"));
+                    table.addCell(rs.getString("item_name"));
                     table.addCell(rs.getString("cause"));
                     table.addCell(String.valueOf(rs.getInt("quantity")));
                 }
