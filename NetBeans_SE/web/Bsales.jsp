@@ -122,24 +122,24 @@
 
         /* Modal styles */
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
             left: 0;
             top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); 
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto;
+            margin: 15% auto; 
             padding: 20px;
             border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
+            width: 80%; 
+            max-width: 500px; 
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
@@ -158,15 +158,13 @@
             cursor: pointer;
         }
     </style>
-
-    <script>
+<script>
         let itemsToPullout = [];
-        let criticallyLowItems = []; // Array to store critically low items
 
         $(document).ready(function () {
             var table = $('#itemsTable').DataTable({
                 "ajax": {
-                    "url": "Bgetproducts", // Servlet to fetch products from the branch
+                    "url": "Bgetproducts",
                     "dataSrc": ""
                 },
                 "columns": [
@@ -176,7 +174,6 @@
                 ]
             });
 
-            // Handle row click event for item selection
             $('#itemsTable tbody').on('click', 'tr', function () {
                 var data = table.row(this).data();
                 if (data) {
@@ -188,7 +185,6 @@
                 }
             });
 
-            // Add item to pullout list
             $('#addToPulloutButton').on('click', function () {
                 var quantityToPullout = $('#quantityInput').val();
                 var selectedItemCode = $('#selectedItemCode').text();
@@ -208,6 +204,70 @@
                 }
             });
 
+            $('#submitPulloutButton').on('click', function () {
+                if (itemsToPullout.length === 0) {
+                    alert("No items to pull out.");
+                    return;
+                }
+
+                $.ajax({
+                    url: 'Bsales',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(itemsToPullout),
+                    success: function (response) {
+                        console.log("Response from server:", response); // Debug
+
+                        alert("Items pulled out and transferred successfully!");
+
+                        let criticallyLowArray = [];
+
+if (Array.isArray(response)) {
+    criticallyLowArray = response;
+} else if (typeof response === "string") {
+    try {
+        const parsed = JSON.parse(response);
+        if (Array.isArray(parsed)) {
+            criticallyLowArray = parsed;
+        } else if (parsed && Array.isArray(parsed.criticallyLowItems)) {
+            criticallyLowArray = parsed.criticallyLowItems;
+        }
+    } catch (e) {
+        console.error("Failed to parse JSON:", e);
+    }
+}
+
+
+                        if (criticallyLowArray.length > 0) {
+                            showModal(criticallyLowArray);
+                        }
+
+                        itemsToPullout = [];
+                        updatePulloutList();
+                        resetItemInformation();
+                        table.ajax.reload();
+                    },
+                    error: function (xhr) {
+                        alert("Error: " + xhr.responseText);
+                    }
+                });
+            });
+
+            function showModal(criticallyLowItems) {
+                $('#modalContent').text("Warning: The following items are critically low: " + criticallyLowItems.join(", "));
+                $('#myModal').css("display", "block");
+            }
+
+            $('.close').on('click', function () {
+                $('#myModal').css("display", "none");
+            });
+
+            $(window).on('click', function (event) {
+                if ($(event.target).is('#myModal')) {
+                    $('#myModal').css("display", "none");
+                }
+            });
+
             function resetItemInformation() {
                 $('#selectedItemCode').text('');
                 $('#selectedItemName').text('');
@@ -217,16 +277,16 @@
             }
 
             function updatePulloutList() {
-                var pulloutListHtml = '';
+                var html = '';
                 itemsToPullout.forEach(function (item, index) {
-                    pulloutListHtml += '<tr>' +
+                    html += '<tr>' +
                         '<td>' + item.itemCode + '</td>' +
                         '<td>' + item.itemName + '</td>' +
                         '<td>' + item.quantity + '</td>' +
                         '<td><button onclick="removeFromPullout(' + index + ')">Remove</button></td>' +
                         '</tr>';
                 });
-                $('#pulloutList tbody').html(pulloutListHtml);
+                $('#pulloutList tbody').html(html);
             }
 
             window.removeFromPullout = function (index) {
@@ -234,50 +294,8 @@
                 updatePulloutList();
             };
 
-            // Submit the pullout request
-            $('#submitPulloutButton').on('click', function () {
-                if (itemsToPullout.length === 0) {
-                    alert("No items to pull out.");
-                    return;
-                }
-
-                $.ajax({
-                    url: 'Bsales', 
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(itemsToPullout),
-                    success: function (response) {
-                        alert(response.message);
-
-                        criticallyLowItems = response.criticallyLowItems || []; // Update critically low items
-                        showCriticallyLowModal(); // Show the modal if there are critically low items
-
-                        itemsToPullout = [];
-                        updatePulloutList();
-                    },
-                    error: function (xhr) {
-                        alert("Error: " + xhr.responseText);
-                    }
-                });
-            });
-
-            // Function to show the critically low items modal
-            function showCriticallyLowModal() {
-                if (criticallyLowItems.length > 0) {
-                    let modalContent = '<h3>Critically Low Items</h3><ul>';
-                    criticallyLowItems.forEach(function (item) {
-                        modalContent += '<li>' + item + '</li>';
-                    });
-                    modalContent += '</ul>';
-                    $('#criticallyLowModal .modal-content').html(modalContent);
-                    $('#criticallyLowModal').show();
-                }
-            }
-
-            // Close the modal
-            $('.close').on('click', function () {
-                $('#criticallyLowModal').hide();
-            });
+            // Optional: Test modal display manually
+            showModal(["TestItem1", "TestItem2"]);
         });
     </script>
 </head>
@@ -329,9 +347,10 @@
     </div>
 
     <!-- Critically Low Items Modal -->
-    <div id="criticallyLowModal" class="modal">
+    <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
+            <p id="modalContent"></p>
         </div>
     </div>
 </body>

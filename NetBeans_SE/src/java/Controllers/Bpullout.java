@@ -165,9 +165,6 @@ public class Bpullout extends HttpServlet {
                     updateCriticallyLowStmt.setInt(1, totalQuantity <= 100 ? 1 : 0);
                     updateCriticallyLowStmt.setString(2, item.getItemCode());
                     int affectedRows = updateCriticallyLowStmt.executeUpdate();
-                    if (affectedRows > 0 && totalQuantity <= 100) {
-                        criticallyLowItems.add(item.getItemName()); // Add item name to the list
-                    }
                 }
             }
         }

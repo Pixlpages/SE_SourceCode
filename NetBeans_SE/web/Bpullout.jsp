@@ -150,7 +150,6 @@
             width: 100%; 
             height: 100%; 
             overflow: auto; 
-            background-color: rgb(0,0,0); 
             background-color: rgba(0,0,0,0.4); 
         }
 
@@ -180,12 +179,12 @@
         }
     </style>
     <script>
-        let itemsToPullout = []; // Array to hold items to pull out
+        let itemsToPullout = [];
 
         $(document).ready(function () {
             var table = $('#itemsTable').DataTable({
                 "ajax": {
-                    "url": "Bgetproducts", // Servlet to fetch products from the branch
+                    "url": "Bgetproducts",
                     "dataSrc": ""
                 },
                 "columns": [
@@ -195,19 +194,17 @@
                 ]
             });
 
-            // Handle row click event for item selection
             $('#itemsTable tbody').on('click', 'tr', function () {
                 var data = table.row(this).data();
                 if (data) {
                     $('#selectedItemCode').text(data.itemCode);
                     $('#selectedItemName').text(data.itemName);
                     $('#selectedItemQuantity').text(data.totalQuantity);
-                    $('#quantityInput').val(''); // Clear previous input
+                    $('#quantityInput').val('');
                     $('#selectedItem').show();
                 }
             });
 
-            // Add item to pullout list
             $('#addToPulloutButton').on('click', function () {
                 var quantityToPullout = $('#quantityInput').val();
                 var selectedItemCode = $('#selectedItemCode').text();
@@ -221,45 +218,61 @@
                     });
 
                     updatePulloutList();
-                    resetItemInformation(); // Reset item information after adding
+                    resetItemInformation();
                 } else {
                     alert("Please select an item and enter a quantity.");
                 }
             });
 
-// Submit the pullout request
-$('#submitPulloutButton').on('click', function () {
-    if (itemsToPullout.length === 0) {
-        alert("No items to pull out.");
-        return;
-    }
+            $('#submitPulloutButton').on('click', function () {
+                if (itemsToPullout.length === 0) {
+                    alert("No items to pull out.");
+                    return;
+                }
 
-    $.ajax({
-        url: 'Bpullout',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(itemsToPullout),
-        success: function (criticallyLowItems) {
-            alert("Items pulled out and transferred successfully!");
+                $.ajax({
+                    url: 'Bpullout',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(itemsToPullout),
+                    success: function (response) {
+                        console.log("Response from server:", response); // Debug
 
-            // Check if there are critically low items
-            if (criticallyLowItems.length > 0) {
-                showModal(criticallyLowItems);
-            }
+                        alert("Items pulled out and transferred successfully!");
 
-            // Clear the list and reset UI elements
-            itemsToPullout = []; // Clear the list after successful submission
-            updatePulloutList(); // Refresh the displayed list
-            resetItemInformation(); // Reset selected item information
-            table.ajax.reload(); // Reload the items table
-        },
-        error: function (xhr) {
-            alert("Error: " + xhr.responseText);
+                        let criticallyLowArray = [];
+
+if (Array.isArray(response)) {
+    criticallyLowArray = response;
+} else if (typeof response === "string") {
+    try {
+        const parsed = JSON.parse(response);
+        if (Array.isArray(parsed)) {
+            criticallyLowArray = parsed;
+        } else if (parsed && Array.isArray(parsed.criticallyLowItems)) {
+            criticallyLowArray = parsed.criticallyLowItems;
         }
-    });
-});
+    } catch (e) {
+        console.error("Failed to parse JSON:", e);
+    }
+}
 
-            // Function to show critical condition pop-up
+
+                        if (criticallyLowArray.length > 0) {
+                            showModal(criticallyLowArray);
+                        }
+
+                        itemsToPullout = [];
+                        updatePulloutList();
+                        resetItemInformation();
+                        table.ajax.reload();
+                    },
+                    error: function (xhr) {
+                        alert("Error: " + xhr.responseText);
+                    }
+                });
+            });
+
             function showModal(criticallyLowItems) {
                 $('#modalContent').text("Warning: The following items are critically low: " + criticallyLowItems.join(", "));
                 $('#myModal').css("display", "block");
@@ -275,16 +288,14 @@ $('#submitPulloutButton').on('click', function () {
                 }
             });
 
-            // Function to reset item information
             function resetItemInformation() {
                 $('#selectedItemCode').text('');
                 $('#selectedItemName').text('');
                 $('#selectedItemQuantity').text('');
-                $('#quantityInput').val(''); // Clear input
-                $('#selectedItem').hide(); // Hide selected item details
+                $('#quantityInput').val('');
+                $('#selectedItem').hide();
             }
 
-            // Function to update the pullout list display
             function updatePulloutList() {
                 var html = '';
                 itemsToPullout.forEach(function (item, index) {
@@ -298,11 +309,13 @@ $('#submitPulloutButton').on('click', function () {
                 $('#pulloutList tbody').html(html);
             }
 
-            // Function to remove an item from the pullout list
             window.removeFromPullout = function (index) {
                 itemsToPullout.splice(index, 1);
                 updatePulloutList();
             };
+
+            // Optional: Test modal display manually
+            // showModal(["TestItem1", "TestItem2"]);
         });
     </script>
 </head>
@@ -325,8 +338,7 @@ $('#submitPulloutButton').on('click', function () {
                         <th>Total Quantity</th>
                     </tr>
                 </thead>
-                <tbody>
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
         <div class="right-side">
@@ -349,13 +361,13 @@ $('#submitPulloutButton').on('click', function () {
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody>
-                </tbody>
+                <tbody></tbody>
             </table>
 
             <button id="submitPulloutButton">Submit Pullout</button>
         </div>
     </div>
+
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
