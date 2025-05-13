@@ -172,6 +172,7 @@
                     { "data": "itemCode" },
                     { "data": "itemName" },
                     { "data": "itemCategory" },
+                    { "data": "petCategory" },
                     { "data": "totalQuantity" },
                     { "data": "criticalCondition" }
                 ]
@@ -283,6 +284,7 @@
                         <th>Item Code</th>
                         <th>Item Name</th>
                         <th>Item Category</th>
+                        <th>Pet Category</th>
                         <th>Total Quantity</th>
                         <th>Critical Condition</th>
                     </tr>

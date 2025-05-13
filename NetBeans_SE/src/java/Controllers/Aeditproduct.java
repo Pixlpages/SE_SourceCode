@@ -28,7 +28,6 @@ public class Aeditproduct extends HttpServlet {
         Gson gson = new Gson();
         Item[] items = gson.fromJson(jsonData, Item[].class);
 
-        // Call the method to update items
         try {
             updateItemsInDatabase(items);
             response.setStatus(HttpServletResponse.SC_OK);
@@ -38,31 +37,50 @@ public class Aeditproduct extends HttpServlet {
         }
     }
 
-    // Method to update items in the database
     private void updateItemsInDatabase(Item[] items) throws SQLException {
-        String sql = "UPDATE items SET item_name = ?, item_category = ?, pet_category = ?, critical_condition = ? WHERE item_code = ?";
+        String updateItemsSql = "UPDATE items SET item_name = ?, item_category = ?, pet_category = ?, critical_condition = ? WHERE item_code = ?";
+
+        // Branch tables to update
+        String[] branches = {
+            "malabon", "bacolod", "cebu", "marquee", "olongapo",
+            "subic", "tacloban", "tagaytay", "urdaneta"
+        };
+        String updateBranchSqlTemplate = "UPDATE %s SET item_name = ? WHERE item_code = ?";
 
         try (Connection connection = DatabaseUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+             PreparedStatement updateItemsStmt = connection.prepareStatement(updateItemsSql)) {
+
             for (Item item : items) {
-                preparedStatement.setString(1, item.getItemName());
-                preparedStatement.setString(2, item.getItemCategory());
-                preparedStatement.setString(3, item.getPetCategory());
-                preparedStatement.setInt(4, item.getCriticalCondition());
-                preparedStatement.setString(5, item.getItemCode());
-                preparedStatement.addBatch(); // Add to batch
+                // Update in items table
+                updateItemsStmt.setString(1, item.getItemName());
+                updateItemsStmt.setString(2, item.getItemCategory());
+                updateItemsStmt.setString(3, item.getPetCategory());
+                updateItemsStmt.setInt(4, item.getCriticalCondition());
+                updateItemsStmt.setString(5, item.getItemCode());
+                updateItemsStmt.addBatch();
+
+                // Update item_name in all branch tables
+                for (String branch : branches) {
+                    String updateBranchSql = String.format(updateBranchSqlTemplate, branch);
+                    try (PreparedStatement updateBranchStmt = connection.prepareStatement(updateBranchSql)) {
+                        updateBranchStmt.setString(1, item.getItemName());
+                        updateBranchStmt.setString(2, item.getItemCode());
+                        updateBranchStmt.executeUpdate();
+                    }
+                }
             }
-            preparedStatement.executeBatch(); // Execute batch update
+
+            updateItemsStmt.executeBatch(); // Execute all batched item updates
         }
     }
 
     private static class Item {
         private String itemCode;
-        private String itemName; // Add itemName property
-        private String itemCategory; // Add itemCategory property
-        private String petCategory; // Add petCategory property
-        private int criticalCondition; 
-        
+        private String itemName;
+        private String itemCategory;
+        private String petCategory;
+        private int criticalCondition;
+
         // Getters and Setters
         public String getItemCode() { return itemCode; }
         public void setItemCode(String itemCode) { this.itemCode = itemCode; }
