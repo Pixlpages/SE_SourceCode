@@ -46,7 +46,7 @@ public class Bsales extends HttpServlet {
             connection.setAutoCommit(false); // Start transaction
 
             // Generate a new sales_code
-            String salesCode = generateNextSalesCode();
+            String salesCode = generateNextSalesCode(branch);
 
             // Insert items into the sales table before updating the inventory
             for (Item item : itemsToPullout) {
@@ -72,29 +72,32 @@ public class Bsales extends HttpServlet {
         }
     }
 
-    private String generateNextSalesCode() {
-        String nextSalesCode = "S-0001"; // Default value
-        String query = "SELECT MAX(sales_code) FROM sales";
+private String generateNextSalesCode(String branch) {
+    String nextSalesCode = "S-" + branch + "-0001"; // Default
+    String query = "SELECT MAX(sales_code) FROM sales WHERE sales_code LIKE ?";
 
-        try (Connection connection = DatabaseUtil.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet resultSet = statement.executeQuery()) {
+    try (Connection connection = DatabaseUtil.getConnection();
+         PreparedStatement statement = connection.prepareStatement(query)) {
 
-            if (resultSet.next()) {
-                String maxDRCode = resultSet.getString(1);
-                if (maxDRCode != null) {
-                    // Extract the numeric part and increment it
-                    String numericPart = maxDRCode.substring(3); // Get the part after "DR-"
-                    int nextNumber = Integer.parseInt(numericPart) + 1;
-                    nextSalesCode = String.format("S-%04d", nextNumber); // Format to DR-0001, DR-0002, etc.
-                }
+        statement.setString(1, "S-" + branch + "-%");
+
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            String maxSalesCode = resultSet.getString(1);
+            if (maxSalesCode != null) {
+                String[] parts = maxSalesCode.split("-");
+                int lastNumber = Integer.parseInt(parts[2]);
+                int nextNumber = lastNumber + 1;
+                nextSalesCode = String.format("S-%s-%04d", branch, nextNumber);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-
-        return nextSalesCode;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+
+    return nextSalesCode;
+}
+
 
     private void insertIntoSalesTable(Connection connection, String salesCode, String branch, Item item) throws SQLException {
         String insertSql = "INSERT INTO sales (sales_code, item_code, item_name, quantity, branch, delivery_date) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
