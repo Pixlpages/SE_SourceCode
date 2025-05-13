@@ -7,7 +7,6 @@ import javax.servlet.http.*;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 public class Aview extends HttpServlet {
@@ -90,12 +89,12 @@ public class Aview extends HttpServlet {
                 document.add(title);
                 document.add(Chunk.NEWLINE);
 
-                table = new PdfPTable(5); // Items table
+                table = new PdfPTable(6); // Items table
                 table.setWidthPercentage(100);
                 Font headerFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
                 BaseColor headerColor = new BaseColor(220, 220, 220);
 
-                String[] headers = {"Item Code", "Item Name", "Item Category", "Pet Category", "Total Quantity"};
+                String[] headers = {"Item Code", "Item Name", "Item Category", "Pet Category", "Item Description", "Total Quantity"};
                 for (String col : headers) {
                     PdfPCell cell = new PdfPCell(new Phrase(col, headerFont));
                     cell.setBackgroundColor(headerColor);
@@ -111,6 +110,7 @@ public class Aview extends HttpServlet {
                         table.addCell(rs.getString("item_name"));
                         table.addCell(rs.getString("item_category"));
                         table.addCell(rs.getString("pet_category"));
+                        table.addCell(rs.getString("item_description"));
                         table.addCell(String.valueOf(rs.getInt("total_quantity")));
                     }
                 }

@@ -125,8 +125,7 @@
                 columns: [
                     { data: 'itemCode' },
                     { data: 'itemName' },
-                    { data: 'quantity' },
-                    { data: 'branch' },
+                    { data: 'quantity' }
                 ],
                 destroy: true,
                 lengthChange: false
@@ -172,7 +171,6 @@
                     <th>Item Code</th>
                     <th>Item Name</th>
                     <th>Quantity</th>
-                    <th>Branch</th>
                 </tr>
             </thead>
             <tbody></tbody>
