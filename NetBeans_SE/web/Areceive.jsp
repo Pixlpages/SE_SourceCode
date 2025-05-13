@@ -96,7 +96,7 @@
                     {
                         data: 'deliveryDate',
                         render: function(data) {
-                            return new Date(data).toLocaleDateString(); // Format date to readable format
+                            return new Date(data).toLocaleString(); // Format date to readable format
                         }
                     }
                 ],
@@ -131,7 +131,7 @@
                                 { data: 'itemCode' },
                                 { data: 'itemName' },
                                 { data: 'quantity' },
-                                { data: 'branch' }
+                                { data: 'reason' }
                             ],
                             destroy: true,
                             lengthChange: false
@@ -176,7 +176,7 @@
                     <th>Item Code</th>
                     <th>Item Name</th>
                     <th>Quantity</th>
-                    <th>Branch</th>
+                    <th>Reason</th>
                 </tr>
             </thead>
             <tbody></tbody>

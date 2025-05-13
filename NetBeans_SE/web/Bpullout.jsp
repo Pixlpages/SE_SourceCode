@@ -210,12 +210,14 @@
                 var quantityToPullout = $('#quantityInput').val();
                 var selectedItemCode = $('#selectedItemCode').text();
                 var selectedItemName = $('#selectedItemName').text();
+                var reason = $('#textInput').val();
 
                 if (selectedItemCode && quantityToPullout) {
                     itemsToPullout.push({
                         itemCode: selectedItemCode,
                         itemName: selectedItemName,
-                        quantity: quantityToPullout
+                        quantity: quantityToPullout,
+                        reason: reason
                     });
 
                     updatePulloutList();
@@ -304,6 +306,7 @@ if (Array.isArray(response)) {
                         '<td>' + item.itemCode + '</td>' +
                         '<td>' + item.itemName + '</td>' +
                         '<td>' + item.quantity + '</td>' +
+                        '<td>' + item.reason + '</td>' +
                         '<td><button onclick="removeFromPullout(' + index + ')">Remove</button></td>' +
                         '</tr>';
                 });
@@ -360,6 +363,7 @@ if (Array.isArray(response)) {
                         <th>Item Code</th>
                         <th>Item Name</th>
                         <th>Quantity</th>
+                        <th>Reason</th>
                         <th>Action</th>
                     </tr>
                 </thead>

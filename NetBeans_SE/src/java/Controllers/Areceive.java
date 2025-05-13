@@ -79,6 +79,7 @@ public class Areceive extends HttpServlet {
                     item.setItemCode(rs.getString("item_code"));
                     item.setItemName(rs.getString("item_name"));
                     item.setQuantity(rs.getInt("quantity"));
+                    item.setReason(rs.getString("reason"));
                     item.setBranch(rs.getString("branch"));
                     item.setDeliveryDate(rs.getTimestamp("delivery_date"));
                     items.add(item);
@@ -98,6 +99,7 @@ public class Areceive extends HttpServlet {
         private String branch;
         private java.sql.Timestamp deliveryDate;
         private String itemName;
+        private String reason;
 
         // Getters and Setters
         public String getPoCode() { return PoCode; }
@@ -112,6 +114,8 @@ public class Areceive extends HttpServlet {
         public void setDeliveryDate(java.sql.Timestamp deliveryDate) { this.deliveryDate = deliveryDate; }
         public String getItemName() { return itemName; } // Getter for itemName
         public void setItemName(String itemName) { this.itemName = itemName; } // Setter for itemName
+        public String getReason() { return reason; }
+        public void setReason(String reason) { this.reason = reason; }
     }
 
     private static class ResponseData {

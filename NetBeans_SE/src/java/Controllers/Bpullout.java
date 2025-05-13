@@ -206,13 +206,14 @@ private void subtractFromBranchTable(Connection connection, Item item, String br
 
     private void logPulloutReceipt(Connection connection, Item item, String PoCode, String branch) throws SQLException {
         // Insert into pullout_receipt for each item pulled out
-        String insertReceiptSql = "INSERT INTO pullout_receipt (pullout_code, item_code, item_name, quantity, branch) VALUES (?, ?, ?, ?, ?)";
+        String insertReceiptSql = "INSERT INTO pullout_receipt (pullout_code, item_code, item_name, quantity, branch, reason) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertReceiptSql)) {
             preparedStatement.setString(1, PoCode);
             preparedStatement.setString(2, item.getItemCode());
             preparedStatement.setString(3, item.getItemName());
             preparedStatement.setInt(4, Integer.parseInt(item.getQuantity()));
             preparedStatement.setString(5, branch);
+            preparedStatement.setString(6, item.getReason());
             preparedStatement.executeUpdate();
         }
     }
@@ -222,6 +223,7 @@ private void subtractFromBranchTable(Connection connection, Item item, String br
         private String itemCode;
         private String itemName;
         private String quantity;
+        private String reason;
 
         // Getters and Setters
         public String getItemCode() { return itemCode; }
@@ -230,5 +232,7 @@ private void subtractFromBranchTable(Connection connection, Item item, String br
         public void setItemName(String itemName) { this.itemName = itemName; }
         public String getQuantity() { return quantity; }
         public void setQuantity(String quantity) { this.quantity = quantity; }
+        public String getReason() { return reason; }
+        public void setReason(String reason) { this.reason = reason; }
     }
 }
