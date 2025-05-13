@@ -58,6 +58,7 @@ public class DBManager {
         private String itemCategory;
         private String petCategory;
         private int totalQuantity;
+        private int criticalCondition;
         private int criticallyLow;
 
         // No-argument constructor
@@ -65,12 +66,13 @@ public class DBManager {
         }
 
         // Constructor with parameters
-        public Item(String itemCode, String itemName, String itemCategory, String petCategory, int totalQuantity) {
+        public Item(String itemCode, String itemName, String itemCategory, String petCategory, int totalQuantity, int criticalCondition) {
             this.itemCode = itemCode;
             this.itemName = itemName;
             this.itemCategory = itemCategory;
             this.petCategory = petCategory;
             this.totalQuantity = totalQuantity;
+            this.criticalCondition = criticalCondition;
         }
 
         // Getters and Setters
@@ -84,6 +86,8 @@ public class DBManager {
         public void setPetCategory(String petCategory) { this.petCategory = petCategory; }
         public int getTotalQuantity() { return totalQuantity; }
         public void setTotalQuantity(int totalQuantity) { this.totalQuantity = totalQuantity; }
+        public int getCriticalCondition() { return criticalCondition; }
+        public void setCriticalCondition(int criticalCondition) { this.criticalCondition = criticalCondition; }
         public int getCriticallyLow() { return criticallyLow; }
         public void setCriticallyLow(int criticallyLow) { this.criticallyLow = criticallyLow; }
     }

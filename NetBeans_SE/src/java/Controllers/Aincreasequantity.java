@@ -66,38 +66,56 @@ public class Aincreasequantity extends HttpServlet {
     }
 
 private boolean increaseItemQuantity(String itemCode, int quantity) throws SQLException {
-    String sql = "UPDATE malabon SET total_quantity = total_quantity + ? WHERE item_code = ?";
+    String updateQuantitySql = "UPDATE malabon SET total_quantity = total_quantity + ? WHERE item_code = ?";
+    String getUpdatedQuantitySql = "SELECT total_quantity FROM malabon WHERE item_code = ?";
+    String getCriticalThresholdSql = "SELECT critical_condition FROM items WHERE item_code = ?";
+    String updateCriticallyLowSql = "UPDATE malabon SET critically_low = ? WHERE item_code = ?";
 
     try (Connection connection = DatabaseUtil.getConnection();
-         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-        preparedStatement.setInt(1, quantity);
-        preparedStatement.setString(2, itemCode);
-        int rowsUpdated = preparedStatement.executeUpdate();
+         PreparedStatement updateStmt = connection.prepareStatement(updateQuantitySql)) {
+
+        // Step 1: Update quantity
+        updateStmt.setInt(1, quantity);
+        updateStmt.setString(2, itemCode);
+        int rowsUpdated = updateStmt.executeUpdate();
 
         if (rowsUpdated > 0) {
-            // After successful quantity update, check if the item total quantity exceeds 100
-            String checkQuantitySql = "SELECT total_quantity FROM malabon WHERE item_code = ?";
-            try (PreparedStatement checkQuantityStmt = connection.prepareStatement(checkQuantitySql)) {
-                checkQuantityStmt.setString(1, itemCode);
-                try (ResultSet resultSet = checkQuantityStmt.executeQuery()) {
-                    if (resultSet.next()) {
-                        int newQuantity = resultSet.getInt("total_quantity");
-                        // If total quantity exceeds 100, update the critically_low column to false
-                        if (newQuantity > 100) {
-                            String updateCriticallyLowSql = "UPDATE malabon SET critically_low = false WHERE item_code = ?";
-                            try (PreparedStatement updateCriticallyLowStmt = connection.prepareStatement(updateCriticallyLowSql)) {
-                                updateCriticallyLowStmt.setString(1, itemCode);
-                                updateCriticallyLowStmt.executeUpdate();
-                            }
-                        }
+            int newQuantity = 0;
+            int criticalCondition = 0;
+
+            // Step 2: Get updated quantity
+            try (PreparedStatement quantityStmt = connection.prepareStatement(getUpdatedQuantitySql)) {
+                quantityStmt.setString(1, itemCode);
+                try (ResultSet rs = quantityStmt.executeQuery()) {
+                    if (rs.next()) {
+                        newQuantity = rs.getInt("total_quantity");
                     }
                 }
+            }
+
+            // Step 3: Get critical condition threshold from items table
+            try (PreparedStatement criticalStmt = connection.prepareStatement(getCriticalThresholdSql)) {
+                criticalStmt.setString(1, itemCode);
+                try (ResultSet rs = criticalStmt.executeQuery()) {
+                    if (rs.next()) {
+                        criticalCondition = rs.getInt("critical_condition");
+                    }
+                }
+            }
+
+            // Step 4: Compare and update critically_low status
+            boolean criticallyLow = newQuantity <= criticalCondition;
+            try (PreparedStatement updateCriticalStmt = connection.prepareStatement(updateCriticallyLowSql)) {
+                updateCriticalStmt.setBoolean(1, criticallyLow);
+                updateCriticalStmt.setString(2, itemCode);
+                updateCriticalStmt.executeUpdate();
             }
         }
 
         return rowsUpdated > 0;
     }
 }
+
 
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

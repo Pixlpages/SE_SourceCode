@@ -102,6 +102,10 @@
             border: 1px solid #ddd;
             text-align: left;
         }
+        
+        table.dataTable {
+            width: 100% !important;
+        }
     </style>
     <script>
         let itemsToUpdate = [];

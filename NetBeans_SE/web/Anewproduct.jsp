@@ -156,16 +156,70 @@
 
     </head>
 
-    <body>
-        <div class="header">
-            <h1>MV88 Ventures Inventory System</h1>
+<body>
+    <div class="header">
+        <h1>MV88 Ventures Inventory System</h1>
+    </div>
+    <div class="sub-header">
+        <a href="Ahome.jsp">&#8592; back</a>
+    </div>
+    <div class="container">
+        <div class="left-side">
+            <h2>Include Items</h2>
+            <form action="Anewproduct" method="POST">
+                <input type="hidden" name="action" value="addItem">
+                <input type="text" name="item_code" placeholder="Item Code" required>
+                <input type="text" name="item_name" placeholder="Item Name" required>
+                <div>
+                    <input type="radio" id="dog" name="pet_category" value="Dog" required>
+                    <label for="dog">Dog</label>
+                    <input type="radio" id="cat" name="pet_category" value="Cat">
+                    <label for="cat">Cat</label>
+                    <input type="radio" id="dog-cat" name="pet_category" value="Both">
+                    <label for="dog-cat">Dog & Cat</label>
+                </div>
+                <select name="item_category" required>
+                    <option value="CODE1">CODE 1</option>
+                    <option value="CODE2">CODE 2</option>
+                    <option value="CODE3">CODE 3</option>
+                    <option value="CODE4">CODE 4</option>
+                    <option value="CODE5">CODE 5</option>
+                    <option value="CODE6">CODE 6</option>
+                    <option value="CODE7">CODE 7</option>
+                    </select>
+                <input type="number" name="total_quantity" placeholder="Total Quantity" min="0" max="99999" required>
+                <input type="number" name="critical_condition" placeholder="Critical Condition Limit" min="0" max="99999" required>
+                <button type="submit" class="da_button">Add to List</button>
+            </form>
+
+            <c:if test="${not empty message}">
+                <div class="message ${messageType}">
+                    ${message}
+                </div>
+            </c:if>
         </div>
-        <div class="sub-header">
-            <a href="Ahome.jsp">&#8592; back</a>
-        </div>
-        <div class="container">
-            <div class="left-side">
-                <h2>Include Items</h2>
+        <div class="right-side">
+            <h3>Items to Include</h3>
+            <c:if test="${not empty itemList}">
+                <ul>
+                    <c:forEach var="item" items="${itemList}">
+                        <li style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>Item Code:</strong> ${item.itemCode},
+                                <strong>Item Name:</strong> ${item.itemName},
+                                <strong>Category:</strong> ${item.itemCategory},
+                                <strong>Pet Category:</strong> ${item.petCategory},
+                                <strong>Quantity:</strong> ${item.totalQuantity},
+                                <strong>Critical Condition:</strong> ${item.criticalCondition}
+                            </div>
+                            <form action="Anewproduct" method="POST" style="margin-left: 10px;">
+                                <input type="hidden" name="action" value="removeItem">
+                                <input type="hidden" name="item_code" value="${item.itemCode}">
+                                <button type="submit" class="da_button" style="background-color: #e74c3c;">Remove</button>
+                            </form>
+                        </li>
+                    </c:forEach>
+                </ul>
                 <form action="Anewproduct" method="POST">
                     <input type="hidden" name="action" value="addItem">
                     <input type="text" name="item_code" placeholder="Item Code" required>

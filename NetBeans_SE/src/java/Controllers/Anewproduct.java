@@ -28,9 +28,10 @@ public class Anewproduct extends HttpServlet {
             String itemCategory = request.getParameter("item_category");
             String petCategory = request.getParameter("pet_category");
             int totalQuantity = Integer.parseInt(request.getParameter("total_quantity"));
+            int criticalCondition = Integer.parseInt(request.getParameter("critical_condition"));
 
             // Create a new item without critically_low
-            DBManager.Item newItem = new DBManager.Item(itemCode, itemName, itemCategory, petCategory, totalQuantity);
+            DBManager.Item newItem = new DBManager.Item(itemCode, itemName, itemCategory, petCategory, totalQuantity, criticalCondition);
 
             // Store items in the session's item list
             List<DBManager.Item> itemList = (List<DBManager.Item>) request.getSession().getAttribute("itemList");
@@ -82,7 +83,7 @@ public class Anewproduct extends HttpServlet {
     }
 
     private void addAllItemsToDatabase(List<DBManager.Item> itemList) throws SQLException {
-        String insertItemsSql = "INSERT INTO items (item_code, item_name, item_category, pet_category, total_quantity) VALUES (?, ?, ?, ?, ?)";
+        String insertItemsSql = "INSERT INTO items (item_code, item_name, item_category, pet_category, total_quantity, critical_condition) VALUES (?, ?, ?, ?, ?, ?)";
         String insertMalabonSql = "INSERT INTO malabon (item_code, item_name, total_quantity, critically_low) VALUES (?, ?, ?, ?)";
 
         try (Connection connection = DatabaseUtil.getConnection();
@@ -96,6 +97,7 @@ public class Anewproduct extends HttpServlet {
                 insertItemsStatement.setString(3, item.getItemCategory());
                 insertItemsStatement.setString(4, item.getPetCategory());
                 insertItemsStatement.setInt(5, item.getTotalQuantity());
+                insertItemsStatement.setInt(6, item.getCriticalCondition());
                 insertItemsStatement.addBatch(); // Add to batch for items
 
                 // Insert into malabon table with critically_low

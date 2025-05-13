@@ -111,67 +111,94 @@ public class Bpullout extends HttpServlet {
         }
     }
 
-    private void checkMalabonCriticalCondition(Connection connection, Item item, List<String> criticallyLowItems) throws SQLException {
-        // Check if the item is critically low in the malabon table
-        String checkQuantitySql = "SELECT total_quantity FROM malabon WHERE item_code = ?";
-        try (PreparedStatement checkStmt = connection.prepareStatement(checkQuantitySql)) {
-            checkStmt.setString(1, item.getItemCode());
-            ResultSet rs = checkStmt.executeQuery();
+private void checkMalabonCriticalCondition(Connection connection, Item item, List<String> criticallyLowItems) throws SQLException {
+    String getQuantitySql = "SELECT total_quantity FROM malabon WHERE item_code = ?";
+    String getCriticalSql = "SELECT critical_condition FROM items WHERE item_code = ?";
+    String updateCriticallyLowSql = "UPDATE malabon SET critically_low = ? WHERE item_code = ?";
 
-            if (rs.next()) {
-                int totalQuantity = rs.getInt("total_quantity");
+    int totalQuantity = 0;
+    int criticalCondition = 0;
 
-                // If total_quantity is less than or equal to 100, add item to criticallyLowItems list
-                if (totalQuantity <= 100) {
-                    criticallyLowItems.add(item.getItemName());
-                }
-
-                // Update critically_low flag in the malabon table
-                String updateCriticallyLowSql = "UPDATE malabon SET critically_low = ? WHERE item_code = ?";
-                try (PreparedStatement updateCriticallyLowStmt = connection.prepareStatement(updateCriticallyLowSql)) {
-                    updateCriticallyLowStmt.setInt(1, totalQuantity <= 100 ? 1 : 0);
-                    updateCriticallyLowStmt.setString(2, item.getItemCode());
-                    updateCriticallyLowStmt.executeUpdate();
-                }
-            }
+    // Get current total quantity from malabon
+    try (PreparedStatement checkStmt = connection.prepareStatement(getQuantitySql)) {
+        checkStmt.setString(1, item.getItemCode());
+        ResultSet rs = checkStmt.executeQuery();
+        if (rs.next()) {
+            totalQuantity = rs.getInt("total_quantity");
         }
     }
 
-    private void subtractFromBranchTable(Connection connection, Item item, String branch, List<String> criticallyLowItems) throws SQLException {
-        String updateBranchSql = "UPDATE " + branch + " SET total_quantity = total_quantity - ? WHERE item_code = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(updateBranchSql)) {
-            preparedStatement.setInt(1, Integer.parseInt(item.getQuantity()));
-            preparedStatement.setString(2, item.getItemCode());
-            preparedStatement.executeUpdate();
-        }
-
-        // Check if the item is critically low in the branch table
-        String checkQuantitySql = "SELECT total_quantity FROM " + branch + " WHERE item_code = ?";
-        try (PreparedStatement checkStmt = connection.prepareStatement(checkQuantitySql)) {
-            checkStmt.setString(1, item.getItemCode());
-            ResultSet rs = checkStmt.executeQuery();
-
-            if (rs.next()) {
-                int totalQuantity = rs.getInt("total_quantity");
-
-                // If total_quantity is less than or equal to 100, add item to criticallyLowItems list
-                if (totalQuantity <= 100) {
-                    criticallyLowItems.add(item.getItemName());
-                }
-
-                // Update critically_low flag in the branch table
-                String updateCriticallyLowSql = "UPDATE " + branch + " SET critically_low = ? WHERE item_code = ?";
-                try (PreparedStatement updateCriticallyLowStmt = connection.prepareStatement(updateCriticallyLowSql)) {
-                    updateCriticallyLowStmt.setInt(1, totalQuantity <= 100 ? 1 : 0);
-                    updateCriticallyLowStmt.setString(2, item.getItemCode());
-                    int affectedRows = updateCriticallyLowStmt.executeUpdate();
-                    if (affectedRows > 0 && totalQuantity <= 100) {
-                        criticallyLowItems.add(item.getItemName()); // Add item name to the list
-                    }
-                }
-            }
+    // Get critical condition from items table
+    try (PreparedStatement criticalStmt = connection.prepareStatement(getCriticalSql)) {
+        criticalStmt.setString(1, item.getItemCode());
+        ResultSet rs = criticalStmt.executeQuery();
+        if (rs.next()) {
+            criticalCondition = rs.getInt("critical_condition");
         }
     }
+
+    // Compare and update
+    boolean isCritical = totalQuantity <= criticalCondition;
+    try (PreparedStatement updateStmt = connection.prepareStatement(updateCriticallyLowSql)) {
+        updateStmt.setBoolean(1, isCritical);
+        updateStmt.setString(2, item.getItemCode());
+        updateStmt.executeUpdate();
+    }
+
+    if (isCritical) {
+        criticallyLowItems.add(item.getItemName());
+    }
+}
+
+
+private void subtractFromBranchTable(Connection connection, Item item, String branch, List<String> criticallyLowItems) throws SQLException {
+    String updateQuantitySql = "UPDATE " + branch + " SET total_quantity = total_quantity - ? WHERE item_code = ?";
+    String getQuantitySql = "SELECT total_quantity FROM " + branch + " WHERE item_code = ?";
+    String getCriticalSql = "SELECT critical_condition FROM items WHERE item_code = ?";
+    String updateCriticallyLowSql = "UPDATE " + branch + " SET critically_low = ? WHERE item_code = ?";
+
+    int quantityToSubtract = Integer.parseInt(item.getQuantity());
+    int totalQuantity = 0;
+    int criticalCondition = 0;
+
+    // Update quantity in branch
+    try (PreparedStatement updateStmt = connection.prepareStatement(updateQuantitySql)) {
+        updateStmt.setInt(1, quantityToSubtract);
+        updateStmt.setString(2, item.getItemCode());
+        updateStmt.executeUpdate();
+    }
+
+    // Get updated quantity
+    try (PreparedStatement quantityStmt = connection.prepareStatement(getQuantitySql)) {
+        quantityStmt.setString(1, item.getItemCode());
+        ResultSet rs = quantityStmt.executeQuery();
+        if (rs.next()) {
+            totalQuantity = rs.getInt("total_quantity");
+        }
+    }
+
+    // Get critical condition
+    try (PreparedStatement criticalStmt = connection.prepareStatement(getCriticalSql)) {
+        criticalStmt.setString(1, item.getItemCode());
+        ResultSet rs = criticalStmt.executeQuery();
+        if (rs.next()) {
+            criticalCondition = rs.getInt("critical_condition");
+        }
+    }
+
+    // Update critically low
+    boolean isCritical = totalQuantity <= criticalCondition;
+    try (PreparedStatement updateCriticalStmt = connection.prepareStatement(updateCriticallyLowSql)) {
+        updateCriticalStmt.setBoolean(1, isCritical);
+        updateCriticalStmt.setString(2, item.getItemCode());
+        updateCriticalStmt.executeUpdate();
+    }
+
+    if (isCritical) {
+        criticallyLowItems.add(item.getItemName());
+    }
+}
+
 
     private void logPulloutReceipt(Connection connection, Item item, String PoCode, String branch) throws SQLException {
         // Insert into pullout_receipt for each item pulled out

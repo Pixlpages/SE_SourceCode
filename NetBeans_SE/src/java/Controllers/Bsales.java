@@ -123,35 +123,48 @@ public class Bsales extends HttpServlet {
         }
     }
 
-    private String checkCriticallyLowCondition(Connection connection, String branch, Item item) throws SQLException {
-        // Query to check the current total_quantity after the update
-        String checkQuantitySql = "SELECT total_quantity FROM " + branch + " WHERE item_code = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(checkQuantitySql)) {
-            preparedStatement.setString(1, item.getItemCode());
-            try (ResultSet rs = preparedStatement.executeQuery()) {
-                if (rs.next()) {
-                    int totalQuantity = rs.getInt("total_quantity");
-                    // Check if the total quantity is less than or equal to 100
-                    String updateCriticallyLowSql = "UPDATE " + branch + " SET critically_low = ? WHERE item_code = ?";
-                    try (PreparedStatement updateStatement = connection.prepareStatement(updateCriticallyLowSql)) {
-                        if (totalQuantity <= 100) {
-                            updateStatement.setInt(1, 1); // Set critically_low = 1 (true)
-                        } else {
-                            updateStatement.setInt(1, 0); // Set critically_low = 0 (false)
-                        }
-                        updateStatement.setString(2, item.getItemCode());
-                        updateStatement.executeUpdate();
+private String checkCriticallyLowCondition(Connection connection, String branch, Item item) throws SQLException {
+    String getQuantitySql = "SELECT total_quantity FROM " + branch + " WHERE item_code = ?";
+    String getCriticalSql = "SELECT critical_condition FROM items WHERE item_code = ?";
+    String updateCriticallyLowSql = "UPDATE " + branch + " SET critically_low = ? WHERE item_code = ?";
 
-                        // Return the item code if it's critically low
-                        if (totalQuantity <= 100) {
-                            return item.getItemCode();
-                        }
-                    }
-                }
-            }
+    int totalQuantity = 0;
+    int criticalCondition = 0;
+
+    // Get current total quantity from branch
+    try (PreparedStatement checkStmt = connection.prepareStatement(getQuantitySql)) {
+        checkStmt.setString(1, item.getItemCode());
+        ResultSet rs = checkStmt.executeQuery();
+        if (rs.next()) {
+            totalQuantity = rs.getInt("total_quantity");
         }
-        return null;
     }
+
+    // Get critical condition from items table
+    try (PreparedStatement criticalStmt = connection.prepareStatement(getCriticalSql)) {
+        criticalStmt.setString(1, item.getItemCode());
+        ResultSet rs = criticalStmt.executeQuery();
+        if (rs.next()) {
+            criticalCondition = rs.getInt("critical_condition");
+        }
+    }
+
+    // Compare and update critically low status
+    boolean isCritical = totalQuantity <= criticalCondition;
+    try (PreparedStatement updateStmt = connection.prepareStatement(updateCriticallyLowSql)) {
+        updateStmt.setBoolean(1, isCritical);
+        updateStmt.setString(2, item.getItemCode());
+        updateStmt.executeUpdate();
+    }
+
+    if (isCritical) {
+        return item.getItemName();
+    }
+
+    return null;
+}
+
+
 
     // Inner class to represent the item structure
     public static class Item {

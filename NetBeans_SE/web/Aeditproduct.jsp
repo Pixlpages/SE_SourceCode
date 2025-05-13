@@ -172,7 +172,9 @@
                     { "data": "itemCode" },
                     { "data": "itemName" },
                     { "data": "itemCategory" },
-                    { "data": "totalQuantity" }
+                    { "data": "petCategory" },
+                    { "data": "totalQuantity" },
+                    { "data": "criticalCondition" }
                 ]
             });
 
@@ -186,6 +188,8 @@
                     $('#newItemName').val(data.itemName);
                     $('#selectedItemCategory').text(data.itemCategory);
                     $('#selectedItemQuantity').text(data.totalQuantity);
+                    $('#selectedItemCondition').text(data.criticalCondition);
+                    $('#newItemCondition').val(data.criticalCondition);
                     $('#quantityInput').val(''); // Clear previous input
                     $('#selectedItem').show();
                 }
@@ -195,6 +199,7 @@
             $('#addToBatchButton').on('click', function () {
                 var itemCode = $('#selectedItemCode').text();
                 var itemName = $('#newItemName').val();
+                var criticalCondition = $('#newItemCondition').val();
                 var itemCategory = $('#itemCategorySelect').val(); // Get the selected item category
                 var petCategory = $('input[name="petCategory"]:checked').val();
 
@@ -203,6 +208,7 @@
                     itemsToEdit.push({
                         itemCode: itemCode,
                         itemName: itemName,
+                        criticalCondition: criticalCondition,
                         itemCategory: itemCategory, // Include item category
                         petCategory: petCategory
                     });
@@ -221,6 +227,7 @@
                     batchListHtml += '<tr>' +
                         '<td>' + item.itemCode + '</td>' +
                         '<td>' + item.itemName + '</td>' +
+                        '<td>' + item.criticalCondition + '</td>' +
                         '<td>' + item.itemCategory + '</td>' + // Display item category
                         '<td>' + item.petCategory + '</td>' +
                         '<td><button onclick="removeFromBatch(' + index + ')">Remove</button></td>' +
@@ -277,7 +284,9 @@
                         <th>Item Code</th>
                         <th>Item Name</th>
                         <th>Item Category</th>
+                        <th>Pet Category</th>
                         <th>Total Quantity</th>
+                        <th>Critical Condition</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -291,6 +300,8 @@
                 <p><strong>Item Name:</strong> <span id="selectedItemName"></span></p>
                 <p><strong>New Item Name:</strong> <input type="text" id="newItemName"/></p>
                 <p><strong>Total Quantity:</strong> <span id="selectedItemQuantity"></span></p>
+                <p><strong>Critical Condition:</strong> <span id="selectedItemCondition"></span></p>
+                <p><strong>New Critical Condition:</strong> <input type="number" id="newItemCondition"/></p>
                 <select id="itemCategorySelect">
                     <option value="CODE1">CODE 1</option>
                     <option value="CODE2">CODE 2</option>
@@ -319,6 +330,7 @@
                     <tr>
                         <th>Item Code</th>
                         <th>Item Name</th>
+                        <th>Critical Condition</th>
                         <th>Item Category</th>
                         <th>Pet Category</th>
                         <th>Action</th>
