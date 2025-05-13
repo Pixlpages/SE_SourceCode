@@ -107,12 +107,26 @@
         const username = usernameField.value.trim();
 
         if (username) {
-            showNotification("Please wait for admin to retrieve your password.");
-            closeModal(); // Closes modal after submission
+            fetch('ForgotPassword', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'username=' + encodeURIComponent(username)
+            })
+            .then(response => response.text())
+            .then(data => {
+                showNotification(data);
+                closeModal(); // Closes modal after submission
+            })
+            .catch(error => {
+                showNotification("An error occurred. Please try again.");
+            });
         } else {
             showNotification("Please enter a valid username.");
         }
     }
+
 
     function showNotification(message) {
         const notification = document.createElement("div");
