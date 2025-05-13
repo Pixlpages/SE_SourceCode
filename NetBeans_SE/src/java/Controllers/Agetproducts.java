@@ -32,7 +32,7 @@ public class Agetproducts extends HttpServlet {
     // Method to fetch products from the database and populate the DBManager's item list
     private void fetchProductsFromDatabase(DBManager dbManager) {
         // Updated SQL query without is_defective
-        String sql = "SELECT item_code, item_name, item_category, pet_category, total_quantity FROM items";
+        String sql = "SELECT item_code, item_name, item_category, pet_category, total_quantity, critical_condition FROM items";
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -45,6 +45,7 @@ public class Agetproducts extends HttpServlet {
                 item.setItemCategory(resultSet.getString("item_category"));
                 item.setPetCategory(resultSet.getString("pet_category"));
                 item.setTotalQuantity(resultSet.getInt("total_quantity"));
+                item.setCriticalCondition(resultSet.getInt("critical_condition"));
                 dbManager.addItem(item); // Add item to DBManager's list
             }
         } catch (SQLException e) {

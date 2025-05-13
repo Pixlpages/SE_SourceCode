@@ -40,7 +40,7 @@ public class Aeditproduct extends HttpServlet {
 
     // Method to update items in the database
     private void updateItemsInDatabase(Item[] items) throws SQLException {
-        String sql = "UPDATE items SET item_name = ?, item_category = ?, pet_category = ? WHERE item_code = ?";
+        String sql = "UPDATE items SET item_name = ?, item_category = ?, pet_category = ?, critical_condition = ? WHERE item_code = ?";
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -48,7 +48,8 @@ public class Aeditproduct extends HttpServlet {
                 preparedStatement.setString(1, item.getItemName());
                 preparedStatement.setString(2, item.getItemCategory());
                 preparedStatement.setString(3, item.getPetCategory());
-                preparedStatement.setString(4, item.getItemCode());
+                preparedStatement.setInt(4, item.getCriticalCondition());
+                preparedStatement.setString(5, item.getItemCode());
                 preparedStatement.addBatch(); // Add to batch
             }
             preparedStatement.executeBatch(); // Execute batch update
@@ -60,7 +61,8 @@ public class Aeditproduct extends HttpServlet {
         private String itemName; // Add itemName property
         private String itemCategory; // Add itemCategory property
         private String petCategory; // Add petCategory property
-
+        private int criticalCondition; 
+        
         // Getters and Setters
         public String getItemCode() { return itemCode; }
         public void setItemCode(String itemCode) { this.itemCode = itemCode; }
@@ -70,5 +72,7 @@ public class Aeditproduct extends HttpServlet {
         public void setItemCategory(String itemCategory) { this.itemCategory = itemCategory; }
         public String getPetCategory() { return petCategory; }
         public void setPetCategory(String petCategory) { this.petCategory = petCategory; }
+        public int getCriticalCondition() { return criticalCondition; }
+        public void setCriticalCondition(int criticalCondition) { this.criticalCondition = criticalCondition; }
     }
 }

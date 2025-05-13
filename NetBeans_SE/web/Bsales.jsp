@@ -9,7 +9,6 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
     <style>
-        /* Same styles as before */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -293,9 +292,6 @@ if (Array.isArray(response)) {
                 itemsToPullout.splice(index, 1);
                 updatePulloutList();
             };
-
-            // Optional: Test modal display manually
-            showModal(["TestItem1", "TestItem2"]);
         });
     </script>
 </head>

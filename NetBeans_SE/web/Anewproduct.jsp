@@ -188,6 +188,7 @@
                     <option value="CODE7">CODE 7</option>
                     </select>
                 <input type="number" name="total_quantity" placeholder="Total Quantity" min="0" max="99999" required>
+                <input type="number" name="critical_condition" placeholder="Critical Condition Limit" min="0" max="99999" required>
                 <button type="submit" class="da_button">Add to List</button>
             </form>
 
@@ -208,7 +209,8 @@
                                 <strong>Item Name:</strong> ${item.itemName},
                                 <strong>Category:</strong> ${item.itemCategory},
                                 <strong>Pet Category:</strong> ${item.petCategory},
-                                <strong>Quantity:</strong> ${item.totalQuantity}
+                                <strong>Quantity:</strong> ${item.totalQuantity},
+                                <strong>Critical Condition:</strong> ${item.criticalCondition}
                             </div>
                             <form action="Anewproduct" method="POST" style="margin-left: 10px;">
                                 <input type="hidden" name="action" value="removeItem">
