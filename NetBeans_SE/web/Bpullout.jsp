@@ -336,6 +336,7 @@ $('#submitPulloutButton').on('click', function () {
                 <p>Item Name: <span id="selectedItemName"></span></p>
                 <p>Total Quantity: <span id="selectedItemQuantity"></span></p>
                 <input type="number" id="quantityInput" placeholder="Enter quantity" />
+                <input type="text" id="textInput" name="textInput" placeholder="Reason for pullout">
                 <button id="addToPulloutButton">Add to Pullout</button>
             </div>
 

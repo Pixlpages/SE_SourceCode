@@ -6,6 +6,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import java.io.*;
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class Bview extends HttpServlet {
 
@@ -29,7 +31,14 @@ public class Bview extends HttpServlet {
             Document document = new Document();
             PdfWriter.getInstance(document, response.getOutputStream());
             document.open();
-
+            java.util.Date now = new java.util.Date();
+            // Define the desired format
+            SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM d, yyyy 'at' h:mm a", Locale.ENGLISH);
+            // Format the current date and time
+            String formattedDate = formatter.format(now);
+            Font dateFont = new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL);
+            Paragraph dateGen = new Paragraph("Date generated: " + formattedDate, dateFont);
+            document.add(dateGen);
             // Title
             Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
             Paragraph title = new Paragraph("Branch Report: " + capitalize(branch), titleFont);
@@ -70,7 +79,9 @@ public class Bview extends HttpServlet {
 
                 document.add(table);
             } finally {
-                if (conn != null) conn.close();
+                if (conn != null) {
+                    conn.close();
+                }
             }
 
             document.close();
@@ -95,7 +106,9 @@ public class Bview extends HttpServlet {
     }
 
     private String capitalize(String input) {
-        if (input == null || input.isEmpty()) return input;
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
         return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
     }
 }

@@ -6,8 +6,11 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class Bviewcritical extends HttpServlet {
+
     private static final long serialVersionUID = 1L;
 
     private static final String[] BRANCH_TABLES = {
@@ -25,7 +28,14 @@ public class Bviewcritical extends HttpServlet {
             Document document = new Document();
             PdfWriter.getInstance(document, response.getOutputStream());
             document.open();
-
+            java.util.Date now = new java.util.Date();
+            // Define the desired format
+            SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM d, yyyy 'at' h:mm a", Locale.ENGLISH);
+            // Format the current date and time
+            String formattedDate = formatter.format(now);
+            Font dateFont = new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL);
+            Paragraph dateGen = new Paragraph("Date generated: " + formattedDate, dateFont);
+            document.add(dateGen);
             Font titleFont = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD);
             Paragraph title;
 
@@ -52,7 +62,7 @@ public class Bviewcritical extends HttpServlet {
 
                 String query = "SELECT * FROM " + branch + " WHERE critically_low = true";
                 try (Statement stmt = connection.createStatement();
-                     ResultSet rs = stmt.executeQuery(query)) {
+                        ResultSet rs = stmt.executeQuery(query)) {
 
                     while (rs.next()) {
                         table.addCell(rs.getString("item_code"));
@@ -83,7 +93,9 @@ public class Bviewcritical extends HttpServlet {
     }
 
     private String capitalize(String input) {
-        if (input == null || input.isEmpty()) return input;
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
         return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
     }
 }
