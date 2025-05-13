@@ -36,7 +36,7 @@ public class Bpullout extends HttpServlet {
             jsonBuffer.append(line);
         }
 
-        String PoCode = generateNextPullOutCode();
+        String PoCode = generateNextPullOutCode(branch);
 
         // Parse the JSON data into a list of items
         Gson gson = new Gson();
@@ -72,29 +72,33 @@ public class Bpullout extends HttpServlet {
         }
     }
 
-    private String generateNextPullOutCode() {
-        String nextPOCode = "PO-0001"; // Default value
-        String query = "SELECT MAX(pullout_code) FROM pullout_receipt";
+    private String generateNextPullOutCode(String branch) {
+    String prefix = "PO-" + branch + "-";
+    String nextPOCode = prefix + "0001"; // Default value
+    String query = "SELECT MAX(pullout_code) FROM pullout_receipt WHERE pullout_code LIKE ?";
 
-        try (Connection connection = DatabaseUtil.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet resultSet = statement.executeQuery()) {
+    try (Connection connection = DatabaseUtil.getConnection();
+         PreparedStatement statement = connection.prepareStatement(query)) {
 
-            if (resultSet.next()) {
-                String maxPOCode = resultSet.getString(1);
-                if (maxPOCode != null) {
-                    // Extract the numeric part and increment it
-                    String numericPart = maxPOCode.substring(3); // Get the part after "PO-"
-                    int nextNumber = Integer.parseInt(numericPart) + 1;
-                    nextPOCode = String.format("PO-%04d", nextNumber); // Format to PO-0001, PO-0002, etc.
-                }
+        statement.setString(1, prefix + "%");
+        ResultSet resultSet = statement.executeQuery();
+
+        if (resultSet.next()) {
+            String maxPOCode = resultSet.getString(1);
+            if (maxPOCode != null) {
+                // Extract the numeric part (after "PO-branch-") and increment it
+                String numericPart = maxPOCode.substring(prefix.length());
+                int nextNumber = Integer.parseInt(numericPart) + 1;
+                nextPOCode = prefix + String.format("%04d", nextNumber);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-
-        return nextPOCode;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+
+    return nextPOCode;
+}
+
 
     private void transferToMalabon(Connection connection, Item item) throws SQLException {
         // Update the malabon table with the item being transferred

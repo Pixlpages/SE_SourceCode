@@ -6,6 +6,8 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class Aviewlogs extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -22,6 +24,14 @@ public class Aviewlogs extends HttpServlet {
             StringBuilder queryBuilder = new StringBuilder();
             String reportTitle;
 
+            java.util.Date now = new java.util.Date();
+            // Define the desired format
+            SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM d, yyyy 'at' h:mm a", Locale.ENGLISH);
+            // Format the current date and time
+            String formattedDateLabel = formatter.format(now);
+            Font dateFont = new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL);
+            Paragraph dateGen = new Paragraph("Date generated: " + formattedDateLabel, dateFont);
+            document.add(dateGen);
             if (logType == null || logType.equals("all")) {
                 reportTitle = "Delivery, Pullout, and Sales Logs";
                 queryBuilder.append("SELECT 'Distribute' AS receipt_type, dr_code AS receipt_code, item_code, item_name, branch, delivery_date, quantity FROM delivery_receipt ")

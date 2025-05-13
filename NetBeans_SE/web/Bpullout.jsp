@@ -80,7 +80,8 @@
             text-align: left;
         }
 
-        #quantityInput {
+        #quantityInput,
+        #textInput {
             width: auto;
             max-width: 300px;
             padding: 6px 12px;
@@ -348,6 +349,7 @@ if (Array.isArray(response)) {
                 <p>Item Name: <span id="selectedItemName"></span></p>
                 <p>Total Quantity: <span id="selectedItemQuantity"></span></p>
                 <input type="number" id="quantityInput" placeholder="Enter quantity" />
+                <input type="text" id="textInput" name="textInput" placeholder="Reason for pullout">
                 <button id="addToPulloutButton">Add to Pullout</button>
             </div>
 

@@ -6,8 +6,12 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class Aview extends HttpServlet {
+
     private static final long serialVersionUID = 1L;
 
     private static final String[] BRANCH_TABLES = {
@@ -31,9 +35,17 @@ public class Aview extends HttpServlet {
             PdfPTable table;
 
             if (branch != null && isValidBranch(branch)) {
+                java.util.Date now = new java.util.Date();
+                // Define the desired format
+                SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM d, yyyy 'at' h:mm a", Locale.ENGLISH);
+                // Format the current date and time
+                String formattedDate = formatter.format(now);
+                Font dateFont = new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL);
+                Paragraph dateGen = new Paragraph("Date generated: " + formattedDate, dateFont);
                 // Generate report for specific branch table
                 title = new Paragraph("Branch Report: " + capitalize(branch), titleFont);
                 title.setAlignment(Element.ALIGN_CENTER);
+                document.add(dateGen);
                 document.add(title);
                 document.add(Chunk.NEWLINE);
 
@@ -49,10 +61,9 @@ public class Aview extends HttpServlet {
                     table.addCell(cell);
                 }
 
-
                 String query = "SELECT * FROM " + branch;
                 try (Statement stmt = connection.createStatement();
-                     ResultSet rs = stmt.executeQuery(query)) {
+                        ResultSet rs = stmt.executeQuery(query)) {
 
                     while (rs.next()) {
                         table.addCell(rs.getString("item_code"));
@@ -65,7 +76,15 @@ public class Aview extends HttpServlet {
             } else {
                 // Default: recalculate total and show master items table
                 recalculateTotalQuantities();
-
+                // Generate report for the selected branch with critically low items
+                java.util.Date now = new java.util.Date();
+                // Define the desired format
+                SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM d, yyyy 'at' h:mm a", Locale.ENGLISH);
+                // Format the current date and time
+                String formattedDate = formatter.format(now);
+                Font dateFont = new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL);
+                Paragraph dateGen = new Paragraph("Date generated: " + formattedDate, dateFont);
+                document.add(dateGen);
                 title = new Paragraph("Master Item Report", titleFont);
                 title.setAlignment(Element.ALIGN_CENTER);
                 document.add(title);
@@ -83,10 +102,9 @@ public class Aview extends HttpServlet {
                     table.addCell(cell);
                 }
 
-
                 String query = "SELECT * FROM items";
                 try (Statement stmt = connection.createStatement();
-                     ResultSet rs = stmt.executeQuery(query)) {
+                        ResultSet rs = stmt.executeQuery(query)) {
 
                     while (rs.next()) {
                         table.addCell(rs.getString("item_code"));
@@ -150,7 +168,9 @@ public class Aview extends HttpServlet {
     }
 
     private String capitalize(String input) {
-        if (input == null || input.isEmpty()) return input;
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
         return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
     }
 }

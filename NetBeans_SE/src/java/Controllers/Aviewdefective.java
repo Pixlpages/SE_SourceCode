@@ -6,6 +6,8 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class Aviewdefective extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -21,6 +23,15 @@ public class Aviewdefective extends HttpServlet {
             Font titleFont = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD);
             Paragraph title = new Paragraph("Defective Items Report", titleFont);
             title.setAlignment(Element.ALIGN_CENTER);
+// Create a Date object to get the current date and time
+            java.util.Date now = new java.util.Date();
+            // Define the desired format
+            SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM d, yyyy 'at' h:mm a", Locale.ENGLISH);
+            // Format the current date and time
+            String formattedDate = formatter.format(now);
+            Font dateFont = new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL);
+            Paragraph dateGen = new Paragraph("Date generated: " + formattedDate, dateFont);
+            document.add(dateGen);
             document.add(title);
             document.add(Chunk.NEWLINE);
 

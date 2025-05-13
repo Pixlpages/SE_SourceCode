@@ -288,7 +288,7 @@
                     <option value="Customer return">Customer return</option>
                     <option value="Expired">Expired</option>
                 </select><br><br>
-
+                
                 <label for="defectQuantity">Defective Quantity:</label>
                 <input type="number" id="defectQuantity" min="1" placeholder="Enter quantity" required><br><br>
 
