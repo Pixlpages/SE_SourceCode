@@ -183,6 +183,7 @@
                     // Display selected item details
                     $('#selectedItemCode').text(data.itemCode);
                     $('#selectedItemName').text(data.itemName);
+                    $('#newItemName').val(data.itemName);
                     $('#selectedItemCategory').text(data.itemCategory);
                     $('#selectedItemQuantity').text(data.totalQuantity);
                     $('#quantityInput').val(''); // Clear previous input
@@ -193,7 +194,7 @@
             // Add item to batch list
             $('#addToBatchButton').on('click', function () {
                 var itemCode = $('#selectedItemCode').text();
-                var itemName = $('#selectedItemName').text();
+                var itemName = $('#newItemName').val();
                 var itemCategory = $('#itemCategorySelect').val(); // Get the selected item category
                 var petCategory = $('input[name="petCategory"]:checked').val();
 
@@ -244,6 +245,7 @@
                         data: JSON.stringify(itemsToEdit), // Send the items as JSON
                         success: function (response) {
                             alert("Items edited successfully!");
+                            table.ajax.reload();
                             itemsToEdit = []; // Clear the batch list
                             updateBatchList(); // Refresh the display
                         },
@@ -287,6 +289,7 @@
             <div id="selectedItem" style="display:none;">
                 <p><strong>Item Code:</strong> <span id="selectedItemCode"></span></p>
                 <p><strong>Item Name:</strong> <span id="selectedItemName"></span></p>
+                <p><strong>New Item Name:</strong> <input type="text" id="newItemName"/></p>
                 <p><strong>Total Quantity:</strong> <span id="selectedItemQuantity"></span></p>
                 <select id="itemCategorySelect">
                     <option value="CODE1">CODE 1</option>
