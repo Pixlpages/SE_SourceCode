@@ -27,11 +27,11 @@
                 <div class="input-container">
                     <label>Username</label>
                     <div class="input-wrapper">
-                        <input type="text" name="username" placeholder="Value" required>
+                        <input type="text" name="username" placeholder="Username" required>
                     </div>
                     <label>Password</label>
                     <div class="input-wrapper">
-                        <input type="password" name="password" placeholder="Value" required>
+                        <input type="password" name="password" placeholder="*****" required>
                     </div>
                 </div>
                 <input class="button" type="submit" value="LOGIN">
