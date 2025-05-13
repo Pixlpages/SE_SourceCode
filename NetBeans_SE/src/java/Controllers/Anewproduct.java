@@ -85,7 +85,7 @@ public class Anewproduct extends HttpServlet {
 
     private void addAllItemsToDatabase(List<DBManager.Item> itemList) throws SQLException {
         String insertItemsSql = "INSERT INTO items (item_code, item_name, item_category, pet_category, total_quantity, critical_condition, item_description) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        String insertMalabonSql = "INSERT INTO malabon (item_code, item_name, total_quantity, critically_low, item_description) VALUES (?, ?, ?, ?, ?)";
+        String insertMalabonSql = "INSERT INTO malabon (item_code, item_name, total_quantity, critically_low) VALUES (?, ?, ?, ?)";
 
         try (Connection connection = DatabaseUtil.getConnection();
              PreparedStatement insertItemsStatement = connection.prepareStatement(insertItemsSql);
@@ -108,7 +108,6 @@ public class Anewproduct extends HttpServlet {
                 insertMalabonStatement.setString(2, item.getItemName());
                 insertMalabonStatement.setInt(3, item.getTotalQuantity());
                 insertMalabonStatement.setBoolean(4, criticallyLow); // Insert critically_low value
-                insertMalabonStatement.setString(5, item.getItemDescription());
                 insertMalabonStatement.addBatch(); // Add to batch for malabon
             }
 

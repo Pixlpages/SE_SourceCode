@@ -67,7 +67,7 @@ public class DBManager {
         }
 
         // Constructor with parameters
-        public Item(String itemCode, String itemName, String itemCategory, String petCategory, int totalQuantity, int criticalCondition, String itemDescripion) {
+        public Item(String itemCode, String itemName, String itemCategory, String petCategory, int totalQuantity, int criticalCondition, String itemDescription) {
             this.itemCode = itemCode;
             this.itemName = itemName;
             this.itemCategory = itemCategory;
