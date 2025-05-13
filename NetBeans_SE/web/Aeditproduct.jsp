@@ -69,6 +69,16 @@
             min-width: 300px;
             box-sizing: border-box;
         }
+        
+        .right-side select {
+                width: auto;
+                padding: 10px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                box-sizing: border-box;
+            }
 
         .selected-item {
             margin-top: 20px;
@@ -97,12 +107,14 @@
             text-align: left;
         }
 
-        #quantityInput,
-        #branchSelect {
-            width: 100%;
-            padding: 8px;
+        #newItemName,
+        #newItemCondition {
+            width: auto;
+            max-width: 300px;
+            padding: 6px 12px;
             margin: 8px 0;
             box-sizing: border-box;
+            display: block;
         }
 
         #addToBatchButton,
@@ -303,13 +315,13 @@
                 <p><strong>Critical Condition:</strong> <span id="selectedItemCondition"></span></p>
                 <p><strong>New Critical Condition:</strong> <input type="number" id="newItemCondition"/></p>
                 <select id="itemCategorySelect">
-                    <option value="CODE1">CODE 1</option>
-                    <option value="CODE2">CODE 2</option>
-                    <option value="CODE3">CODE 3</option>
-                    <option value="CODE4">CODE 4</option>
-                    <option value="CODE5">CODE 5</option>
-                    <option value="CODE6">CODE 6</option>
-                    <option value="CODE7">CODE 7</option>
+                    <option value="CODE1">1-Toys,Litter Boxes, Scratchers, and Cat</option>
+                    <option value="CODE2">2-Beds, Tents, Houses, and Bags</option>
+                        <option value="CODE3">3-Clothing, Accessories</option>
+                        <option value="CODE4">4-Carriers, Cage, and Strollers</option>
+                        <option value="CODE5">5-Toiletries</option>
+                        <option value="CODE6">6-Leash, Harnesses</option>
+                        <option value="CODE7">7-Food</option>
                     </select>
                 <div class="pet-category-options">
                     <label>
