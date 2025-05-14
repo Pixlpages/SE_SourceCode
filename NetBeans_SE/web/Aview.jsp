@@ -208,7 +208,7 @@
             <button type="submit" id="daButton">Generate Report</button><br><br>
         </form>
 
-        <iframe name="report-frame" width="100%" height="600px"></iframe>
+        <iframe name="report-frame" width="100%" height="900px"></iframe>
     </div>
 
 <div id="defective" class="content-section">
@@ -216,7 +216,7 @@
     <form method="get" action="Aviewdefective" target="defective-frame">
         <button type="submit" id="daButton">Generate Defective Report</button><br><br>
     </form>
-    <iframe name="defective-frame" width="100%" height="600px"></iframe>
+    <iframe name="defective-frame" width="100%" height="900px"></iframe>
 </div>
     
 <div id="critical" class="content-section">
@@ -236,7 +236,7 @@
         </select>
         <button type="submit" id="daButton">Generate Critical Report</button><br><br>
     </form>
-    <iframe name="critical-frame" width="100%" height="600px"></iframe>
+    <iframe name="critical-frame" width="100%" height="900px"></iframe>
 </div>
 
 
@@ -252,7 +252,7 @@
     </select>
     <button type="submit" id="daButton">Generate Logs</button><br><br>
 </form>
-<iframe name="logs-frame" width="100%" height="600px"></iframe>
+<iframe name="logs-frame" width="100%" height="900px"></iframe>
 
 </div>
 </body>

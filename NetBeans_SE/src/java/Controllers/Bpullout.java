@@ -165,14 +165,7 @@ private void subtractFromBranchTable(Connection connection, Item item, String br
     int totalQuantity = 0;
     int criticalCondition = 0;
 
-    // Update quantity in branch
-    try (PreparedStatement updateStmt = connection.prepareStatement(updateQuantitySql)) {
-        updateStmt.setInt(1, quantityToSubtract);
-        updateStmt.setString(2, item.getItemCode());
-        updateStmt.executeUpdate();
-    }
-
-    // Get updated quantity
+    // Get the current quantity in the branch table
     try (PreparedStatement quantityStmt = connection.prepareStatement(getQuantitySql)) {
         quantityStmt.setString(1, item.getItemCode());
         ResultSet rs = quantityStmt.executeQuery();
@@ -181,7 +174,34 @@ private void subtractFromBranchTable(Connection connection, Item item, String br
         }
     }
 
-    // Get critical condition
+    // Check if the total quantity is greater than 0 and if there's enough stock for the pullout
+    if (totalQuantity <= 0) {
+        System.out.println("Cannot pull out item " + item.getItemCode() + " because its total_quantity is 0 or less.");
+        return; // Prevent pullout if quantity is 0 or less
+    }
+
+    if (totalQuantity < quantityToSubtract) {
+        System.out.println("Not enough stock to pull out item " + item.getItemCode());
+        return; // Prevent pullout if not enough stock
+    }
+
+    // Update the quantity in the branch table
+    try (PreparedStatement updateStmt = connection.prepareStatement(updateQuantitySql)) {
+        updateStmt.setInt(1, quantityToSubtract);
+        updateStmt.setString(2, item.getItemCode());
+        updateStmt.executeUpdate();
+    }
+
+    // Get updated quantity in the branch table
+    try (PreparedStatement quantityStmt = connection.prepareStatement(getQuantitySql)) {
+        quantityStmt.setString(1, item.getItemCode());
+        ResultSet rs = quantityStmt.executeQuery();
+        if (rs.next()) {
+            totalQuantity = rs.getInt("total_quantity");
+        }
+    }
+
+    // Get the critical condition from the items table
     try (PreparedStatement criticalStmt = connection.prepareStatement(getCriticalSql)) {
         criticalStmt.setString(1, item.getItemCode());
         ResultSet rs = criticalStmt.executeQuery();
@@ -190,7 +210,7 @@ private void subtractFromBranchTable(Connection connection, Item item, String br
         }
     }
 
-    // Update critically low
+    // Check if the item is critically low and update the branch table
     boolean isCritical = totalQuantity <= criticalCondition;
     try (PreparedStatement updateCriticalStmt = connection.prepareStatement(updateCriticallyLowSql)) {
         updateCriticalStmt.setBoolean(1, isCritical);
@@ -202,7 +222,6 @@ private void subtractFromBranchTable(Connection connection, Item item, String br
         criticallyLowItems.add(item.getItemName());
     }
 }
-
 
     private void logPulloutReceipt(Connection connection, Item item, String PoCode, String branch) throws SQLException {
         // Insert into pullout_receipt for each item pulled out

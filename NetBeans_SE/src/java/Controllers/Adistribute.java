@@ -68,6 +68,26 @@ public class Adistribute extends HttpServlet {
             for (Item item : items) {
                 int quantity = Integer.parseInt(item.getQuantity());
 
+                // Get current stock in malabon
+                int currentQty = 0;
+                String selectSql = "SELECT total_quantity FROM malabon WHERE item_code = ?";
+                try (PreparedStatement selectStmt = connection.prepareStatement(selectSql)) {
+                    selectStmt.setString(1, item.getItemCode());
+                    ResultSet rs = selectStmt.executeQuery();
+                    if (rs.next()) {
+                        currentQty = rs.getInt("total_quantity");
+                    } else {
+                        System.out.println("Item not found: " + item.getItemCode());
+                        continue;
+                    }
+                }
+
+                // Skip if not enough stock
+                if (currentQty < quantity) {
+                    System.out.println("Insufficient stock for item: " + item.getItemCode());
+                    continue;
+                }
+
                 // Get critical level from items table
                 int criticalLevel = getCriticalCondition(connection, item.getItemCode());
 
@@ -142,6 +162,7 @@ public class Adistribute extends HttpServlet {
             e.printStackTrace();
         }
     }
+
 
     private int getCriticalCondition(Connection connection, String itemCode) throws SQLException {
         String sql = "SELECT critical_condition FROM items WHERE item_code = ?";

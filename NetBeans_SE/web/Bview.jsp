@@ -164,12 +164,12 @@
 
     <div id="report" class="content-section active">
         <h3>Branch Report</h3>
-        <iframe src="Bview" width="100%" height="400px"></iframe>
+        <iframe src="Bview" width="100%" height="900px"></iframe>
     </div>
 
     <div id="critical" class="content-section">
         <h3>Critical Condition</h3>
-        <iframe src="Bviewcritical" width="100%" height="400px"></iframe>
+        <iframe src="Bviewcritical" width="100%" height="900px"></iframe>
     </div>
 </body>
 

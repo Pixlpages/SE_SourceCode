@@ -114,17 +114,38 @@ private String generateNextSalesCode(String branch) {
         }
     }
 
-    private void updateBranchTable(Connection connection, String branch, Item item) throws SQLException {
-        String updateSql = "UPDATE " + branch + " SET total_quantity = total_quantity - ? WHERE item_code = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(updateSql)) {
-            preparedStatement.setInt(1, Integer.parseInt(item.getQuantity()));
-            preparedStatement.setString(2, item.getItemCode());
-            int rowsUpdated = preparedStatement.executeUpdate();
-            if (rowsUpdated == 0) {
-                throw new SQLException("No rows updated for item code: " + item.getItemCode());
-            }
+private void updateBranchTable(Connection connection, String branch, Item item) throws SQLException {
+    String getQuantitySql = "SELECT total_quantity FROM " + branch + " WHERE item_code = ?";
+    String updateSql = "UPDATE " + branch + " SET total_quantity = total_quantity - ? WHERE item_code = ?";
+
+    // Get current total quantity from branch
+    int totalQuantity = 0;
+    try (PreparedStatement checkStmt = connection.prepareStatement(getQuantitySql)) {
+        checkStmt.setString(1, item.getItemCode());
+        ResultSet rs = checkStmt.executeQuery();
+        if (rs.next()) {
+            totalQuantity = rs.getInt("total_quantity");
         }
     }
+
+    // Check if the requested quantity exceeds available inventory
+    int requestedQuantity = Integer.parseInt(item.getQuantity());
+    if (requestedQuantity > totalQuantity) {
+        // Send an error response back indicating insufficient quantity
+        throw new SQLException("Insufficient quantity for item: " + item.getItemName() + " (requested: " + requestedQuantity + ", available: " + totalQuantity + ")");
+    }
+
+    // Proceed with the update if the quantity is sufficient
+    try (PreparedStatement preparedStatement = connection.prepareStatement(updateSql)) {
+        preparedStatement.setInt(1, requestedQuantity);
+        preparedStatement.setString(2, item.getItemCode());
+        int rowsUpdated = preparedStatement.executeUpdate();
+        if (rowsUpdated == 0) {
+            throw new SQLException("No rows updated for item code: " + item.getItemCode());
+        }
+    }
+}
+
 
 private String checkCriticallyLowCondition(Connection connection, String branch, Item item) throws SQLException {
     String getQuantitySql = "SELECT total_quantity FROM " + branch + " WHERE item_code = ?";

@@ -79,6 +79,12 @@
             width: 100% !important;
         }
 
+        .disabled-row {
+            background-color: #ddd !important;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
         #itemsTable,
         #batchList {
             width: 100%;
@@ -156,27 +162,28 @@
                 align-items: flex-start;
             }
         }
+
         /* Modal styles */
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
+            display: none;
+            position: fixed;
+            z-index: 1000;
             left: 0;
             top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgb(0,0,0); 
-            background-color: rgba(0,0,0,0.4); 
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto; 
+            margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%; 
-            max-width: 500px; 
+            width: 80%;
+            max-width: 500px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
@@ -212,6 +219,8 @@
             });
 
             $('#itemsTable tbody').on('click', 'tr', function () {
+                if ($(this).hasClass('disabled-row')) return; // Ignore disabled rows
+
                 var data = table.row(this).data();
                 if (data) {
                     $('#selectedItemCode').text(data.itemCode);
@@ -223,23 +232,39 @@
             });
 
             $('#addToBatchButton').on('click', function () {
-                var quantity = $('#quantityInput').val();
+                var quantity = parseInt($('#quantityInput').val());
                 var code = $('#selectedItemCode').text();
                 var name = $('#selectedItemName').text();
+                var available = parseInt($('#selectedItemQuantity').text());
 
-                if (code && quantity) {
-                    itemsToDistribute.push({
-                        itemCode: code,
-                        itemName: name,
-                        quantity: quantity
-                    });
-
-                    updateBatchList();
-                    resetItemSelection();
-                } else {
+                if (!code || !quantity) {
                     alert("Please select an item and enter quantity.");
+                    return;
                 }
+
+                if (quantity > available) {
+                    $('#overQuantityModal').css("display", "block");
+                    return;
+                }
+
+                itemsToDistribute.push({
+                    itemCode: code,
+                    itemName: name,
+                    quantity: quantity
+                });
+
+                // Add after itemsToDistribute.push(...)
+                $('#itemsTable tbody tr').each(function () {
+                    var rowData = table.row(this).data();
+                    if (rowData && rowData.itemCode === code) {
+                        $(this).addClass('disabled-row');
+                    }
+                });
+
+                updateBatchList();
+                resetItemSelection();
             });
+
 
             function resetItemSelection() {
                 $('#selectedItemCode').text('');
@@ -263,9 +288,23 @@
             }
 
             window.removeFromBatch = function (index) {
+                let item = itemsToDistribute[index];
+
+                // Re-enable the row in the available items table
+                $('#itemsTable tbody tr').each(function () {
+                    var rowData = table.row(this).data();
+                    if (rowData && rowData.itemCode === item.itemCode) {
+                        $(this).removeClass('disabled-row'); // Remove the disabled class
+                    }
+                });
+
+                // Remove the item from the batch list
                 itemsToDistribute.splice(index, 1);
+
+                // Update the batch list
                 updateBatchList();
             };
+
 
             $('#distributeButton').on('click', function () {
                 var branch = $('#branchSelect').val();
@@ -283,6 +322,8 @@
                         contentType: 'application/json',
                         data: JSON.stringify(itemsToDistribute),
                         success: function (criticallyLowItems) {
+                            $('#itemsTable tbody tr').removeClass('disabled-row');
+
                             alert("Items distributed successfully!");
 
                             // Check if there are critically low items
@@ -318,7 +359,18 @@
                     $('#myModal').css("display", "none");
                 }
             });
+            $('.close-over').on('click', function () {
+                $('#overQuantityModal').css("display", "none");
+            });
+
+            $(window).on('click', function (event) {
+                if ($(event.target).is('#overQuantityModal')) {
+                    $('#overQuantityModal').css("display", "none");
+                }
+            });
+
         });
+
     </script>
 </head>
 
@@ -380,8 +432,13 @@
             <button id="distributeButton">Distribute Items</button>
         </div>
     </div>
+    <div id="overQuantityModal" class="modal">
+        <div class="modal-content">
+            <span class="close-over">&times;</span>
+            <p id="overQuantityContent">You cannot distribute more than the available quantity.</p>
+        </div>
+    </div>
 
-    <!-- Modal for Critical Low Items -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>

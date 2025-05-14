@@ -1,4 +1,24 @@
 <!DOCTYPE html>
+<%@ page session="true" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%
+    // HTTP 1.1
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    // HTTP 1.0
+    response.setHeader("Pragma", "no-cache");
+    // Proxies
+    response.setHeader("Expires", "0");
+
+    // Session validation
+    String username = (String) session.getAttribute("username");
+    String role = (String) session.getAttribute("role");
+    Boolean loggedIn = (Boolean) session.getAttribute("LoggedIn");
+
+    if (loggedIn == null || !loggedIn || !"staff".equals(role)) {
+        // Redirect unauthorized users
+        response.sendRedirect("error_session.jsp");
+    }
+%>
 <html lang="en">
 
 <head>
@@ -64,6 +84,12 @@
             width: 100% !important;
         }
 
+        .disabled-row {
+            background-color: #ddd !important;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
         #itemsTable,
         #pulloutList {
             width: 100%;
@@ -121,24 +147,24 @@
 
         /* Modal styles */
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
+            display: none;
+            position: fixed;
+            z-index: 1000;
             left: 0;
             top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.4); 
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto; 
+            margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%; 
-            max-width: 500px; 
+            width: 80%;
+            max-width: 500px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
@@ -150,6 +176,15 @@
             font-weight: bold;
         }
 
+        .close-over {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+
         .close:hover,
         .close:focus {
             color: black;
@@ -157,7 +192,7 @@
             cursor: pointer;
         }
     </style>
-<script>
+    <script>
         let itemsToPullout = [];
 
         $(document).ready(function () {
@@ -173,8 +208,17 @@
                 ]
             });
 
+            // Store items already added to pullout
+            var disabledItems = [];
+
             $('#itemsTable tbody').on('click', 'tr', function () {
                 var data = table.row(this).data();
+                var itemCode = data.itemCode;
+
+                if (disabledItems.includes(itemCode)) {
+                    return; // Item is already in the pullout, prevent selection
+                }
+
                 if (data) {
                     $('#selectedItemCode').text(data.itemCode);
                     $('#selectedItemName').text(data.itemName);
@@ -188,20 +232,30 @@
                 var quantityToPullout = $('#quantityInput').val();
                 var selectedItemCode = $('#selectedItemCode').text();
                 var selectedItemName = $('#selectedItemName').text();
+                var totalQuantity = parseInt($('#selectedItemQuantity').text());
 
                 if (selectedItemCode && quantityToPullout) {
+                    if (parseInt(quantityToPullout) > totalQuantity) {
+                        // Show modal if quantity exceeds total stock
+                        $('#overQuantityModal').css("display", "block");
+                        return;
+                    }
+
                     itemsToPullout.push({
                         itemCode: selectedItemCode,
                         itemName: selectedItemName,
                         quantity: quantityToPullout
                     });
 
+                    disabledItems.push(selectedItemCode); // Disable item
                     updatePulloutList();
                     resetItemInformation();
+                    updateDisabledItems();
                 } else {
                     alert("Please select an item and enter a quantity.");
                 }
             });
+
 
             $('#submitPulloutButton').on('click', function () {
                 if (itemsToPullout.length === 0) {
@@ -217,34 +271,38 @@
                     success: function (response) {
                         console.log("Response from server:", response); // Debug
 
-                        alert("Items pulled out and transferred successfully!");
+                        alert("Items sold successfully!");
 
                         let criticallyLowArray = [];
 
-if (Array.isArray(response)) {
-    criticallyLowArray = response;
-} else if (typeof response === "string") {
-    try {
-        const parsed = JSON.parse(response);
-        if (Array.isArray(parsed)) {
-            criticallyLowArray = parsed;
-        } else if (parsed && Array.isArray(parsed.criticallyLowItems)) {
-            criticallyLowArray = parsed.criticallyLowItems;
-        }
-    } catch (e) {
-        console.error("Failed to parse JSON:", e);
-    }
-}
+                        if (Array.isArray(response)) {
+                            criticallyLowArray = response;
+                        } else if (typeof response === "string") {
+                            try {
+                                const parsed = JSON.parse(response);
+                                if (Array.isArray(parsed)) {
+                                    criticallyLowArray = parsed;
+                                } else if (parsed && Array.isArray(parsed.criticallyLowItems)) {
+                                    criticallyLowArray = parsed.criticallyLowItems;
+                                }
+                            } catch (e) {
+                                console.error("Failed to parse JSON:", e);
+                            }
+                        }
 
 
                         if (criticallyLowArray.length > 0) {
-                            showModal(criticallyLowArray);
+                            showMod(criticallyLowArray);
                         }
 
                         itemsToPullout = [];
                         updatePulloutList();
                         resetItemInformation();
                         table.ajax.reload();
+
+                        // Re-enable items after pulling out
+                        disabledItems = [];
+                        updateDisabledItems();
                     },
                     error: function (xhr) {
                         alert("Error: " + xhr.responseText);
@@ -252,7 +310,7 @@ if (Array.isArray(response)) {
                 });
             });
 
-            function showModal(criticallyLowItems) {
+            function showMod(criticallyLowItems) {
                 $('#modalContent').text("Warning: The following items are critically low: " + criticallyLowItems.join(", "));
                 $('#myModal').css("display", "block");
             }
@@ -289,9 +347,43 @@ if (Array.isArray(response)) {
             }
 
             window.removeFromPullout = function (index) {
-                itemsToPullout.splice(index, 1);
+                let item = itemsToPullout.splice(index, 1)[0];
                 updatePulloutList();
+
+                // Remove the item from the disabledItems array
+                let itemCode = item.itemCode;
+                disabledItems = disabledItems.filter(code => code !== itemCode);
+
+                updateDisabledItems();
             };
+
+            function updateDisabledItems() {
+                $('#itemsTable tbody tr').each(function () {
+                    var itemCode = $(this).find('td').eq(0).text();
+                    if (disabledItems.includes(itemCode)) {
+                        $(this).addClass('disabled-row');
+                    } else {
+                        $(this).removeClass('disabled-row');
+                    }
+                });
+            }
+
+            function showModal(message) {
+                $('#modalContent').text(message);
+                $('#myModal').css("display", "block");
+            }
+            // Close the over-quantity modal
+            $('.close-over').on('click', function () {
+                $('#overQuantityModal').css("display", "none");
+            });
+
+            $(window).on('click', function (event) {
+                if ($(event.target).is('#overQuantityModal')) {
+                    $('#overQuantityModal').css("display", "none");
+                }
+            });
+
+
         });
     </script>
 </head>
@@ -323,10 +415,10 @@ if (Array.isArray(response)) {
                 <p>Item Code: <span id="selectedItemCode"></span></p>
                 <p>Item Name: <span id="selectedItemName"></span></p>
                 <p>Total Quantity: <span id="selectedItemQuantity"></span></p>
-                <input type="number" id="quantityInput" placeholder="Enter quantity" />
-                <button id="addToPulloutButton">Add to Pullout</button>
+                <input type="number" id="quantityInput" placeholder="Enter quantity" min="1" />
+                <button id="addToPulloutButton">Add to List</button>
             </div>
-            <h2>Pullout List</h2>
+            <h2>Sales List</h2>
             <table id="pulloutList">
                 <thead>
                     <tr>
@@ -338,11 +430,17 @@ if (Array.isArray(response)) {
                 </thead>
                 <tbody></tbody>
             </table>
-            <button id="submitPulloutButton">Submit Pullout</button>
+            <button id="submitPulloutButton">Submit Sales</button>
         </div>
     </div>
 
-    <!-- Critically Low Items Modal -->
+    <div id="overQuantityModal" class="modal">
+        <div class="modal-content">
+            <span class="close-over">&times;</span>
+            <p>You cannot sell more than the available quantity.</p>
+        </div>
+    </div>
+
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
