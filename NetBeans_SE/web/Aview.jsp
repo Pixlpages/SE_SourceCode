@@ -243,7 +243,7 @@
 <div id="logs" class="content-section">
     <h3>Logs Report</h3>
     <form method="get" action="Aviewlogs" target="logs-frame">
-    <label for="logType">Select Log Type:</label>
+    <label for="logType">Filter By:</label>
     <select name="logType" id="branch">
         <option value="all">All</option>
         <option value="distribute">Distribute</option>

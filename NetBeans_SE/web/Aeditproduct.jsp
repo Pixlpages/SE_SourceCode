@@ -1,17 +1,16 @@
 <%@ page session="true" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
-    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
-    response.setHeader("Expires", "0"); // Proxies
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setHeader("Expires", "0");
 
-    // Session validation
     String username = (String) session.getAttribute("username");
     String role = (String) session.getAttribute("role");
     Boolean loggedIn = (Boolean) session.getAttribute("LoggedIn");
 
     if (loggedIn == null || !loggedIn || !"admin".equals(role)) {
-        response.sendRedirect("error_session.jsp"); // Redirect unauthorized users
+        response.sendRedirect("error_session.jsp");
     }
 %>
 
@@ -20,11 +19,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Product</title>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
-    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -172,12 +171,12 @@
     </style>
 
     <script>
-        let itemsToEdit = []; // Array to hold items to edit
+        let itemsToEdit = [];
 
         $(document).ready(function () {
             var table = $('#itemsTable').DataTable({
                 "ajax": {
-                    "url": "Agetproducts", // Servlet to fetch products
+                    "url": "Agetproducts",
                     "dataSrc": ""
                 },
                 "columns": [
@@ -190,11 +189,9 @@
                 ]
             });
 
-            // Handle row click event for item selection
             $('#itemsTable tbody').on('click', 'tr', function () {
                 var data = table.row(this).data();
                 if (data) {
-                    // Display selected item details
                     $('#selectedItemCode').text(data.itemCode);
                     $('#selectedItemName').text(data.itemName);
                     $('#newItemName').val(data.itemName);
@@ -202,78 +199,73 @@
                     $('#selectedItemQuantity').text(data.totalQuantity);
                     $('#selectedItemCondition').text(data.criticalCondition);
                     $('#newItemCondition').val(data.criticalCondition);
-                    $('#quantityInput').val(''); // Clear previous input
+                    $('#itemDescription').val(data.itemDescription || "");
                     $('#selectedItem').show();
                 }
             });
 
-            // Add item to batch list
             $('#addToBatchButton').on('click', function () {
                 var itemCode = $('#selectedItemCode').text();
                 var itemName = $('#newItemName').val();
                 var criticalCondition = $('#newItemCondition').val();
-                var itemCategory = $('#itemCategorySelect').val(); // Get the selected item category
+                var itemCategory = $('#itemCategorySelect').val();
                 var petCategory = $('input[name="petCategory"]:checked').val();
+                var itemDescription = $('#itemDescription').val();
 
                 if (itemCode && itemName && itemCategory && petCategory) {
-                    // Add item to the batch list
                     itemsToEdit.push({
                         itemCode: itemCode,
                         itemName: itemName,
                         criticalCondition: criticalCondition,
-                        itemCategory: itemCategory, // Include item category
-                        petCategory: petCategory
+                        itemCategory: itemCategory,
+                        petCategory: petCategory,
+                        itemDescription: itemDescription
                     });
-
-                    // Update the batch list display
                     updateBatchList();
                 } else {
-                    alert("Please select an item and fill in all fields.");
+                    alert("Please fill in all fields.");
                 }
             });
 
-            // Function to update the batch list display
             function updateBatchList() {
-                var batchListHtml = '';
+                var html = '';
                 itemsToEdit.forEach(function (item, index) {
-                    batchListHtml += '<tr>' +
+                    html += '<tr>' +
                         '<td>' + item.itemCode + '</td>' +
                         '<td>' + item.itemName + '</td>' +
                         '<td>' + item.criticalCondition + '</td>' +
-                        '<td>' + item.itemCategory + '</td>' + // Display item category
+                        '<td>' + item.itemCategory + '</td>' +
                         '<td>' + item.petCategory + '</td>' +
                         '<td><button onclick="removeFromBatch(' + index + ')">Remove</button></td>' +
                         '</tr>';
                 });
-                $('#batchList tbody').html(batchListHtml);
+                $('#batchList tbody').html(html);
             }
 
-            // Function to remove an item from the batch list
             window.removeFromBatch = function (index) {
                 itemsToEdit.splice(index, 1);
                 updateBatchList();
             };
 
-            // Submit the batch list for editing
             $('#editButton').on('click', function () {
                 if (itemsToEdit.length > 0) {
                     $.ajax({
-                        url: 'Aeditproduct', // Your servlet to handle editing
+                        url: 'Aeditproduct',
                         type: 'POST',
                         contentType: 'application/json',
-                        data: JSON.stringify(itemsToEdit), // Send the items as JSON
-                        success: function (response) {
+                        data: JSON.stringify(itemsToEdit),
+                        success: function () {
                             alert("Items edited successfully!");
                             table.ajax.reload();
-                            itemsToEdit = []; // Clear the batch list
-                            updateBatchList(); // Refresh the display
+                            itemsToEdit = [];
+                            updateBatchList();
                         },
                         error: function (xhr, status, error) {
                             alert("Error editing items: " + error);
                         }
                     });
                 } else {
-                    alert("No items in the batch list to edit.");
+                    alert("No items in the batch list.");
                 }
             });
         });
@@ -301,8 +293,7 @@
                         <th>Critical Condition</th>
                     </tr>
                 </thead>
-                <tbody>
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
         <div class="right-side">
@@ -314,25 +305,23 @@
                 <p><strong>Total Quantity:</strong> <span id="selectedItemQuantity"></span></p>
                 <p><strong>Critical Condition:</strong> <span id="selectedItemCondition"></span></p>
                 <p><strong>New Critical Condition:</strong> <input type="number" id="newItemCondition"/></p>
+                <p><strong>Item Description:</strong><br>
+                    <textarea id="itemDescription" rows="4"></textarea>
+                </p>
+                <label for="itemCategorySelect"><strong>Item Category:</strong></label>
                 <select id="itemCategorySelect">
-                    <option value="CODE1">1-Toys,Litter Boxes, Scratchers, and Cat</option>
+                    <option value="CODE1">1-Toys, Litter Boxes, Scratchers, and Cat</option>
                     <option value="CODE2">2-Beds, Tents, Houses, and Bags</option>
-                        <option value="CODE3">3-Clothing, Accessories</option>
-                        <option value="CODE4">4-Carriers, Cage, and Strollers</option>
-                        <option value="CODE5">5-Toiletries</option>
-                        <option value="CODE6">6-Leash, Harnesses</option>
-                        <option value="CODE7">7-Food</option>
-                    </select>
+                    <option value="CODE3">3-Clothing, Accessories</option>
+                    <option value="CODE4">4-Carriers, Cage, and Strollers</option>
+                    <option value="CODE5">5-Toiletries</option>
+                    <option value="CODE6">6-Leash, Harnesses</option>
+                    <option value="CODE7">7-Food</option>
+                </select>
                 <div class="pet-category-options">
-                    <label>
-                        <input type="radio" name="petCategory" value="Dog" id="petCategoryDog"> Dog
-                    </label>
-                    <label>
-                        <input type="radio" name="petCategory" value="Cat" id="petCategoryCat"> Cat
-                    </label>
-                    <label>
-                        <input type="radio" name="petCategory" value="Both" id="petCategoryBoth"> Both
-                    </label>
+                    <label><input type="radio" name="petCategory" value="Dog"> Dog</label>
+                    <label><input type="radio" name="petCategory" value="Cat"> Cat</label>
+                    <label><input type="radio" name="petCategory" value="Both"> Both</label>
                 </div>
                 <button id="addToBatchButton">Add to Batch</button>
             </div>
@@ -348,8 +337,7 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody>
-                </tbody>
+                <tbody></tbody>
             </table>
             <button id="editButton">Edit Items</button>
         </div>

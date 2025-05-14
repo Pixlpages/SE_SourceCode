@@ -38,7 +38,7 @@ public class Aeditproduct extends HttpServlet {
     }
 
     private void updateItemsInDatabase(Item[] items) throws SQLException {
-        String updateItemsSql = "UPDATE items SET item_name = ?, item_category = ?, pet_category = ?, critical_condition = ? WHERE item_code = ?";
+        String updateItemsSql = "UPDATE items SET item_name = ?, item_category = ?, pet_category = ?, critical_condition = ?, item_description = ? WHERE item_code = ?";
 
         // Branch tables to update
         String[] branches = {
@@ -53,10 +53,12 @@ public class Aeditproduct extends HttpServlet {
             for (Item item : items) {
                 // Update in items table
                 updateItemsStmt.setString(1, item.getItemName());
-                updateItemsStmt.setString(2, item.getItemCategory());
-                updateItemsStmt.setString(3, item.getPetCategory());
-                updateItemsStmt.setInt(4, item.getCriticalCondition());
-                updateItemsStmt.setString(5, item.getItemCode());
+updateItemsStmt.setString(2, item.getItemCategory());
+updateItemsStmt.setString(3, item.getPetCategory());
+updateItemsStmt.setInt(4, item.getCriticalCondition());
+updateItemsStmt.setString(5, item.getItemDescription());
+updateItemsStmt.setString(6, item.getItemCode());
+
                 updateItemsStmt.addBatch();
 
                 // Update item_name in all branch tables
@@ -80,6 +82,7 @@ public class Aeditproduct extends HttpServlet {
         private String itemCategory;
         private String petCategory;
         private int criticalCondition;
+        private String itemDescription;
 
         // Getters and Setters
         public String getItemCode() { return itemCode; }
@@ -92,5 +95,7 @@ public class Aeditproduct extends HttpServlet {
         public void setPetCategory(String petCategory) { this.petCategory = petCategory; }
         public int getCriticalCondition() { return criticalCondition; }
         public void setCriticalCondition(int criticalCondition) { this.criticalCondition = criticalCondition; }
+        public String getItemDescription() { return itemDescription; }
+        public void setItemDescription(String itemDescription) { this.itemDescription = itemDescription; }
     }
 }
